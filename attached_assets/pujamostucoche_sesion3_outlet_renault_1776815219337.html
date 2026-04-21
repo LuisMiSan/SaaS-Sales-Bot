@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pujamostucoche.es — Ofertas Flash Outlet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#D4A574;
+  --gold-dark:#A68456;
+  --dark:#1a1a1a;
+  --gray:#333;
+  --light:#f5f5f5;
+  --white:#fff;
+  --red:#E74C3C;
+  --amber:#F39C12;
+  --green:#27AE60;
+}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0ebe3;color:#222;line-height:1.6}
+
+/* HEADER */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 40px;display:flex;align-items:center;justify-content:space-between;transition:all .3s;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px)}
+.hdr--dark{background:rgba(26,26,26,0.98)}
+.hdr--dark .nav-logo{filter:brightness(1.15)}
+.hdr--dark .nav-link{color:rgba(255,255,255,0.8)}
+.hdr--dark .nav-link:hover{color:var(--gold)}
+.nav-logo{font-size:20px;font-weight:800;color:var(--dark);transition:filter .3s;letter-spacing:-0.02em}
+.nav-logo b{color:var(--gold)}
+.nav-right{display:flex;gap:32px;align-items:center}
+.nav-link{text-decoration:none;font-size:14px;font-weight:600;color:var(--gray);transition:color .2s;text-transform:uppercase;letter-spacing:.05em}
+.nav-link:hover{color:var(--gold)}
+
+/* HERO */
+.hero{margin-top:70px;background:linear-gradient(135deg,#1a1a1a 0%,#2a2a2a 100%);padding:80px 40px;text-align:center;position:relative;overflow:hidden;min-height:500px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(212,165,116,0.15) 0%,transparent 70%);pointer-events:none}
+.hero-content{position:relative;z-1;max-width:800px}
+.hero-badge{display:inline-block;background:rgba(212,165,116,0.2);border:1px solid rgba(212,165,116,0.4);color:var(--gold);padding:8px 16px;border-radius:50px;font-size:12px;font-weight:700;margin-bottom:20px;letter-spacing:.08em;text-transform:uppercase}
+.hero-title{font-size:56px;font-weight:800;color:white;margin-bottom:16px;line-height:1.1;letter-spacing:-.02em}
+.hero-title i{color:var(--gold);font-style:italic}
+.hero-sub{font-size:18px;color:rgba(255,255,255,0.7);margin-bottom:32px}
+.hero-cta{display:inline-flex;gap:10px;background:var(--gold);color:white;padding:16px 32px;border-radius:8px;font-size:15px;font-weight:800;text-decoration:none;transition:all .2s;letter-spacing:.02em;border:none;cursor:pointer}
+.hero-cta:hover{background:var(--gold-dark);transform:translateY(-2px)}
+
+/* COUNTDOWN GLOBAL */
+.countdown-global{background:var(--red);color:white;padding:16px 40px;text-align:center;font-weight:700;letter-spacing:.02em}
+.countdown-global span{font-size:18px;font-weight:900;font-family:monospace;margin:0 8px}
+
+/* QUICK ACTIONS */
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;padding:60px 40px;background:white}
+.qa-card{text-align:center;padding:32px 20px;border-radius:12px;border:1px solid #eee;transition:all .3s;cursor:pointer}
+.qa-card:hover{border-color:var(--gold);box-shadow:0 8px 32px rgba(212,165,116,0.2);transform:translateY(-4px)}
+.qa-icon{font-size:40px;margin-bottom:12px}
+.qa-title{font-size:15px;font-weight:700;color:var(--dark);margin-bottom:6px}
+.qa-desc{font-size:12px;color:var(--gray)}
+
+/* MARCAS CARRUSEL */
+.marcas-section{padding:60px 40px;background:#f5f5f5}
+.section-title{text-align:center;font-size:32px;font-weight:800;margin-bottom:8px;letter-spacing:-.02em}
+.section-title i{color:var(--gold)}
+.section-sub{text-align:center;font-size:14px;color:var(--gray);margin-bottom:40px}
+.marcas-carousel{position:relative;overflow:hidden;background:white;border-radius:12px}
+.marcas-scroll{display:flex;gap:40px;padding:40px 0;animation:scroll 30s linear infinite;will-change:transform}
+.marcas-scroll:hover{animation-play-state:paused}
+.marca-item{flex:0 0 120px;display:flex;align-items:center;justify-content:center;height:60px}
+.marca-item img{height:36px;width:auto;max-width:90px;object-fit:contain;opacity:.45;transition:opacity .3s;filter:grayscale(100%)}
+.marca-item:hover img{opacity:.9;filter:grayscale(0%)}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 40px))}}
+
+/* CATÁLOGO */
+.catalog{padding:60px 40px;background:white}
+.catalog-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px;flex-wrap:wrap;gap:16px}
+.catalog-title{font-size:32px;font-weight:800;letter-spacing:-.02em}
+.catalog-title i{color:var(--gold)}
+.filters{display:flex;gap:8px}
+.filter-btn{background:transparent;border:2px solid #ddd;padding:8px 16px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--gray)}
+.filter-btn.active{background:var(--gold);color:white;border-color:var(--gold)}
+.filter-btn:hover{border-color:var(--gold)}
+
+.car-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
+.car-card{background:white;border:1px solid #e0e0e0;border-radius:12px;overflow:hidden;transition:all .25s;position:relative}
+.car-card:hover{box-shadow:0 8px 32px rgba(0,0,0,0.12);border-color:var(--gold);transform:translateY(-4px)}
+.car-badge{position:absolute;top:12px;left:12px;z-index:2;padding:6px 12px;border-radius:50px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.badge-flash{background:var(--red);color:white}
+.badge-last{background:var(--amber);color:white}
+.badge-discount{position:absolute;top:12px;right:12px;background:var(--green);color:white;padding:6px 12px;border-radius:50px;font-size:11px;font-weight:700}
+.car-img{width:100%;height:200px;background:linear-gradient(135deg,#f0ebe3,#e5ddd0);display:flex;align-items:center;justify-content:center;color:var(--gray);font-size:14px}
+.car-body{padding:16px}
+.car-brand{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gold);letter-spacing:.08em;margin-bottom:4px}
+.car-model{font-size:18px;font-weight:800;color:var(--dark);margin-bottom:8px}
+.car-specs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.spec-tag{background:#f5f5f5;padding:4px 10px;border-radius:6px;font-size:12px;color:var(--gray)}
+.car-price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.price-current{font-size:24px;font-weight:900;color:var(--dark)}
+.price-original{font-size:14px;color:var(--gray);text-decoration:line-through}
+.car-countdown{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--red);font-weight:700;margin-bottom:12px}
+.car-countdown svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5}
+.btn-offer{width:100%;padding:12px;background:var(--gold);color:white;border:none;border-radius:8px;font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.02em}
+.btn-offer:hover{background:var(--gold-dark);transform:translateY(-1px)}
+
+/* MODAL FORM */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.modal-box{background:white;border-radius:16px;padding:40px;max-width:500px;width:100%;animation:slideUp .3s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border:none;background:#f5f5f5;border-radius:50%;cursor:pointer;font-size:18px;transition:all .2s}
+.modal-close:hover{background:#e0e0e0}
+.modal-title{font-size:24px;font-weight:800;margin-bottom:12px;color:var(--dark)}
+.modal-desc{font-size:14px;color:var(--gray);margin-bottom:20px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--dark)}
+.form-group input{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:'Plus Jakarta Sans',sans-serif}
+.form-group input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,165,116,0.1)}
+.form-group input[type="checkbox"]{width:auto;margin-right:8px}
+.btn-submit{width:100%;padding:14px;background:var(--gold);color:white;border:none;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif}
+.btn-submit:hover{background:var(--gold-dark)}
+
+/* FOOTER */
+.footer{background:var(--dark);color:white;padding:40px;text-align:center;font-size:13px}
+.footer a{color:var(--gold);text-decoration:none}
+.footer a:hover{text-decoration:underline}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .quick-actions{grid-template-columns:repeat(2,1fr)}
+  .car-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+}
+@media(max-width:768px){
+  .hdr{padding:12px 20px}
+  .hero{padding:60px 20px;margin-top:60px}
+  .hero-title{font-size:36px}
+  .quick-actions{grid-template-columns:1fr;padding:40px 20px}
+  .marcas-section{padding:40px 20px}
+  .catalog{padding:40px 20px}
+  .car-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+  .nav-right{gap:16px}
+  .modal{padding:12px}
+  .modal-box{padding:24px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr" id="hdr">
+  <div class="nav-logo">Pujamos<b>tu</b>coche.es</div>
+  <nav class="nav-right">
+    <a href="#catalogo" class="nav-link">Ver coches</a>
+    <a href="#" class="nav-link">Sobre nosotros</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">Ofertas Flash Outlet</div>
+    <h1 class="hero-title">Coches de <i>oportunidad</i> cada semana</h1>
+    <p class="hero-sub">Miércoles a sábado. Descuentos de hasta el 30%. Última unidad.</p>
+    <a href="#catalogo" class="hero-cta">Ver oferta esta semana →</a>
+  </div>
+</section>
+
+<!-- COUNTDOWN -->
+<div class="countdown-global">
+  ⏱️ Oferta termina el sábado a las 23:59 — 
+  <span id="countdown">-- días -- horas -- minutos</span>
+</div>
+
+<!-- QUICK ACTIONS -->
+<section class="quick-actions">
+  <div class="qa-card">
+    <div class="qa-icon">🔍</div>
+    <div class="qa-title">Tasar tu coche</div>
+    <div class="qa-desc">¿Quieres saber cuánto vale?</div>
+  </div>
+  <div class="qa-card">
+    <div class="qa-icon">💚</div>
+    <div class="qa-title">Favoritos</div>
+    <div class="qa-desc">Guarda tus coches preferidos</div>
+  </div>
+  <div class="qa-card">
+    <div class="qa-icon">📋</div>
+    <div class="qa-title">Financiación</div>
+    <div class="qa-desc">Planes a tu medida</div>
+  </div>
+  <div class="qa-card">
+    <div class="qa-icon">🛠️</div>
+    <div class="qa-title">Servicio técnico</div>
+    <div class="qa-desc">Garantía y revisiones</div>
+  </div>
+</section>
+
+<!-- MARCAS -->
+<section class="marcas-section">
+  <h2 class="section-title">Marcas <i>disponibles</i></h2>
+  <p class="section-sub">Trabajamos con las mejores marcas del mercado</p>
+  <div class="marcas-carousel">
+    <div class="marcas-scroll">
+      <div class="marca-item"><img src="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50' y='55' text-anchor='middle' font-size='20' font-weight='bold' fill='%23333'%3EAUDI%3C/text%3E%3C/svg%3E" alt="Audi"></div>
+      <div class="marca-item"><img src="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50' y='55' text-anchor='middle' font-size='20' font-weight='bold' fill='%23333'%3EBMW%3C/text%3E%3C/svg%3E" alt="BMW"></div>
+      <div class="marca-item"><img src="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50' y='55' text-anchor='middle' font-size='18' font-weight='bold' fill='%23333'%3EMERCEDES%3C/text%3E%3C/svg%3E" alt="Mercedes"></div>
+      <div class="marca-item"><img src="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50' y='55' text-anchor='middle' font-size='16' font-weight='bold' fill='%23333'%3EVOLK.%3C/text%3E%3C/svg%3E" alt="VW"></div>
+      <div class="marca-item"><img src="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50' y='55' text-anchor='middle' font-size='18' font-weight='bold' fill='%23333'%3ETOYOTA%3C/text%3E%3C/svg%3E" alt="Toyota"></div>
+      <div class="marca-item"><img src="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50' y='55' text-anchor='middle' font-size='16' font-weight='bold' fill='%23333'%3ERENAULT%3C/text%3E%3C/svg%3E" alt="Renault"></div>
+      <div class="marca-item"><img src="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50' y='55' text-anchor='middle' font-size='20' font-weight='bold' fill='%23333'%3ESEAT%3C/text%3E%3C/svg%3E" alt="SEAT"></div>
+      <div class="marca-item"><img src="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50' y='55' text-anchor='middle' font-size='18' font-weight='bold' fill='%23333'%3EHYUNDAI%3C/text%3E%3C/svg%3E" alt="Hyundai"></div>
+      <div class="marca-item"><img src="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50' y='55' text-anchor='middle' font-size='20' font-weight='bold' fill='%23333'%3EKIA%3C/text%3E%3C/svg%3E" alt="Kia"></div>
+      <div class="marca-item"><img src="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50' y='55' text-anchor='middle' font-size='16' font-weight='bold' fill='%23333'%3EPEUGEOT%3C/text%3E%3C/svg%3E" alt="Peugeot"></div>
+      <!-- Duplicar para efecto infinito -->
+      <div class="marca-item"><img src="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50' y='55' text-anchor='middle' font-size='20' font-weight='bold' fill='%23333'%3EAUDI%3C/text%3E%3C/svg%3E" alt="Audi"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CATÁLOGO -->
+<section class="catalog" id="catalogo">
+  <div class="catalog-header">
+    <h2 class="catalog-title">Coches <i>disponibles</i></h2>
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterCars('all')">Todos</button>
+      <button class="filter-btn" onclick="filterCars('flash')">Flash</button>
+      <button class="filter-btn" onclick="filterCars('last')">Última unidad</button>
+    </div>
+  </div>
+  <div class="car-grid" id="carGrid"></div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>&copy; 2026 Pujamostucoche.es • <a href="#">Política de privacidad</a> • <a href="#">Términos y condiciones</a></p>
+</footer>
+
+<!-- MODAL -->
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 class="modal-title" id="modalTitle">—</h3>
+    <p class="modal-desc">Te llamaremos en breve para confirmar detalles.</p>
+    <form onsubmit="submitForm(event)">
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="name" required>
+      </div>
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input type="tel" id="phone" required>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="email" required>
+      </div>
+      <div class="form-group">
+        <label><input type="checkbox" required> Acepto política de privacidad</label>
+      </div>
+      <button type="submit" class="btn-submit">Quiero mi oferta</button>
+    </form>
+  </div>
+</div>
+
+<script>
+const cars = [
+  {id:1,brand:'Volkswagen',model:'Golf 8',year:2022,km:'35.000',fuel:'Gasolina',price:24900,original:26500,discount:6,badge:'flash',countdown:1200},
+  {id:2,brand:'BMW',model:'Serie 3',year:2021,km:'52.000',fuel:'Diésel',price:29500,original:32000,discount:8,badge:'flash',countdown:800},
+  {id:3,brand:'Audi',model:'A4 Avant',year:2020,km:'61.000',fuel:'Diésel',price:22800,original:25000,discount:9,badge:'last',countdown:2100},
+  {id:4,brand:'Mercedes',model:'Clase A',year:2023,km:'18.000',fuel:'Gasolina',price:31900,original:34500,discount:7,badge:'flash',countdown:1500},
+  {id:5,brand:'Toyota',model:'Corolla',year:2022,km:'29.000',fuel:'Híbrido',price:21500,original:23500,discount:9,badge:'flash',countdown:1800},
+  {id:6,brand:'SEAT',model:'León',year:2021,km:'45.000',fuel:'Gasolina',price:18400,original:20000,discount:8,badge:'flash',countdown:2400},
+  {id:7,brand:'Kia',model:'Sportage',year:2022,km:'33.000',fuel:'Diésel',price:26200,original:28500,discount:8,badge:'last',countdown:600},
+  {id:8,brand:'Hyundai',model:'Tucson',year:2023,km:'22.000',fuel:'Híbrido',price:28700,original:31000,discount:7,badge:'flash',countdown:1100},
+  {id:9,brand:'Peugeot',model:'308 GT',year:2023,km:'15.000',fuel:'Híbrido',price:27300,original:29500,discount:8,badge:'flash',countdown:1400},
+  {id:10,brand:'Renault',model:'Clio',year:2022,km:'27.000',fuel:'Gasolina',price:15900,original:17500,discount:9,badge:'last',countdown:2200},
+];
+
+function renderCars(filter='all'){
+  const grid=document.getElementById('carGrid');
+  const filtered=filter==='all'?cars:cars.filter(c=>c.badge===filter);
+  grid.innerHTML=filtered.map(c=>`
+  <div class="car-card">
+    <div style="position:relative">
+      <div class="car-badge ${c.badge==='flash'?'badge-flash':'badge-last'}">${c.badge==='flash'?'OFERTA FLASH':'ÚLTIMA UNIDAD'}</div>
+      <div class="car-badge badge-discount">-${c.discount}%</div>
+      <div class="car-img">Foto de ${c.brand} ${c.model}</div>
+    </div>
+    <div class="car-body">
+      <div class="car-brand">${c.brand}</div>
+      <div class="car-model">${c.model} · ${c.year}</div>
+      <div class="car-specs">
+        <span class="spec-tag">${c.km} km</span>
+        <span class="spec-tag">${c.fuel}</span>
+      </div>
+      <div class="car-price-row">
+        <span class="price-current">${c.price.toLocaleString('es-ES')}€</span>
+        <span class="price-original">${c.original.toLocaleString('es-ES')}€</span>
+      </div>
+      <div class="car-countdown">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <span class="countdown-car" data-id="${c.id}">--</span>
+      </div>
+      <button class="btn-offer" onclick="openModal(${c.id},'${c.brand} ${c.model}')">Quiero mi oferta</button>
+    </div>
+  </div>
+  `).join('');
+}
+
+function filterCars(type){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderCars(type);
+  updateCountdowns();
+}
+
+function openModal(id,name){
+  document.getElementById('modalTitle').textContent=name;
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function submitForm(e){
+  e.preventDefault();
+  alert('¡Gracias! Te contactaremos pronto.');
+  closeModal();
+  document.getElementById('name').value='';
+  document.getElementById('phone').value='';
+  document.getElementById('email').value='';
+}
+
+function updateCountdown(){
+  const now=new Date().getTime();
+  const target=new Date(now+7*24*60*60*1000).setHours(23,59,59,0);
+  const diff=target-now;
+  if(diff>0){
+    const d=Math.floor(diff/86400000);
+    const h=Math.floor((diff%86400000)/3600000);
+    const m=Math.floor((diff%3600000)/60000);
+    document.getElementById('countdown').textContent=`${d} días ${h}h ${m}m`;
+  }
+}
+
+function updateCountdowns(){
+  document.querySelectorAll('.countdown-car').forEach(el=>{
+    const id=el.dataset.id;
+    const car=cars.find(c=>c.id==id);
+    const mins=car.countdown;
+    const h=Math.floor(mins/60);
+    const m=mins%60;
+    el.textContent=h>0?`${h}h ${m}m`:`${m}m`;
+  });
+}
+
+function scrollHeader(){
+  const hdr=document.getElementById('hdr');
+  if(window.scrollY>200){
+    hdr.classList.add('hdr--dark');
+  }else{
+    hdr.classList.remove('hdr--dark');
+  }
+}
+
+renderCars();
+updateCountdown();
+updateCountdowns();
+setInterval(updateCountdown,60000);
+setInterval(updateCountdowns,60000);
+window.addEventListener('scroll',scrollHeader,{passive:true});
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +8,8 @@ import DashboardPage from "@/pages/dashboard";
 import InboxPage from "@/pages/inbox";
 import InventoryPage from "@/pages/inventory";
 import CarDetailPage from "@/pages/car-detail";
+import LandingPage from "@/pages/landing";
+import LandingCarPage from "@/pages/landing-car";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,6 +18,18 @@ const queryClient = new QueryClient({
 });
 
 function Router() {
+  const [location] = useLocation();
+  const isPublic = location.startsWith("/tienda");
+
+  if (isPublic) {
+    return (
+      <Switch>
+        <Route path="/tienda" component={LandingPage} />
+        <Route path="/tienda/coche/:id" component={LandingCarPage} />
+      </Switch>
+    );
+  }
+
   return (
     <Layout>
       <Switch>
