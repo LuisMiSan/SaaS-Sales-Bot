@@ -1,2 +1,27 @@
 export * from "./generated/api";
-export * from "./generated/types";
+export type {
+  ActivityEvent,
+  ActivityEventKind,
+  Car,
+  CarAttractiveness,
+  CarStatus,
+  CreateCarBodyAttractiveness,
+  DashboardSummary,
+  DraftReply,
+  DraftReplyBodyIntent,
+  HealthStatus,
+  Lead,
+  LeadDetail,
+  LeadStage,
+  LeadWithCar,
+  ListCarsParams,
+  ListCarsStatus,
+  ListLeadsParams,
+  ListLeadsStage,
+  Message,
+  MessageDirection,
+  StageCount,
+  StatusCount,
+  UpdateCarBodyAttractiveness,
+  UpdateLeadBodyStage,
+} from "./generated/types";

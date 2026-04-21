@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Asistente Ventas WhatsApp"
+version = "1.0.0"
+id = "artifacts/asistente-ventas"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21004
+
+[services.development]
+run = "pnpm --filter @workspace/asistente-ventas run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/asistente-ventas", "run", "build" ]
+publicDir = "artifacts/asistente-ventas/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21004"
+BASE_PATH = "/"

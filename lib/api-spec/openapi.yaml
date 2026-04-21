@@ -1,36 +1,527 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: AsistenteVenta API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: cars
+  - name: leads
+  - name: messages
+  - name: ai
+  - name: dashboard
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
           content:
             application/json:
+              schema: { $ref: "#/components/schemas/HealthStatus" }
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: KPIs for the dashboard
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DashboardSummary" }
+
+  /dashboard/activity:
+    get:
+      operationId: getRecentActivity
+      tags: [dashboard]
+      summary: Recent activity feed
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
               schema:
-                $ref: "#/components/schemas/HealthStatus"
+                type: array
+                items: { $ref: "#/components/schemas/ActivityEvent" }
+
+  /cars:
+    get:
+      operationId: listCars
+      tags: [cars]
+      parameters:
+        - in: query
+          name: status
+          required: false
+          schema: { type: string, enum: [open, locking, locked, released, sold] }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Car" }
+    post:
+      operationId: createCar
+      tags: [cars]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateCarBody" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Car" }
+
+  /cars/{id}:
+    get:
+      operationId: getCar
+      tags: [cars]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Car" }
+    patch:
+      operationId: updateCar
+      tags: [cars]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateCarBody" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Car" }
+
+  /cars/{id}/lock:
+    post:
+      operationId: lockCar
+      tags: [cars]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LockCarBody" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Car" }
+
+  /cars/{id}/release:
+    post:
+      operationId: releaseCar
+      tags: [cars]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Car" }
+
+  /cars/{id}/sell:
+    post:
+      operationId: markCarSold
+      tags: [cars]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Car" }
+
+  /leads:
+    get:
+      operationId: listLeads
+      tags: [leads]
+      parameters:
+        - in: query
+          name: stage
+          required: false
+          schema: { type: string, enum: [new, awaiting_deposit, locked, doubting, released, won, lost] }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/LeadWithCar" }
+    post:
+      operationId: createLead
+      tags: [leads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateLeadBody" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadWithCar" }
+
+  /leads/{id}:
+    get:
+      operationId: getLead
+      tags: [leads]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadDetail" }
+    patch:
+      operationId: updateLead
+      tags: [leads]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateLeadBody" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadWithCar" }
+
+  /leads/{id}/messages:
+    get:
+      operationId: listLeadMessages
+      tags: [messages]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Message" }
+    post:
+      operationId: sendLeadMessage
+      tags: [messages]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SendMessageBody" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Message" }
+
+  /leads/{id}/draft:
+    post:
+      operationId: draftLeadReply
+      tags: [ai]
+      summary: Generate AI draft for next WhatsApp reply
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DraftReplyBody" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DraftReply" }
+
+  /leads/{id}/incoming:
+    post:
+      operationId: simulateIncomingMessage
+      tags: [messages]
+      summary: Simulate an incoming WhatsApp from the customer (demo)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SimulateIncomingBody" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Message" }
+
 components:
   schemas:
     HealthStatus:
       type: object
       properties:
-        status:
-          type: string
-      required:
-        - status
+        status: { type: string }
+      required: [status]
 
+    Car:
+      type: object
+      properties:
+        id: { type: integer }
+        make: { type: string }
+        model: { type: string }
+        year: { type: integer }
+        price: { type: number }
+        priceLabel: { type: string }
+        attractiveness: { type: string, enum: [hot, normal, hard] }
+        windowHours: { type: integer }
+        status: { type: string, enum: [open, locking, locked, released, sold] }
+        imageUrl: { type: ["string", "null"] }
+        km: { type: integer }
+        fuel: { type: string }
+        transmission: { type: string }
+        location: { type: string }
+        depositCents: { type: integer }
+        publishedAt: { type: string, format: date-time }
+        availableUntil: { type: string, format: date-time }
+        lockedUntil: { type: ["string", "null"], format: date-time }
+        releasedAt: { type: ["string", "null"], format: date-time }
+        viewersNow: { type: integer }
+        notes: { type: ["string", "null"] }
+      required: [id, make, model, year, price, priceLabel, attractiveness, windowHours, status, km, fuel, transmission, location, depositCents, publishedAt, availableUntil, viewersNow]
+
+    CreateCarBody:
+      type: object
+      properties:
+        make: { type: string }
+        model: { type: string }
+        year: { type: integer }
+        price: { type: number }
+        attractiveness: { type: string, enum: [hot, normal, hard] }
+        km: { type: integer }
+        fuel: { type: string }
+        transmission: { type: string }
+        location: { type: string }
+        imageUrl: { type: ["string", "null"] }
+        depositCents: { type: integer }
+        notes: { type: ["string", "null"] }
+      required: [make, model, year, price, attractiveness, km, fuel, transmission, location, depositCents]
+
+    UpdateCarBody:
+      type: object
+      properties:
+        price: { type: number }
+        attractiveness: { type: string, enum: [hot, normal, hard] }
+        notes: { type: ["string", "null"] }
+        imageUrl: { type: ["string", "null"] }
+
+    LockCarBody:
+      type: object
+      properties:
+        leadId: { type: integer }
+        depositCents: { type: integer }
+      required: [leadId]
+
+    Lead:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        phone: { type: string }
+        carId: { type: integer }
+        stage: { type: string, enum: [new, awaiting_deposit, locked, doubting, released, won, lost] }
+        depositPaid: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        lastMessageAt: { type: ["string", "null"], format: date-time }
+        lastMessagePreview: { type: ["string", "null"] }
+        unreadCount: { type: integer }
+        avatarColor: { type: string }
+      required: [id, name, phone, carId, stage, depositPaid, createdAt, updatedAt, unreadCount, avatarColor]
+
+    LeadWithCar:
+      allOf:
+        - $ref: "#/components/schemas/Lead"
+        - type: object
+          properties:
+            car: { $ref: "#/components/schemas/Car" }
+          required: [car]
+
+    LeadDetail:
+      allOf:
+        - $ref: "#/components/schemas/LeadWithCar"
+        - type: object
+          properties:
+            messages:
+              type: array
+              items: { $ref: "#/components/schemas/Message" }
+          required: [messages]
+
+    CreateLeadBody:
+      type: object
+      properties:
+        name: { type: string }
+        phone: { type: string }
+        carId: { type: integer }
+      required: [name, phone, carId]
+
+    UpdateLeadBody:
+      type: object
+      properties:
+        stage: { type: string, enum: [new, awaiting_deposit, locked, doubting, released, won, lost] }
+        depositPaid: { type: boolean }
+        name: { type: string }
+        phone: { type: string }
+
+    Message:
+      type: object
+      properties:
+        id: { type: integer }
+        leadId: { type: integer }
+        direction: { type: string, enum: [incoming, outgoing, system] }
+        content: { type: string }
+        createdAt: { type: string, format: date-time }
+        aiGenerated: { type: boolean }
+        intent: { type: ["string", "null"] }
+      required: [id, leadId, direction, content, createdAt, aiGenerated]
+
+    SendMessageBody:
+      type: object
+      properties:
+        content: { type: string }
+        aiGenerated: { type: boolean }
+        intent: { type: ["string", "null"] }
+      required: [content]
+
+    SimulateIncomingBody:
+      type: object
+      properties:
+        content: { type: string }
+      required: [content]
+
+    DraftReplyBody:
+      type: object
+      properties:
+        intent:
+          type: string
+          enum: [first_response, ask_deposit, confirm_lock, handle_doubt, post_release, custom]
+        instructions: { type: ["string", "null"] }
+      required: [intent]
+
+    DraftReply:
+      type: object
+      properties:
+        intent: { type: string }
+        content: { type: string }
+        rationale: { type: string }
+      required: [intent, content, rationale]
+
+    DashboardSummary:
+      type: object
+      properties:
+        openCars: { type: integer }
+        lockedCars: { type: integer }
+        releasedCars: { type: integer }
+        soldCars: { type: integer }
+        activeLeads: { type: integer }
+        awaitingDeposit: { type: integer }
+        wonLast7d: { type: integer }
+        depositValueCents: { type: integer }
+        avgResponseMinutes: { type: number }
+        conversionRate: { type: number }
+        leadsByStage:
+          type: array
+          items: { $ref: "#/components/schemas/StageCount" }
+        carsByStatus:
+          type: array
+          items: { $ref: "#/components/schemas/StatusCount" }
+      required: [openCars, lockedCars, releasedCars, soldCars, activeLeads, awaitingDeposit, wonLast7d, depositValueCents, avgResponseMinutes, conversionRate, leadsByStage, carsByStatus]
+
+    StageCount:
+      type: object
+      properties:
+        stage: { type: string }
+        count: { type: integer }
+      required: [stage, count]
+
+    StatusCount:
+      type: object
+      properties:
+        status: { type: string }
+        count: { type: integer }
+      required: [status, count]
+
+    ActivityEvent:
+      type: object
+      properties:
+        id: { type: integer }
+        kind: { type: string, enum: [lock, release, sale, message, draft, new_lead] }
+        text: { type: string }
+        leadName: { type: ["string", "null"] }
+        carLabel: { type: ["string", "null"] }
+        at: { type: string, format: date-time }
+      required: [id, kind, text, at]

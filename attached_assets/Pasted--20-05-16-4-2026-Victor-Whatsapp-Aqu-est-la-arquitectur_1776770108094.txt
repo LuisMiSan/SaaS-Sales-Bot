@@ -1,0 +1,219 @@
+[20:05, 16/4/2026] Victor Whatsapp: Aquí está la arquitectura que necesitas:
+🧩 FASES DEL PROCESO
+1. PUBLICACIÓN (VENTANA ABIERTA)
+Duración: 48h estándar
+Variación:
+coches muy buenos → 24h
+coches normales → 72h
+👉 Pero tú comunicas:
+“Ventana limitada (24–72h según unidad)”
+2. BLOQUEO (EL MOMENTO CLAVE)
+Cuando alguien pulsa “Bloquear unidad”:
+👉 NO compra
+👉 se posiciona
+🔐 BLOQUEO IDEAL
+💰 Depósito:
+100€ – 300€ (España encaja aquí)
+suficiente para filtrar curiosos
+⏱️ Duración del bloqueo:
+👉 12 horas
+No más.
+🧠 ¿Por qué 12h?
+crea urgencia real
+no congela inventario
+obliga a decidir
+🔁 ¿Se puede renovar?
+👉 ❌ NO automáticamente
+👉 ✔ SOLO si tú decides manualmente
+🔥 FRASE CLAVE PARA LA WEB
+“Al bloquear la unidad, se retira del escaparate durante 12h.”
+🔁 ¿QUÉ PASA SI NO COMPRA?
+Aquí está el sistema:
+ESCENARIO A:
+Cliente bloquea → NO compra
+👉 coche vuelve a:
+“Ventana abierta”
+👉 Y puedes mostrar:
+“Liberado hace 2h”
+💥 Esto es oro psicológico
+ESCENARIO B:
+Cliente bloquea → compra
+👉 desaparece
+👉 Puedes mostrar:
+“Reservado en 36h”
+⏳ ¿CUÁNTO DURA UNA OFERTA?
+MODELO SIMPLE (RECOMENDADO)
+👉 estándar:
+48h por defecto
+👉 variación:
+Tipo coche
+Tiempo
+Muy atractivo
+24h
+Normal
+48h
+Difícil
+72h
+👉 Pero no compliques UX:
+Muestra siempre:
+“Disponible hasta…”
+🧠 SISTEMA DE PRESIÓN REAL (ESTO ES CLAVE)
+En vez de subir precio, usas:
+1. TIEMPO
+“Disponible hasta…”
+“Últimas horas”
+2. DISPONIBILIDAD
+“Bloqueado”
+“Liberado”
+“Pendiente de decisión”
+3. COMPETENCIA
+“X personas viéndolo”
+4. CONTEXTO
+“No entrará en stock público”
+👉 Esto es presión REAL
+👉 no marketing barato
+🔥 EL MEJOR TRUCO (POCOS LO HACEN)
+👉 Añade estado dinámico:
+ETIQUETAS
+🟢 Ventana abierta
+🟡 En proceso de bloqueo
+🔴 Bloqueado (temporalmente)
+🔵 Liberado recientemente
+👉 Esto crea narrativa viva
+⚠️ ERROR QUE TE PUEDE MATAR
+Si haces esto:
+bloqueos largos (24h+)
+reservas blandas sin dinero
+coches siempre disponibles
+👉 muere la urgencia
+💥 RESUMEN EJECUTIVO
+✔ LO QUE HACES
+Ventana: 24–72h
+Estándar: 48h
+Bloqueo: 12h
+Depósito: 100–300€
+Sin subida artificial de precio
+❌ LO QUE NO HACES
+subir precio “porque sí”
+bloqueos largos
+falsas urgencias
+💬 FRASE QUE DEFINE TU SISTEMA
+“Aquí no sube el precio.
+Aquí pierdes la oportunidad.”
+🚀 SIGUIENTE PASO
+Si quieres, ahora diseñamos:
+👉 el flujo exacto del botón “Bloquear unidad”
+qué dice
+qué pasa en WhatsApp
+qué mensaje automático envías
+cómo cierras la venta
+Ahí es donde conviertes tráfico en dinero real.
+[20:06, 16/4/2026] Victor Whatsapp: Voy a diseñarte el flujo completo de “Bloquear unidad”, como si mañana lo estuvieras operando tú con clientes reales.
+🧠 OBJETIVO DEL FLUJO
+No es vender en la web.
+👉 Es llevar al cliente a WhatsApp con intención y urgencia, no como curioso.
+🔥 ESTRUCTURA DEL FLUJO (VISIÓN GENERAL)
+Usuario hace clic en “Bloquear unidad”
+Micro-confirmación (filtro psicológico)
+Entra a WhatsApp con mensaje pre-armado
+Tú respondes con control
+Se solicita depósito
+Se bloquea la unidad (12h)
+Cierre o liberación
+🟥 1. BOTÓN (EN LA WEB)
+Ya lo tienes bien:
+👉 “Bloquear unidad”
+🔥 AÑADE SUBTEXTO DEBAJO (MUY IMPORTANTE)
+“Se retira del escaparate durante 12h mientras decides.”
+👉 Esto cambia todo:
+de botón → a compromiso
+🟠 2. MICRO-POPUP (FILTRO CLAVE)
+Antes de ir a WhatsApp.
+TEXTO EXACTO:
+Esta unidad puede desaparecer si otro cliente la bloquea antes.
+¿Quieres asegurarte acceso durante las próximas horas?
+BOTONES:
+👉 Sí, bloquear ahora
+👉 Seguir mirando
+👉 Este paso:
+elimina curiosos
+aumenta intención
+🟢 3. MENSAJE AUTOMÁTICO DE WHATSAPP
+Cuando el usuario entra, NO debe escribir desde cero.
+MENSAJE PREFILL (IMPORTANTE)
+Hola, quiero bloquear la unidad:
+Audi A4 Avant 2020 (24.500€)
+¿Sigue disponible?
+👉 Esto hace:
+contexto inmediato
+rapidez
+sensación profesional
+🔵 4. TU PRIMERA RESPUESTA (CLAVE TOTAL)
+Aquí es donde la mayoría pierde ventas.
+NO respondas como concesionario.
+RESPUESTA IDEAL (COPIAR/PEGAR)
+Sí, sigue disponible ahora mismo.
+Te explico rápido: puedo bloquearla durante 12h para que nadie más acceda mientras decides.
+Para hacerlo, pedimos un pequeño depósito (200€) que asegura la unidad.
+Si quieres, te explico el proceso en 1 minuto.
+👉 Esto:
+no presiona
+pero marca reglas
+🟡 5. SI EL CLIENTE DICE “OK”
+Aquí no improvisas.
+RESPUESTA 2
+Perfecto.
+En cuanto haces el depósito, la retiramos del escaparate y queda solo para ti durante 12h.
+Te paso ahora los datos para bloquearla.
+👉 Aquí envías:
+Bizum / transferencia / link pago
+🔴 6. CONFIRMACIÓN DE BLOQUEO
+Cuando paga:
+MENSAJE
+Listo, unidad bloqueada.
+Durante las próximas 12h nadie más puede acceder a ella.
+Vamos viendo contigo los detalles para cerrar con calma.
+👉 Y en la web (idealmente):
+cambia a “Bloqueado”
+⚫ 7. SI EL CLIENTE DUDA (MUY IMPORTANTE)
+No lo pierdes.
+RESPUESTA
+Sin problema.
+Solo ten en cuenta que si otro cliente la bloquea antes, deja de estar disponible.
+Si quieres asegurarla, aún estás a tiempo.
+👉 Sin presión agresiva
+👉 pero con realidad
+🧠 8. SI NO COMPRA (POST BLOQUEO)
+Aquí hay oro psicológico.
+MENSAJE FINAL
+La unidad ha sido liberada nuevamente.
+Si sigue encajando contigo, aún puedes acceder si no se bloquea otra vez.
+👉 Esto:
+reabre interés
+genera FOMO real
+🔥 DETALLE PRO (MUY IMPORTANTE)
+Cuando un coche se libera:
+👉 en la web muestra:
+“Liberado hace 1h”
+💥 Esto convierte muchísimo.
+[20:07, 16/4/2026] Victor Whatsapp: Resumen:
+
+🔥 Flujo “Bloquear unidad” (resumen operativo)
+Usuario pulsa “Bloquear unidad”
+Aparece popup: se le avisa que la unidad puede desaparecer y que el bloqueo dura 12h
+Si confirma → se abre WhatsApp con mensaje prellenado (modelo + precio)
+Se le responde explicando:
+bloqueo temporal de 12h
+requiere depósito (100–300€)
+Si paga →
+coche se marca como “Bloqueado”
+se retira del escaparate
+Si no compra en 12h →
+coche vuelve a disponible
+estado: “Liberado recientemente”
+Durante todo el proceso:
+no se sube precio
+la urgencia viene de tiempo + disponibilidad real
+🧠 Concepto clave
+No vendemos coches.
+Permitimos al cliente no perder una oportunidad.
