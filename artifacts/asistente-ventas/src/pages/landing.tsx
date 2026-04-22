@@ -109,7 +109,7 @@ export default function LandingPage() {
               Miércoles a sábado. Bloqueas la unidad 12h con un pequeño depósito. Ningún precio sube. Lo que pierdes es la oportunidad.
             </p>
             <a href="#catalogo" className="mt-8 inline-flex items-center gap-2 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold px-7 py-3.5 rounded-md transition-colors">
-              Ver oferta esta semana <ArrowRight className="h-4 w-4" />
+              Ver ofertas Flash <ArrowRight className="h-4 w-4" />
             </a>
           </div>
         </div>
@@ -141,11 +141,25 @@ export default function LandingPage() {
         </h2>
         <p className="text-center text-sm text-stone-500 mt-1">Las mejores marcas del mercado pasan por el escaparate</p>
         <div className="mt-10 max-w-7xl mx-auto bg-white rounded-xl overflow-hidden">
-          <div className="flex items-center gap-12 py-8 px-8 overflow-hidden">
-            <div className="flex items-center gap-12 animate-[scroll_30s_linear_infinite] shrink-0">
+          <div className="flex items-center gap-16 py-10 px-8 overflow-hidden">
+            <div className="flex items-center gap-16 animate-[scroll_30s_linear_infinite] shrink-0">
               {[...BRANDS, ...BRANDS].map((b, i) => (
-                <div key={i} className="text-stone-400 hover:text-stone-800 font-extrabold text-xl tracking-widest shrink-0 transition-colors uppercase">
-                  {b}
+                <div key={i} className="shrink-0 h-12 flex items-center justify-center min-w-[90px]" title={b.name}>
+                  <img
+                    src={`https://cdn.simpleicons.org/${b.slug}/9CA3AF`}
+                    alt={b.name}
+                    className="h-9 w-auto opacity-70 hover:opacity-100 transition-opacity"
+                    loading="lazy"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      img.style.display = "none";
+                      const span = img.nextElementSibling as HTMLElement | null;
+                      if (span) span.style.display = "inline";
+                    }}
+                  />
+                  <span style={{ display: "none" }} className="text-stone-400 font-extrabold text-base tracking-widest uppercase">
+                    {b.name}
+                  </span>
                 </div>
               ))}
             </div>
@@ -288,7 +302,20 @@ export default function LandingPage() {
   );
 }
 
-const BRANDS = ["Audi", "BMW", "Mercedes", "Volkswagen", "Toyota", "Renault", "Seat", "Hyundai", "Kia", "Ford", "Peugeot", "Citroën"];
+const BRANDS = [
+  { name: "Audi", slug: "audi" },
+  { name: "BMW", slug: "bmw" },
+  { name: "Mercedes", slug: "mercedes" },
+  { name: "Volkswagen", slug: "volkswagen" },
+  { name: "Toyota", slug: "toyota" },
+  { name: "Renault", slug: "renault" },
+  { name: "Seat", slug: "seat" },
+  { name: "Hyundai", slug: "hyundai" },
+  { name: "Kia", slug: "kia" },
+  { name: "Ford", slug: "ford" },
+  { name: "Peugeot", slug: "peugeot" },
+  { name: "Citroën", slug: "citroen" },
+];
 
 function QuickAction({ icon: Icon, title, desc, href, tag }: { icon: React.ElementType; title: string; desc: string; href: string; tag?: string }) {
   return (
