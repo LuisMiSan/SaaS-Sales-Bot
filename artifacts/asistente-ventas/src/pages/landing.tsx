@@ -73,17 +73,17 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="bg-[#f0ebe3] text-[#222] font-jakarta min-h-screen">
+    <div className="bg-[#f5f7fa] text-[#222] font-jakarta min-h-screen">
       {/* HEADER */}
       <header className="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
           <Link href="/tienda" className="text-xl font-extrabold tracking-tight">
-            Pujamos<span className="text-[#D4A574]">tu</span>coche.es
+            Pujamos<span className="text-[#EE7B22]">tu</span>coche.es
           </Link>
           <nav className="flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-stone-600">
-            <a href="#catalogo" className="hover:text-[#D4A574]">Ver coches</a>
-            <a href="#proceso" className="hover:text-[#D4A574]">Cómo funciona</a>
-            <a href="#confianza" className="hover:text-[#D4A574]">Sobre nosotros</a>
+            <a href="#catalogo" className="hover:text-[#EE7B22]">Ver coches</a>
+            <a href="#proceso" className="hover:text-[#EE7B22]">Cómo funciona</a>
+            <a href="#confianza" className="hover:text-[#EE7B22]">Sobre nosotros</a>
             <Link href="/" className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-stone-900 text-white normal-case tracking-normal text-[11px]">
               <LayoutDashboard className="h-3.5 w-3.5" /> Panel comercial
             </Link>
@@ -95,20 +95,20 @@ export default function LandingPage() {
       <section className="pt-20">
         <div
           className="relative overflow-hidden text-center px-6 py-24 md:py-32"
-          style={{ background: "linear-gradient(135deg,#1a1a1a 0%,#2a2a2a 100%)" }}
+          style={{ background: "linear-gradient(135deg,#0E4F8E 0%,#15558A 100%)" }}
         >
           <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 50%,rgba(212,165,116,0.18) 0%,transparent 70%)" }} />
           <div className="relative max-w-3xl mx-auto">
-            <div className="inline-block px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-[#D4A574] border border-[#D4A574]/40 bg-[#D4A574]/15 mb-5">
+            <div className="inline-block px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-[#EE7B22] border border-[#EE7B22]/40 bg-[#EE7B22]/15 mb-5">
               Ofertas Flash Outlet
             </div>
             <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-[1.05]">
-              Coches de <em className="not-italic text-[#D4A574]">oportunidad</em><br /> cada semana
+              Coches de <em className="not-italic text-[#EE7B22]">oportunidad</em><br /> cada semana
             </h1>
             <p className="mt-5 text-lg text-white/70">
               Miércoles a sábado. Bloqueas la unidad 12h con un pequeño depósito. Ningún precio sube. Lo que pierdes es la oportunidad.
             </p>
-            <a href="#catalogo" className="mt-8 inline-flex items-center gap-2 bg-[#D4A574] hover:bg-[#A68456] text-white font-extrabold px-7 py-3.5 rounded-md transition-colors">
+            <a href="#catalogo" className="mt-8 inline-flex items-center gap-2 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold px-7 py-3.5 rounded-md transition-colors">
               Ver oferta esta semana <ArrowRight className="h-4 w-4" />
             </a>
           </div>
@@ -135,9 +135,9 @@ export default function LandingPage() {
       </section>
 
       {/* MARCAS */}
-      <section className="py-14 px-6" style={{ background: "#f5f0e8" }}>
+      <section className="py-14 px-6" style={{ background: "#eef2f7" }}>
         <h2 className="text-center text-3xl font-extrabold tracking-tight">
-          Marcas <em className="not-italic text-[#D4A574]">disponibles</em>
+          Marcas <em className="not-italic text-[#EE7B22]">disponibles</em>
         </h2>
         <p className="text-center text-sm text-stone-500 mt-1">Las mejores marcas del mercado pasan por el escaparate</p>
         <div className="mt-10 max-w-7xl mx-auto bg-white rounded-xl overflow-hidden">
@@ -159,7 +159,7 @@ export default function LandingPage() {
           <div className="flex flex-wrap items-end justify-between gap-4 mb-10">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight">
-                Outlet de la <em className="not-italic text-[#D4A574]">semana</em>
+                Outlet de la <em className="not-italic text-[#EE7B22]">semana</em>
               </h2>
               <p className="text-sm text-stone-500 mt-1">15 coches con ventana de oportunidad. Pulsa "Bloquear unidad" y queda solo para ti durante 12h.</p>
             </div>
@@ -171,8 +171,8 @@ export default function LandingPage() {
                   className={cn(
                     "px-4 py-1.5 text-xs font-semibold rounded-full border-2 transition-all",
                     filter === f.value
-                      ? "bg-[#D4A574] border-[#D4A574] text-white"
-                      : "bg-transparent border-stone-200 text-stone-600 hover:border-[#D4A574]",
+                      ? "bg-[#EE7B22] border-[#EE7B22] text-white"
+                      : "bg-transparent border-stone-200 text-stone-600 hover:border-[#EE7B22]",
                   )}
                 >
                   {f.label}
@@ -187,7 +187,7 @@ export default function LandingPage() {
               const discount = original ? Math.round(((original - car.price) / original) * 100) : null;
               return (
                 <Link key={car.id} href={`/tienda/coche/${car.id}`}>
-                  <article className="bg-white border border-stone-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-[#D4A574] hover:-translate-y-1 transition-all cursor-pointer h-full flex flex-col">
+                  <article className="bg-white border border-stone-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-[#EE7B22] hover:-translate-y-1 transition-all cursor-pointer h-full flex flex-col">
                     <div className="relative">
                       <CarThumb make={car.make} model={car.model} imageUrl={car.imageUrl} className="h-44 w-full" />
                       {idx < 3 && (
@@ -210,7 +210,7 @@ export default function LandingPage() {
                       </span>
                     </div>
                     <div className="p-4 flex-1 flex flex-col">
-                      <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#D4A574]">{car.make}</div>
+                      <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22]">{car.make}</div>
                       <div className="text-base font-extrabold leading-tight mt-1 line-clamp-1">{car.model}</div>
                       <div className="flex flex-wrap gap-1.5 mt-2">
                         <span className="bg-stone-100 text-stone-600 text-[11px] px-2 py-0.5 rounded">{car.year}</span>
@@ -227,7 +227,7 @@ export default function LandingPage() {
                         <Clock className="h-3.5 w-3.5" />
                         Quedan {timeUntilLabel(car.availableUntil)}
                       </div>
-                      <button className="mt-4 w-full py-2.5 rounded-lg bg-[#D4A574] hover:bg-[#A68456] text-white font-extrabold text-sm transition-colors">
+                      <button className="mt-4 w-full py-2.5 rounded-lg bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold text-sm transition-colors">
                         Bloquear unidad
                       </button>
                     </div>
@@ -240,14 +240,14 @@ export default function LandingPage() {
       </section>
 
       {/* PROCESO — corresponde a Buzón + Dashboard */}
-      <section id="proceso" className="bg-[#1a1a1a] text-white py-20 px-6">
+      <section id="proceso" className="bg-[#0E4F8E] text-white py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <div className="inline-block px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-[#D4A574] border border-[#D4A574]/40 bg-[#D4A574]/15 mb-4">
+            <div className="inline-block px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-[#EE7B22] border border-[#EE7B22]/40 bg-[#EE7B22]/15 mb-4">
               Cómo funciona
             </div>
             <h2 className="text-4xl font-extrabold tracking-tight">
-              Una ventana de <em className="not-italic text-[#D4A574]">12 horas</em>
+              Una ventana de <em className="not-italic text-[#EE7B22]">12 horas</em>
             </h2>
             <p className="mt-3 text-white/60 max-w-xl mx-auto">
               Aquí no sube el precio. Aquí pierdes la oportunidad. Bloqueas la unidad, hablamos por WhatsApp, decides con calma.
@@ -270,12 +270,12 @@ export default function LandingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-[#0e0e0e] text-white/60 py-10 px-6 text-center text-sm">
+      <footer className="bg-[#0A3D6E] text-white/60 py-10 px-6 text-center text-sm">
         <div className="max-w-5xl mx-auto space-y-3">
           <div className="text-white font-extrabold text-lg">
-            Pujamos<span className="text-[#D4A574]">tu</span>coche.es
+            Pujamos<span className="text-[#EE7B22]">tu</span>coche.es
           </div>
-          <p>Concesionario de coches de ocasión · Madrid · <a className="text-[#D4A574] hover:underline" href="mailto:hola@pujamostucoche.es">hola@pujamostucoche.es</a></p>
+          <p>Concesionario de coches de ocasión · Madrid · <a className="text-[#EE7B22] hover:underline" href="mailto:hola@pujamostucoche.es">hola@pujamostucoche.es</a></p>
           <p className="text-white/40 text-xs">© {new Date().getFullYear()} Pujamostucoche. Todos los derechos reservados.</p>
         </div>
       </footer>
@@ -292,13 +292,13 @@ const BRANDS = ["Audi", "BMW", "Mercedes", "Volkswagen", "Toyota", "Renault", "S
 
 function QuickAction({ icon: Icon, title, desc, href, tag }: { icon: React.ElementType; title: string; desc: string; href: string; tag?: string }) {
   return (
-    <a href={href} className="block text-center p-6 rounded-xl border border-stone-200 bg-white hover:border-[#D4A574] hover:shadow-lg hover:-translate-y-1 transition-all">
-      <div className="h-12 w-12 mx-auto rounded-full bg-[#D4A574]/10 text-[#D4A574] flex items-center justify-center mb-3">
+    <a href={href} className="block text-center p-6 rounded-xl border border-stone-200 bg-white hover:border-[#EE7B22] hover:shadow-lg hover:-translate-y-1 transition-all">
+      <div className="h-12 w-12 mx-auto rounded-full bg-[#EE7B22]/10 text-[#EE7B22] flex items-center justify-center mb-3">
         <Icon className="h-6 w-6" />
       </div>
       <div className="font-extrabold text-stone-900">{title}</div>
       <div className="text-xs text-stone-500 mt-0.5">{desc}</div>
-      {tag && <div className="mt-3 inline-block text-[10px] uppercase tracking-widest text-[#A68456] bg-[#D4A574]/10 px-2 py-0.5 rounded-full font-bold">→ {tag}</div>}
+      {tag && <div className="mt-3 inline-block text-[10px] uppercase tracking-widest text-[#C4621A] bg-[#EE7B22]/10 px-2 py-0.5 rounded-full font-bold">→ {tag}</div>}
     </a>
   );
 }
@@ -307,14 +307,14 @@ function Step({ n, icon: Icon, title, body, tag }: { n: number; icon: React.Elem
   return (
     <div className="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur">
       <div className="flex items-center justify-between">
-        <div className="h-10 w-10 rounded-lg bg-[#D4A574] text-stone-900 flex items-center justify-center">
+        <div className="h-10 w-10 rounded-lg bg-[#EE7B22] text-stone-900 flex items-center justify-center">
           <Icon className="h-5 w-5" />
         </div>
-        <span className="text-xs font-bold text-[#D4A574]/80 uppercase tracking-widest">Paso {n}</span>
+        <span className="text-xs font-bold text-[#EE7B22]/80 uppercase tracking-widest">Paso {n}</span>
       </div>
       <h3 className="mt-4 text-xl font-extrabold">{title}</h3>
       <p className="mt-2 text-sm text-white/60 leading-relaxed">{body}</p>
-      <div className="mt-4 inline-block text-[10px] uppercase tracking-widest text-[#D4A574] bg-[#D4A574]/15 px-2 py-0.5 rounded-full font-bold">SaaS · {tag}</div>
+      <div className="mt-4 inline-block text-[10px] uppercase tracking-widest text-[#EE7B22] bg-[#EE7B22]/15 px-2 py-0.5 rounded-full font-bold">SaaS · {tag}</div>
     </div>
   );
 }
@@ -322,7 +322,7 @@ function Step({ n, icon: Icon, title, body, tag }: { n: number; icon: React.Elem
 function Stat({ n, l }: { n: string; l: string }) {
   return (
     <div className="text-center">
-      <div className="text-3xl font-black text-[#D4A574]">{n}</div>
+      <div className="text-3xl font-black text-[#EE7B22]">{n}</div>
       <div className="text-xs uppercase tracking-widest text-white/50 mt-1">{l}</div>
     </div>
   );

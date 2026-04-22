@@ -39,7 +39,7 @@ export default function LandingCarPage() {
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
   if (!car) {
-    return <div className="min-h-screen bg-[#f0ebe3] flex items-center justify-center text-stone-500 font-jakarta">Cargando ficha…</div>;
+    return <div className="min-h-screen bg-[#f5f7fa] flex items-center justify-center text-stone-500 font-jakarta">Cargando ficha…</div>;
   }
 
   const original = parseOriginal(car.notes);
@@ -56,14 +56,14 @@ export default function LandingCarPage() {
   };
 
   return (
-    <div className="bg-[#f0ebe3] text-[#222] font-jakarta min-h-screen">
+    <div className="bg-[#f5f7fa] text-[#222] font-jakarta min-h-screen">
       {/* HEADER */}
       <header className="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
           <Link href="/tienda" className="text-xl font-extrabold tracking-tight">
-            Pujamos<span className="text-[#D4A574]">tu</span>coche.es
+            Pujamos<span className="text-[#EE7B22]">tu</span>coche.es
           </Link>
-          <Link href="/tienda" className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-stone-600 hover:text-[#D4A574]">
+          <Link href="/tienda" className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-stone-600 hover:text-[#EE7B22]">
             <ArrowLeft className="h-3.5 w-3.5" /> Volver al outlet
           </Link>
         </div>
@@ -72,7 +72,7 @@ export default function LandingCarPage() {
       <main className="pt-24 pb-20 px-6">
         <div className="max-w-6xl mx-auto">
           <nav className="text-xs text-stone-500 mb-5">
-            <Link href="/tienda" className="hover:text-[#D4A574]">Outlet</Link>
+            <Link href="/tienda" className="hover:text-[#EE7B22]">Outlet</Link>
             <span className="mx-2">/</span>
             <span>{car.make}</span>
             <span className="mx-2">/</span>
@@ -118,7 +118,7 @@ export default function LandingCarPage() {
               <section className="bg-white rounded-2xl p-7 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-extrabold">Cómo funciona el bloqueo</h2>
-                  <span className="text-[10px] uppercase tracking-widest text-[#A68456] bg-[#D4A574]/10 px-2 py-0.5 rounded-full font-bold">Buzón · SaaS</span>
+                  <span className="text-[10px] uppercase tracking-widest text-[#C4621A] bg-[#EE7B22]/10 px-2 py-0.5 rounded-full font-bold">Buzón · SaaS</span>
                 </div>
                 <ol className="space-y-3 text-sm">
                   <Process n={1} icon={Lock}>Dejas {formatDeposit(car.depositCents)} de depósito y la unidad sale del escaparate solo para ti.</Process>
@@ -132,7 +132,7 @@ export default function LandingCarPage() {
             <aside className="lg:col-span-2">
               <div className="sticky top-24 space-y-4">
                 <div className="bg-white rounded-2xl p-7 shadow-sm border border-stone-200">
-                  <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#D4A574]">{car.make}</div>
+                  <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22]">{car.make}</div>
                   <h1 className="text-2xl font-extrabold mt-1 leading-tight">{car.model}</h1>
                   <div className="text-xs text-stone-500 mt-1.5 inline-flex items-center gap-1.5"><MapPin className="h-3 w-3" />{car.location}</div>
 
@@ -155,7 +155,7 @@ export default function LandingCarPage() {
                         <CheckCircle2 className="h-5 w-5" /> Solicitud recibida
                       </div>
                       <p>Hemos creado tu petición de bloqueo. Un comercial te escribirá por WhatsApp al <strong>{phone}</strong> en los próximos minutos.</p>
-                      <Link href={`/inbox/${done.leadId}`} className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-[#A68456] hover:underline">
+                      <Link href={`/inbox/${done.leadId}`} className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-[#C4621A] hover:underline">
                         Ver conversación en el panel comercial →
                       </Link>
                     </div>
@@ -167,7 +167,7 @@ export default function LandingCarPage() {
                           value={name}
                           onChange={(e) => setName(e.target.value)}
                           placeholder="Ej: María García"
-                          className="w-full px-3 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/15"
+                          className="w-full px-3 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-[#EE7B22] focus:ring-2 focus:ring-[#EE7B22]/15"
                         />
                       </Field>
                       <Field label="Teléfono (WhatsApp)">
@@ -177,7 +177,7 @@ export default function LandingCarPage() {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder="+34 ..."
-                          className="w-full px-3 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/15"
+                          className="w-full px-3 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-[#EE7B22] focus:ring-2 focus:ring-[#EE7B22]/15"
                         />
                       </Field>
                       <label className="flex items-start gap-2 text-xs text-stone-500 cursor-pointer">
@@ -187,7 +187,7 @@ export default function LandingCarPage() {
                       <button
                         type="submit"
                         disabled={!accepted || create.isPending}
-                        className="w-full py-3.5 rounded-lg bg-[#D4A574] hover:bg-[#A68456] text-white font-extrabold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                        className="w-full py-3.5 rounded-lg bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                       >
                         <Lock className="h-4 w-4" />
                         {create.isPending ? "Enviando…" : "Bloquear unidad 12h"}
@@ -201,7 +201,7 @@ export default function LandingCarPage() {
 
                 <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-200 text-sm">
                   <div className="flex items-center gap-2 text-stone-700 font-bold">
-                    <CreditCard className="h-4 w-4 text-[#D4A574]" /> Financiación a medida
+                    <CreditCard className="h-4 w-4 text-[#EE7B22]" /> Financiación a medida
                   </div>
                   <p className="text-xs text-stone-500 mt-1.5">
                     Desde 36 meses con condiciones a tu medida. Pregunta al comercial al bloquear.
@@ -216,19 +216,19 @@ export default function LandingCarPage() {
             <section className="mt-16">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-extrabold tracking-tight">
-                  Otros coches del <em className="not-italic text-[#D4A574]">outlet</em>
+                  Otros coches del <em className="not-italic text-[#EE7B22]">outlet</em>
                 </h2>
-                <Link href="/tienda" className="text-xs font-bold uppercase tracking-widest text-[#A68456] hover:underline">
+                <Link href="/tienda" className="text-xs font-bold uppercase tracking-widest text-[#C4621A] hover:underline">
                   Ver los 15 →
                 </Link>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {others.map((o) => (
                   <Link key={o.id} href={`/tienda/coche/${o.id}`}>
-                    <article className="bg-white border border-stone-200 rounded-xl overflow-hidden hover:shadow-lg hover:border-[#D4A574] hover:-translate-y-1 transition-all">
+                    <article className="bg-white border border-stone-200 rounded-xl overflow-hidden hover:shadow-lg hover:border-[#EE7B22] hover:-translate-y-1 transition-all">
                       <CarThumb make={o.make} model={o.model} imageUrl={o.imageUrl} className="h-32 w-full" />
                       <div className="p-3">
-                        <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#D4A574]">{o.make}</div>
+                        <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22]">{o.make}</div>
                         <div className="text-sm font-extrabold leading-tight mt-0.5 line-clamp-1">{o.model}</div>
                         <div className="mt-1.5 text-base font-black tabular-nums">{formatPrice(o.price)}</div>
                       </div>
@@ -241,10 +241,10 @@ export default function LandingCarPage() {
         </div>
       </main>
 
-      <footer className="bg-[#0e0e0e] text-white/60 py-10 px-6 text-center text-sm">
+      <footer className="bg-[#0A3D6E] text-white/60 py-10 px-6 text-center text-sm">
         <div className="max-w-5xl mx-auto space-y-2">
           <div className="text-white font-extrabold text-lg">
-            Pujamos<span className="text-[#D4A574]">tu</span>coche.es
+            Pujamos<span className="text-[#EE7B22]">tu</span>coche.es
           </div>
           <p className="text-white/40 text-xs">© {new Date().getFullYear()} Pujamostucoche. Todos los derechos reservados.</p>
         </div>
@@ -256,7 +256,7 @@ export default function LandingCarPage() {
 function SpecCard({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
   return (
     <div className="bg-white rounded-xl p-4 border border-stone-200 shadow-sm">
-      <Icon className="h-5 w-5 text-[#D4A574] mb-2" />
+      <Icon className="h-5 w-5 text-[#EE7B22] mb-2" />
       <div className="text-[10px] uppercase tracking-widest text-stone-500 font-semibold">{label}</div>
       <div className="text-sm font-extrabold text-stone-900 mt-0.5">{value}</div>
     </div>
@@ -275,7 +275,7 @@ function Bullet({ children }: { children: React.ReactNode }) {
 function Process({ n, icon: Icon, children }: { n: number; icon: React.ElementType; children: React.ReactNode }) {
   return (
     <li className="flex items-start gap-3">
-      <div className="h-9 w-9 shrink-0 rounded-lg bg-[#D4A574]/10 text-[#D4A574] flex items-center justify-center font-black">
+      <div className="h-9 w-9 shrink-0 rounded-lg bg-[#EE7B22]/10 text-[#EE7B22] flex items-center justify-center font-black">
         <Icon className="h-4 w-4" />
       </div>
       <div className="text-stone-600 leading-relaxed pt-1.5">
