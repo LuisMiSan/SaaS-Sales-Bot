@@ -144,22 +144,17 @@ export default function LandingPage() {
           <div className="flex items-center gap-16 py-10 px-8 overflow-hidden">
             <div className="flex items-center gap-16 animate-[scroll_30s_linear_infinite] shrink-0">
               {[...BRANDS, ...BRANDS].map((b, i) => (
-                <div key={i} className="shrink-0 h-12 flex items-center justify-center min-w-[90px]" title={b.name}>
-                  <img
-                    src={`https://cdn.simpleicons.org/${b.slug}/9CA3AF`}
-                    alt={b.name}
-                    className="h-9 w-auto opacity-70 hover:opacity-100 transition-opacity"
-                    loading="lazy"
-                    onError={(e) => {
-                      const img = e.currentTarget;
-                      img.style.display = "none";
-                      const span = img.nextElementSibling as HTMLElement | null;
-                      if (span) span.style.display = "inline";
-                    }}
-                  />
-                  <span style={{ display: "none" }} className="text-stone-400 font-extrabold text-base tracking-widest uppercase">
-                    {b.name}
-                  </span>
+                <div key={i} className="shrink-0 h-12 flex items-center justify-center min-w-[90px] text-stone-400 hover:text-stone-700 transition-colors" title={b.name}>
+                  {b.svg ? (
+                    <div className="h-9 w-9 opacity-60 hover:opacity-100 transition-opacity">{b.svg}</div>
+                  ) : (
+                    <img
+                      src={`https://cdn.simpleicons.org/${b.slug}/9CA3AF`}
+                      alt={b.name}
+                      className="h-9 w-auto opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
+                      loading="lazy"
+                    />
+                  )}
                 </div>
               ))}
             </div>
@@ -305,7 +300,7 @@ export default function LandingPage() {
 const BRANDS = [
   { name: "Audi", slug: "audi" },
   { name: "BMW", slug: "bmw" },
-  { name: "Mercedes", slug: "mercedes" },
+  { name: "Mercedes", slug: "mercedes", svg: <MercedesLogo /> },
   { name: "Volkswagen", slug: "volkswagen" },
   { name: "Toyota", slug: "toyota" },
   { name: "Renault", slug: "renault" },
@@ -352,6 +347,22 @@ function Stat({ n, l }: { n: string; l: string }) {
       <div className="text-3xl font-black text-[#EE7B22]">{n}</div>
       <div className="text-xs uppercase tracking-widest text-white/50 mt-1">{l}</div>
     </div>
+  );
+}
+
+function MercedesLogo() {
+  return (
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" aria-label="Mercedes-Benz">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="4" />
+      <g fill="currentColor">
+        <polygon points="50,50 50,8 47,8" />
+        <polygon points="50,50 50,8 53,8" />
+        <polygon points="50,50 87,71 88.5,68.5" />
+        <polygon points="50,50 87,71 85.5,73.5" />
+        <polygon points="50,50 13,71 11.5,68.5" />
+        <polygon points="50,50 13,71 14.5,73.5" />
+      </g>
+    </svg>
   );
 }
 
