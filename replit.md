@@ -22,3 +22,19 @@ Cockpit comercial para concesionario de coches de ocasión. El equipo gestiona d
 - `/inbox` y `/inbox/:id` Buzón estilo WhatsApp con composer + 5 botones de borrador IA + "Personalizado" + "Simular mensaje entrante".
 - `/inventory` Tarjetas con estado, precio, atractivo, viewers y countdown vivo.
 - `/cars/:id` Detalle de coche con acciones (liberar, vender, editar) y leads relacionados.
+
+## Integración WhatsApp (Cloud API de Meta)
+- Cliente: `artifacts/api-server/src/lib/whatsapp.ts` (`sendWhatsAppText`, `parseIncomingWebhook`).
+- Rutas: `artifacts/api-server/src/routes/whatsapp.ts` montadas bajo `/api`.
+  - `GET  /api/whatsapp/webhook` — verificación (echo del `hub.challenge`).
+  - `POST /api/whatsapp/webhook` — recepción de mensajes; crea lead automáticamente por número (o lo enlaza si ya existe), registra el mensaje como `incoming` y suma `unreadCount`.
+  - `GET  /api/whatsapp/status` — devuelve `enabled` y `mode` (`live` | `sandbox`).
+  - `POST /api/whatsapp/sandbox/inbound` — `{ phone, name?, text }` simula mensaje entrante para pruebas locales.
+- Envío saliente: `POST /api/leads/:id/messages` ahora también dispara `sendWhatsAppText`. Si falla la entrega se registra warning pero el mensaje queda guardado.
+- Variables (todas opcionales en sandbox):
+  - `WHATSAPP_TOKEN` — token permanente de la app de Meta.
+  - `WHATSAPP_PHONE_NUMBER_ID` — id del número emisor (Meta Business).
+  - `WHATSAPP_VERIFY_TOKEN` — string que se introduce al configurar el webhook (por defecto `asistente-ventas-verify`).
+  - `WHATSAPP_GRAPH_VERSION` — opcional, por defecto `v21.0`.
+- Sin token configurado → modo **sandbox**: los envíos solo se loguean. Permite probar el cockpit completo antes de tener credenciales reales.
+- URL del webhook a registrar en Meta una vez desplegado: `https://<dominio>/api/whatsapp/webhook`.

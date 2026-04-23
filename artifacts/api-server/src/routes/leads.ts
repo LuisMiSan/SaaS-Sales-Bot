@@ -17,6 +17,8 @@ import {
 } from "@workspace/api-zod";
 import { serializeLead, serializeCar, serializeMessage } from "../lib/format";
 import { generateDraft } from "../lib/draft";
+import { sendWhatsAppText } from "../lib/whatsapp";
+import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
 
@@ -132,6 +134,11 @@ router.post("/leads/:id/messages", async (req, res): Promise<void> => {
     res.status(400).json({ error: body.error.message });
     return;
   }
+  const [lead] = await db.select().from(leadsTable).where(eq(leadsTable.id, params.data.id));
+  if (!lead) {
+    res.status(404).json({ error: "Lead not found" });
+    return;
+  }
   const [msg] = await db
     .insert(messagesTable)
     .values({
@@ -143,6 +150,12 @@ router.post("/leads/:id/messages", async (req, res): Promise<void> => {
     })
     .returning();
   await db.update(leadsTable).set({ updatedAt: sql`now()` }).where(eq(leadsTable.id, params.data.id));
+
+  const send = await sendWhatsAppText(lead.phone, body.data.content);
+  if (!send.ok) {
+    logger.warn({ leadId: lead.id, err: send.error }, "WhatsApp delivery failed (message stored)");
+  }
+
   res.status(201).json(serializeMessage(msg));
 });
 
