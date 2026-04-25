@@ -8,6 +8,7 @@ import { Countdown } from "@/components/countdown";
 import { attractivenessLabel, formatPrice, formatRelative, statusLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Eye, Fuel, Gauge, MapPin, Settings2 } from "lucide-react";
+import { BulkImportDialog } from "@/components/bulk-import-dialog";
 
 const FILTERS = [
   { value: undefined, label: "Todos" },
@@ -30,19 +31,22 @@ export default function InventoryPage() {
             <h1 className="text-3xl font-semibold tracking-tight">Inventario</h1>
             <p className="text-sm text-muted-foreground mt-1">Cada coche con su ventana de oportunidad.</p>
           </div>
-          <div className="flex items-center gap-1 p-1 bg-secondary rounded-md">
-            {FILTERS.map((f) => (
-              <button
-                key={f.label}
-                onClick={() => setStatus(f.value)}
-                className={cn(
-                  "px-3 py-1.5 text-xs font-medium rounded transition-colors",
-                  status === f.value ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {f.label}
-              </button>
-            ))}
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-1 p-1 bg-secondary rounded-md">
+              {FILTERS.map((f) => (
+                <button
+                  key={f.label}
+                  onClick={() => setStatus(f.value)}
+                  className={cn(
+                    "px-3 py-1.5 text-xs font-medium rounded transition-colors",
+                    status === f.value ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+            <BulkImportDialog />
           </div>
         </header>
 

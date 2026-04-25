@@ -13,8 +13,76 @@ import {
   MarkCarSoldParams,
 } from "@workspace/api-zod";
 import { serializeCar, windowHoursForAttractiveness } from "../lib/format";
+import { parseCarLine } from "../lib/import-ai";
+import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
+
+interface BulkImportResult {
+  created: ReturnType<typeof serializeCar>[];
+  failed: Array<{ line: string; error: string }>;
+}
+
+router.post("/cars/bulk-import", async (req, res): Promise<void> => {
+  const text = typeof req.body?.text === "string" ? req.body.text : "";
+  if (!text.trim()) {
+    res.status(400).json({ error: "text is required" });
+    return;
+  }
+  const lines = text
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0 && !l.startsWith("#"));
+
+  if (lines.length === 0) {
+    res.status(400).json({ error: "no usable lines" });
+    return;
+  }
+  if (lines.length > 50) {
+    res.status(400).json({ error: "max 50 cars per batch" });
+    return;
+  }
+
+  const result: BulkImportResult = { created: [], failed: [] };
+
+  for (const line of lines) {
+    try {
+      const parsed = await parseCarLine(line);
+      const hours = windowHoursForAttractiveness(parsed.attractiveness);
+      const now = new Date();
+      const [car] = await db
+        .insert(carsTable)
+        .values({
+          make: parsed.make,
+          model: parsed.model,
+          year: parsed.year,
+          price: parsed.price,
+          attractiveness: parsed.attractiveness,
+          km: parsed.km,
+          fuel: parsed.fuel,
+          transmission: parsed.transmission,
+          location: parsed.location,
+          depositCents: parsed.depositCents,
+          notes: parsed.notes,
+          status: "open",
+          availableUntil: new Date(now.getTime() + hours * 3600_000),
+          viewersNow: Math.floor(Math.random() * 8) + 1,
+        })
+        .returning();
+      await db.insert(activityTable).values({
+        kind: "new_car",
+        text: `Nuevo coche cargado por IA: ${car.make} ${car.model} ${car.year}`,
+        carLabel: `${car.make} ${car.model}`,
+      });
+      result.created.push(serializeCar(car));
+    } catch (err) {
+      logger.error({ err, line }, "bulk-import line failed");
+      result.failed.push({ line, error: (err as Error).message });
+    }
+  }
+
+  res.status(201).json(result);
+});
 
 router.get("/cars", async (req, res): Promise<void> => {
   const parsed = ListCarsQueryParams.safeParse(req.query);
