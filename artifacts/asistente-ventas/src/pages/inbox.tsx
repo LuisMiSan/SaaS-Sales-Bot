@@ -35,6 +35,7 @@ import {
   Send,
   Sparkles,
   Phone,
+  Wand2,
 } from "lucide-react";
 
 const INTENTS = [
@@ -44,6 +45,30 @@ const INTENTS = [
   { value: "handle_doubt", label: "Cliente duda" },
   { value: "post_release", label: "Post liberación" },
 ] as const;
+
+function pickAutoIntent(args: {
+  stage: string;
+  depositPaid: boolean;
+  carStatus: string;
+  lastIncoming: string | null;
+  hasMessages: boolean;
+}): string {
+  const { stage, depositPaid, carStatus, lastIncoming, hasMessages } = args;
+  const text = (lastIncoming ?? "").toLowerCase();
+
+  if (!hasMessages) return "first_response";
+  if (depositPaid || stage === "locked" || carStatus === "locked") return "confirm_lock";
+  if (stage === "released" || carStatus === "released") return "post_release";
+  if (stage === "awaiting_deposit") return "ask_deposit";
+
+  if (/(bizum|transfer|paypal|pago|paga|ingres|cuenta|iban)/.test(text)) return "confirm_lock";
+  if (/(reserv|bloque|deposit|señal|me lo quedo|lo cojo|lo quiero)/.test(text)) return "ask_deposit";
+  if (/(no sé|duda|pensar|consult|mañana|familia|mujer|marido|hablar|me lo pienso)/.test(text)) return "handle_doubt";
+
+  if (stage === "doubting") return "handle_doubt";
+  if (stage === "new") return "first_response";
+  return "handle_doubt";
+}
 
 const STAGE_FILTERS = [
   { value: undefined, label: "Todas" },
@@ -369,6 +394,26 @@ function Conversation({ leadId, onClose: _onClose }: { leadId: number; onClose: 
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground inline-flex items-center gap-1 mr-1">
             <Sparkles className="h-3 w-3 text-primary" /> Borrador IA
           </span>
+          <Button
+            variant="default"
+            size="sm"
+            className="h-7 text-[11px] gap-1"
+            onClick={() => {
+              const incomingMsgs = lead.messages.filter((m) => m.direction === "incoming");
+              const lastIncoming = incomingMsgs[incomingMsgs.length - 1]?.content ?? null;
+              const intent = pickAutoIntent({
+                stage: lead.stage,
+                depositPaid: lead.depositPaid,
+                carStatus: car.status,
+                lastIncoming,
+                hasMessages: lead.messages.length > 0,
+              });
+              onDraft(intent);
+            }}
+            disabled={draft.isPending}
+          >
+            <Wand2 className="h-3 w-3" /> Auto
+          </Button>
           {INTENTS.map((it) => (
             <Button
               key={it.value}
