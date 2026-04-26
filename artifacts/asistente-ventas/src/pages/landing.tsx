@@ -9,20 +9,19 @@ import {
   Eye,
   MessageSquare,
   CheckCircle2,
-  Inbox as InboxIcon,
   LayoutDashboard,
   Car as CarIcon,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
-import { WhatsappWidget } from "@/components/whatsapp-widget";
+import { WhatsappWidget, buildWhatsappUrl } from "@/components/whatsapp-widget";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const FILTERS = [
   { value: undefined, label: "Todos" },
-  { value: "hot" as const, label: "Atractivos 24h" },
-  { value: "normal" as const, label: "Normales 48h" },
-  { value: "hard" as const, label: "Difíciles 72h" },
+  { value: "hot" as const, label: "Termina hoy" },
+  { value: "normal" as const, label: "Quedan 2 días" },
+  { value: "hard" as const, label: "Quedan 3 días" },
 ];
 
 function endOfWeek(): Date {
@@ -204,12 +203,26 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* QUICK ACTIONS — corresponden a las secciones del SaaS */}
+      {/* ATAJOS — recorridos típicos del comprador */}
       <section className="bg-white py-14 px-6 border-t border-stone-200">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-5">
-          <QuickAction icon={CarIcon} title="Catálogo outlet" desc="15 coches esta semana" href="#catalogo" tag="Inventario" />
-          <QuickAction icon={InboxIcon} title="Mi bloqueo" desc="Habla con tu comercial" href="#proceso" tag="Buzón" />
-          <QuickAction icon={LayoutDashboard} title="Estado en vivo" desc="Cuántas unidades quedan" href="#proceso" tag="Dashboard" />
+          <QuickAction icon={CarIcon} title="Ver coches" desc="15 oportunidades esta semana" href="#catalogo" />
+          <QuickAction icon={Lock} title="Cómo funciona" desc="Bloqueo gratis 2h, sin compromiso" href="#proceso" />
+          <QuickAction
+            icon={MessageSquare}
+            title="Habla por WhatsApp"
+            desc="Te respondemos en minutos"
+            href={
+              buildWhatsappUrl(
+                "Hola, vengo del outlet de Pujamostucoche.es y me gustaría que me ayudéis a encontrar coche.",
+              ) ?? "#proceso"
+            }
+            external={Boolean(
+              buildWhatsappUrl(
+                "Hola, vengo del outlet de Pujamostucoche.es y me gustaría que me ayudéis a encontrar coche.",
+              ),
+            )}
+          />
           <QuickAction icon={CreditCard} title="Financiación" desc="Planes a tu medida" href="#sobre-nosotros" />
         </div>
       </section>
@@ -258,9 +271,9 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <Step n={1} icon={Lock} title="Bloqueas la unidad" body="Pulsas el botón y la unidad queda reservada solo para ti durante 2h. Sin pagar nada. Sin compromiso." tag="Inventario" />
-            <Step n={2} icon={MessageSquare} title="Hablamos por WhatsApp" body="Un comercial te escribe en minutos. Resolvéis dudas, planificáis prueba o entrega." tag="Buzón" />
-            <Step n={3} icon={CheckCircle2} title="Cierras la compra" body="Tienes 2h para cerrar (visita, financiación o transferencia). Si no cierras, vuelve al escaparate como liberada." tag="Dashboard" />
+            <Step n={1} icon={Lock} title="Bloqueas la unidad" body="Pulsas el botón y la unidad queda reservada solo para ti durante 2h. Sin pagar nada. Sin compromiso." />
+            <Step n={2} icon={MessageSquare} title="Hablamos por WhatsApp" body="Un comercial te escribe en minutos. Resolvéis dudas, planificáis prueba o entrega." />
+            <Step n={3} icon={CheckCircle2} title="Cierras la compra" body="Tienes 2h para cerrar (visita, financiación o transferencia). Si no cierras, vuelve al escaparate como liberada." />
           </div>
 
           <div id="sobre-nosotros" className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-white/10 pt-12">
@@ -311,20 +324,36 @@ const BRANDS = [
   { name: "Citroën", slug: "citroen" },
 ];
 
-function QuickAction({ icon: Icon, title, desc, href, tag }: { icon: React.ElementType; title: string; desc: string; href: string; tag?: string }) {
+function QuickAction({
+  icon: Icon,
+  title,
+  desc,
+  href,
+  external,
+}: {
+  icon: React.ElementType;
+  title: string;
+  desc: string;
+  href: string;
+  external?: boolean;
+}) {
+  const externalProps = external ? { target: "_blank" as const, rel: "noopener noreferrer" } : {};
   return (
-    <a href={href} className="block text-center p-6 rounded-xl border border-stone-200 bg-white hover:border-[#EE7B22] hover:shadow-lg hover:-translate-y-1 transition-all">
-      <div className="h-12 w-12 mx-auto rounded-full bg-[#EE7B22]/10 text-[#EE7B22] flex items-center justify-center mb-3">
+    <a
+      href={href}
+      {...externalProps}
+      className="group block text-center p-6 rounded-xl border border-stone-200 bg-white hover:border-[#EE7B22] hover:shadow-lg hover:-translate-y-1 transition-all"
+    >
+      <div className="h-12 w-12 mx-auto rounded-full bg-[#EE7B22]/10 text-[#EE7B22] flex items-center justify-center mb-3 group-hover:bg-[#EE7B22] group-hover:text-white transition-colors">
         <Icon className="h-6 w-6" />
       </div>
       <div className="font-extrabold text-stone-900">{title}</div>
-      <div className="text-xs text-stone-500 mt-0.5">{desc}</div>
-      {tag && <div className="mt-3 inline-block text-[10px] uppercase tracking-widest text-[#C4621A] bg-[#EE7B22]/10 px-2 py-0.5 rounded-full font-bold">→ {tag}</div>}
+      <div className="text-xs text-stone-500 mt-1">{desc}</div>
     </a>
   );
 }
 
-function Step({ n, icon: Icon, title, body, tag }: { n: number; icon: React.ElementType; title: string; body: string; tag: string }) {
+function Step({ n, icon: Icon, title, body }: { n: number; icon: React.ElementType; title: string; body: string }) {
   return (
     <div className="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur">
       <div className="flex items-center justify-between">
@@ -335,7 +364,6 @@ function Step({ n, icon: Icon, title, body, tag }: { n: number; icon: React.Elem
       </div>
       <h3 className="mt-4 text-xl font-extrabold">{title}</h3>
       <p className="mt-2 text-sm text-white/60 leading-relaxed">{body}</p>
-      <div className="mt-4 inline-block text-[10px] uppercase tracking-widest text-[#EE7B22] bg-[#EE7B22]/15 px-2 py-0.5 rounded-full font-bold">SaaS · {tag}</div>
     </div>
   );
 }
