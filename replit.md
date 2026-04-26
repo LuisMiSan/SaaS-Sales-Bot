@@ -8,7 +8,8 @@ Cockpit comercial para concesionario de coches de ocasión. El equipo gestiona d
 - En el cockpit (dashboard, inbox, car-detail) sí se sigue mostrando para uso interno del comercial.
 
 ## Web pública "Pujamostucoche.es" (`/tienda` y `/tienda/coche/:id`)
-- Orden de secciones del landing: Hero+Countdown → Outlet de la semana (catálogo de 15 coches) → Quick actions → Marcas → Cómo funciona (3 pasos, 2h) → Sobre nosotros → Footer.
+- Orden de secciones del landing: Hero+Countdown → Outlet de la semana (selectores de carrocería + marca arriba, después catálogo de hasta 15 coches) → Quick actions → Marcas → Cómo funciona (3 pasos, 2h) → Sobre nosotros → Footer.
+- Selectores horizontales `BodyTypePicker` y `BrandPicker` (`src/components/car-pickers.tsx`): scroll snap + flechas (md+), tarjetas con `aria-pressed` para toggle. Carrocería se infiere por regex del make+model (`inferBodyType`, sin campo en BD). Marca filtra por `car.make` case-insensitive. Filtros se componen con la atractividad existente. Estado vacío con CTA "Quitar todos los filtros" si la combinación no devuelve coches.
 - Per-car: caja "Cómo funciona el bloqueo" rediseñada en 3 columnas horizontales (`LockStep`): Bloquéalo gratis · Te escribimos por WhatsApp · Tienes 2h para cerrar.
 - Widget WhatsApp flotante (`src/components/whatsapp-widget.tsx`): fijo abajo a la derecha. Lee `VITE_WHATSAPP_PUBLIC_NUMBER` (var de entorno expuesta a Vite) y se oculta si está vacío o inválido. Mensaje genérico en `/tienda`, mensaje pre-rellenado por coche en `/tienda/coche/:id`.
 

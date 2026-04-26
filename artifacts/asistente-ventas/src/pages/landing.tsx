@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
 import { WhatsappWidget, buildWhatsappUrl } from "@/components/whatsapp-widget";
+import { BodyTypePicker, BrandPicker, inferBodyType } from "@/components/car-pickers";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -54,6 +55,8 @@ function useWeekCountdown() {
 export default function LandingPage() {
   const { data: allCars } = useListCars();
   const [filter, setFilter] = useState<string | undefined>(undefined);
+  const [bodyFilter, setBodyFilter] = useState<string | undefined>(undefined);
+  const [brandFilter, setBrandFilter] = useState<string | undefined>(undefined);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -65,10 +68,30 @@ export default function LandingPage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [menuOpen]);
   const cars = useMemo(() => {
-    const open = (allCars ?? []).filter((c) => c.status !== "sold");
-    if (!filter) return open.slice(0, 15);
-    return open.filter((c) => c.attractiveness === filter).slice(0, 15);
-  }, [allCars, filter]);
+    let open = (allCars ?? []).filter((c) => c.status !== "sold");
+    if (filter) open = open.filter((c) => c.attractiveness === filter);
+    if (bodyFilter) open = open.filter((c) => inferBodyType(c.make, c.model) === bodyFilter);
+    if (brandFilter) open = open.filter((c) => c.make.toLowerCase() === brandFilter.toLowerCase());
+    return open.slice(0, 15);
+  }, [allCars, filter, bodyFilter, brandFilter]);
+
+  const onPickBody = (value: string | undefined) => {
+    setBodyFilter(value);
+    if (value && typeof window !== "undefined") {
+      requestAnimationFrame(() => {
+        document.getElementById("catalogo-grid")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  };
+
+  const onPickBrand = (value: string | undefined) => {
+    setBrandFilter(value);
+    if (value && typeof window !== "undefined") {
+      requestAnimationFrame(() => {
+        document.getElementById("catalogo-grid")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  };
 
   const { d, h, m, s } = useWeekCountdown();
 
@@ -152,12 +175,31 @@ export default function LandingPage() {
       {/* CATÁLOGO — 15 coches (justo debajo del Hero) */}
       <section id="catalogo" className="bg-white py-12 sm:py-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10">
+          {/* Selectores de búsqueda — carrocerías + marcas */}
+          <div className="space-y-8 mb-10 sm:mb-12">
+            <BodyTypePicker active={bodyFilter} onSelect={onPickBody} />
+            <BrandPicker active={brandFilter} onSelect={onPickBrand} />
+          </div>
+
+          <div id="catalogo-grid" className="flex flex-col sm:flex-row sm:flex-wrap sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10 scroll-mt-24">
             <div>
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                 Outlet de la <em className="not-italic text-[#EE7B22]">semana</em>
               </h2>
-              <p className="text-sm text-stone-500 mt-1">15 coches con ventana de oportunidad. Pulsa "Bloquear unidad" y queda reservada 2h para ti, sin pagar nada.</p>
+              <p className="text-sm text-stone-500 mt-1">
+                {bodyFilter || brandFilter
+                  ? `${cars.length} coches que coinciden con tu búsqueda.`
+                  : "15 coches con ventana de oportunidad. Pulsa \"Bloquear unidad\" y queda reservada 2h para ti, sin pagar nada."}
+              </p>
+              {(bodyFilter || brandFilter) && (
+                <button
+                  type="button"
+                  onClick={() => { setBodyFilter(undefined); setBrandFilter(undefined); }}
+                  className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#EE7B22] hover:underline"
+                >
+                  Quitar filtros y ver todos
+                </button>
+              )}
             </div>
             <div className="flex gap-2 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap pb-1 sm:pb-0">
               {FILTERS.map((f) => (
@@ -177,6 +219,22 @@ export default function LandingPage() {
             </div>
           </div>
 
+          {cars.length === 0 ? (
+            <div className="border-2 border-dashed border-stone-200 rounded-xl py-12 px-6 text-center">
+              <CarIcon className="h-10 w-10 mx-auto text-stone-300" />
+              <p className="mt-3 text-sm font-semibold text-stone-700">
+                Ningún coche del outlet coincide con esta búsqueda esta semana.
+              </p>
+              <p className="text-xs text-stone-500 mt-1">Prueba a cambiar de carrocería o marca, o quita los filtros.</p>
+              <button
+                type="button"
+                onClick={() => { setBodyFilter(undefined); setBrandFilter(undefined); setFilter(undefined); }}
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#EE7B22] hover:bg-[#C4621A] text-white text-xs font-extrabold transition-colors"
+              >
+                Quitar todos los filtros
+              </button>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
             {cars.map((car, idx) => {
               const original = parseOriginal(car.notes);
@@ -271,6 +329,7 @@ export default function LandingPage() {
               );
             })}
           </div>
+          )}
         </div>
       </section>
 
