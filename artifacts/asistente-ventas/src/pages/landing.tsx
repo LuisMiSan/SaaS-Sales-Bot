@@ -149,29 +149,52 @@ export default function LandingPage() {
             {cars.map((car, idx) => {
               const original = parseOriginal(car.notes);
               const discount = original ? Math.round(((original - car.price) / original) * 100) : null;
+              const isLocked = car.status === "locked";
               return (
                 <Link key={car.id} href={`/tienda/coche/${car.id}`}>
-                  <article className="bg-white border border-stone-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-[#EE7B22] hover:-translate-y-1 transition-all cursor-pointer h-full flex flex-col">
+                  <article
+                    className={cn(
+                      "bg-white border rounded-xl overflow-hidden h-full flex flex-col transition-all",
+                      isLocked
+                        ? "border-stone-200 opacity-90 cursor-pointer hover:shadow-md"
+                        : "border-stone-200 cursor-pointer hover:shadow-xl hover:border-[#EE7B22] hover:-translate-y-1",
+                    )}
+                  >
                     <div className="relative">
-                      <CarThumb make={car.make} model={car.model} imageUrl={car.imageUrl} className="h-44 w-full" />
-                      {idx < 3 && (
-                        <span className="absolute top-3 left-3 bg-[#E74C3C] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
-                          Flash
+                      <CarThumb
+                        make={car.make}
+                        model={car.model}
+                        imageUrl={car.imageUrl}
+                        className={cn("h-44 w-full", isLocked && "grayscale")}
+                      />
+                      {isLocked ? (
+                        <span className="absolute top-3 left-3 bg-stone-900 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full inline-flex items-center gap-1">
+                          <Lock className="h-3 w-3" /> Reservado
                         </span>
+                      ) : (
+                        <>
+                          {idx < 3 && (
+                            <span className="absolute top-3 left-3 bg-[#E74C3C] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+                              Flash
+                            </span>
+                          )}
+                          {idx >= 3 && car.status === "open" && car.attractiveness === "hard" && (
+                            <span className="absolute top-3 left-3 bg-[#F39C12] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+                              Última
+                            </span>
+                          )}
+                        </>
                       )}
-                      {idx >= 3 && car.status === "open" && car.attractiveness === "hard" && (
-                        <span className="absolute top-3 left-3 bg-[#F39C12] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
-                          Última
-                        </span>
-                      )}
-                      {discount && discount > 0 && (
+                      {!isLocked && discount && discount > 0 && (
                         <span className="absolute top-3 right-3 bg-[#27AE60] text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
                           -{discount}%
                         </span>
                       )}
-                      <span className="absolute bottom-3 right-3 bg-black/45 backdrop-blur text-white text-[10px] font-medium px-2 py-1 rounded-full inline-flex items-center gap-1">
-                        <Eye className="h-3 w-3" /> {car.viewersNow} viendo
-                      </span>
+                      {!isLocked && (
+                        <span className="absolute bottom-3 right-3 bg-black/45 backdrop-blur text-white text-[10px] font-medium px-2 py-1 rounded-full inline-flex items-center gap-1">
+                          <Eye className="h-3 w-3" /> {car.viewersNow} viendo
+                        </span>
+                      )}
                     </div>
                     <div className="p-4 flex-1 flex flex-col">
                       <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22]">{car.make}</div>
@@ -182,18 +205,34 @@ export default function LandingPage() {
                         <span className="bg-stone-100 text-stone-600 text-[11px] px-2 py-0.5 rounded">{car.fuel}</span>
                       </div>
                       <div className="mt-3 flex items-baseline gap-2">
-                        <span className="text-2xl font-black tabular-nums">{formatPrice(car.price)}</span>
-                        {original && (
+                        <span className={cn("text-2xl font-black tabular-nums", isLocked && "text-stone-500")}>{formatPrice(car.price)}</span>
+                        {!isLocked && original && (
                           <span className="text-sm text-stone-400 line-through tabular-nums">{formatPrice(original)}</span>
                         )}
                       </div>
-                      <div className="mt-2 inline-flex items-center gap-1.5 text-xs text-[#E74C3C] font-bold">
-                        <Clock className="h-3.5 w-3.5" />
-                        Quedan {timeUntilLabel(car.availableUntil)}
-                      </div>
-                      <button className="mt-4 w-full py-2.5 rounded-lg bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold text-sm transition-colors">
-                        Bloquear unidad
-                      </button>
+                      {isLocked ? (
+                        <div className="mt-2 inline-flex items-center gap-1.5 text-xs text-stone-600 font-bold">
+                          <Lock className="h-3.5 w-3.5" />
+                          Vuelve al outlet en {timeUntilLabel(car.lockedUntil ?? car.availableUntil)}
+                        </div>
+                      ) : (
+                        <div className="mt-2 inline-flex items-center gap-1.5 text-xs text-[#E74C3C] font-bold">
+                          <Clock className="h-3.5 w-3.5" />
+                          Quedan {timeUntilLabel(car.availableUntil)}
+                        </div>
+                      )}
+                      {isLocked ? (
+                        <button
+                          disabled
+                          className="mt-4 w-full py-2.5 rounded-lg bg-stone-200 text-stone-500 font-extrabold text-sm cursor-not-allowed"
+                        >
+                          Reservado por otro cliente
+                        </button>
+                      ) : (
+                        <button className="mt-4 w-full py-2.5 rounded-lg bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold text-sm transition-colors">
+                          Bloquear unidad
+                        </button>
+                      )}
                     </div>
                   </article>
                 </Link>

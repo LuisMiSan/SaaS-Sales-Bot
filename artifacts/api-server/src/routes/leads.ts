@@ -67,7 +67,70 @@ router.post("/leads", async (req, res): Promise<void> => {
     leadName: lead.name,
     carLabel: `${car.make} ${car.model}`,
   });
-  res.status(201).json({ ...serializeLead(lead, null), car: serializeCar(car) });
+  const [welcome] = await db
+    .insert(messagesTable)
+    .values({
+      leadId: lead.id,
+      direction: "outgoing",
+      content: `Hola ${lead.name}, soy del equipo de Pujamostucoche.es. He visto que te interesa el ${car.make} ${car.model}. ¿Quieres que te lo bloquee 2h sin compromiso? También puedo ayudarte con financiación.`,
+      aiGenerated: true,
+    })
+    .returning();
+  res.status(201).json({ ...serializeLead(lead, welcome), publicToken: lead.publicToken, car: serializeCar(car) });
+});
+
+router.get("/leads/:id/thread", async (req, res): Promise<void> => {
+  const params = ListLeadMessagesParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const token = typeof req.query.token === "string" ? req.query.token : "";
+  if (!token) {
+    res.status(401).json({ error: "Missing token" });
+    return;
+  }
+  const [lead] = await db.select().from(leadsTable).where(eq(leadsTable.id, params.data.id));
+  if (!lead || lead.publicToken !== token) {
+    res.status(404).json({ error: "Conversation not found" });
+    return;
+  }
+  const messages = await db.select().from(messagesTable).where(eq(messagesTable.leadId, lead.id)).orderBy(messagesTable.createdAt);
+  res.json(messages.map(serializeMessage));
+});
+
+router.post("/leads/:id/thread", async (req, res): Promise<void> => {
+  const params = SimulateIncomingMessageParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const body = SimulateIncomingMessageBody.safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.message });
+    return;
+  }
+  const token = typeof req.query.token === "string" ? req.query.token : "";
+  if (!token) {
+    res.status(401).json({ error: "Missing token" });
+    return;
+  }
+  const [lead] = await db.select().from(leadsTable).where(eq(leadsTable.id, params.data.id));
+  if (!lead || lead.publicToken !== token) {
+    res.status(404).json({ error: "Conversation not found" });
+    return;
+  }
+  const [msg] = await db
+    .insert(messagesTable)
+    .values({
+      leadId: lead.id,
+      direction: "incoming",
+      content: body.data.content,
+      aiGenerated: false,
+    })
+    .returning();
+  await db.update(leadsTable).set({ unreadCount: sql`${leadsTable.unreadCount} + 1`, updatedAt: sql`now()` }).where(eq(leadsTable.id, lead.id));
+  res.status(201).json(serializeMessage(msg));
 });
 
 router.get("/leads/:id", async (req, res): Promise<void> => {

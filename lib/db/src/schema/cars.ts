@@ -1,4 +1,5 @@
 import { pgTable, serial, text, integer, timestamp, boolean, doublePrecision } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const carsTable = pgTable("cars", {
   id: serial("id").primaryKey(),
@@ -38,6 +39,7 @@ export const leadsTable = pgTable("leads", {
   depositPaid: boolean("deposit_paid").notNull().default(false),
   unreadCount: integer("unread_count").notNull().default(0),
   avatarColor: text("avatar_color").notNull().default("#7c3aed"),
+  publicToken: text("public_token").notNull().default(sql`gen_random_uuid()`),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

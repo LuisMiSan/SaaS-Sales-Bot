@@ -25,7 +25,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { CarThumb } from "@/components/car-thumb";
 import { StatusBadge, StageBadge } from "@/components/badges";
 import { Countdown } from "@/components/countdown";
-import { formatDeposit, formatPrice, formatRelative, formatTime, initials, intentLabel, stageLabel } from "@/lib/format";
+import { formatPrice, formatRelative, formatTime, initials, intentLabel, stageLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import {
   ChevronDown,
@@ -332,7 +332,6 @@ function Conversation({ leadId, onClose: _onClose }: { leadId: number; onClose: 
               <div className="flex items-center justify-between mt-2 gap-3 flex-wrap">
                 <div className="flex items-baseline gap-3">
                   <div className="text-base font-semibold tabular-nums">{formatPrice(car.price)}</div>
-                  <div className="text-xs text-muted-foreground">Depósito {formatDeposit(car.depositCents)}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   {car.status !== "sold" && <Countdown target={target} variant={variant} />}

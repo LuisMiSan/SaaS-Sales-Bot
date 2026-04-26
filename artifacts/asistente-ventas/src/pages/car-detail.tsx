@@ -19,7 +19,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { CarThumb } from "@/components/car-thumb";
 import { StatusBadge, StageBadge } from "@/components/badges";
 import { Countdown } from "@/components/countdown";
-import { attractivenessLabel, formatDeposit, formatPrice, formatRelative } from "@/lib/format";
+import { attractivenessLabel, formatPrice, formatRelative } from "@/lib/format";
 import { ArrowLeft, Check, Eye, MapPin, MessageSquare, Pencil, Unlock } from "lucide-react";
 
 export default function CarDetailPage() {
@@ -78,7 +78,6 @@ export default function CarDetailPage() {
 
               <div className="flex items-baseline gap-3">
                 <div className="text-3xl font-semibold tabular-nums">{formatPrice(car.price)}</div>
-                <div className="text-xs text-muted-foreground">Depósito {formatDeposit(car.depositCents)}</div>
               </div>
 
               {car.status !== "sold" && (

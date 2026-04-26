@@ -1,7 +1,7 @@
 import { useGetDashboardSummary, useGetRecentActivity } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
-import { formatDeposit, formatRelative, stageLabel, statusLabel } from "@/lib/format";
-import { Activity, Car, Lock, Sparkles, TrendingUp, Users, Clock, Wallet } from "lucide-react";
+import { formatRelative, stageLabel, statusLabel } from "@/lib/format";
+import { Activity, Car, Lock, Sparkles, TrendingUp, Users, Clock } from "lucide-react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 
@@ -60,8 +60,8 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Kpi icon={Car} label="En escaparate" value={String(summary?.openCars ?? "·")} hint="Disponibles para bloquear" accent="bg-emerald-500/15 text-emerald-400" />
-          <Kpi icon={Lock} label="Bloqueadas 2h" value={String(summary?.lockedCars ?? "·")} hint={summary ? `${formatDeposit(summary.depositValueCents)} en depósitos` : undefined} accent="bg-rose-500/15 text-rose-400" />
-          <Kpi icon={Users} label="Leads activos" value={String(summary?.activeLeads ?? "·")} hint={`${summary?.awaitingDeposit ?? 0} esperando depósito`} accent="bg-sky-500/15 text-sky-400" />
+          <Kpi icon={Lock} label="Bloqueadas 2h" value={String(summary?.lockedCars ?? "·")} hint="Reservadas ahora mismo" accent="bg-rose-500/15 text-rose-400" />
+          <Kpi icon={Users} label="Leads activos" value={String(summary?.activeLeads ?? "·")} hint="Conversaciones abiertas" accent="bg-sky-500/15 text-sky-400" />
           <Kpi icon={TrendingUp} label="Ventas 7 días" value={String(summary?.wonLast7d ?? "·")} hint={summary ? `Conversión ${(summary.conversionRate * 100).toFixed(0)}%` : undefined} accent="bg-primary/15 text-primary" />
         </div>
 
@@ -120,14 +120,6 @@ export default function DashboardPage() {
                   </div>
                 );
               })}
-            </div>
-            <div className="mt-5 pt-5 border-t border-border">
-              <div className="flex items-center gap-2">
-                <Wallet className="h-4 w-4 text-primary" />
-                <div className="text-sm font-medium">Depósitos retenidos</div>
-              </div>
-              <div className="text-2xl font-semibold tabular-nums mt-1">{summary ? formatDeposit(summary.depositValueCents) : "—"}</div>
-              <div className="text-xs text-muted-foreground">En unidades bloqueadas ahora mismo</div>
             </div>
           </Card>
         </div>

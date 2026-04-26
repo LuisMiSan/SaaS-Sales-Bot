@@ -64,3 +64,12 @@ Cockpit comercial para concesionario de coches de ocasión. El equipo gestiona d
 - Se rellenan automáticamente al importar coches por la IA (basadas en coches.net, AutoScout24, milanuncios, wallapop motor: depreciación, kms, equipamiento, automático). Amplitud típica 15-25%.
 - Backfill puntual de coches antiguos: `pnpm dlx tsx artifacts/api-server/scripts/backfill-market-prices.ts` (idempotente, solo procesa los que estén `NULL`).
 - Componente UI: `artifacts/asistente-ventas/src/components/market-price-card.tsx`. Renderiza una barra horizontal con rango azul (mín-máx portales), nuestro precio como pin naranja, tres KPIs (mín/tú pagas/máx) y el ahorro vs media. Solo se muestra si ambos campos están presentes y `max > min`.
+
+## Chat público en la ficha de coche (`/tienda/coche/:id`)
+- Cuando el cliente rellena el formulario de bloqueo, `POST /api/leads` crea el lead, inserta automáticamente un mensaje `outgoing` de bienvenida (no se envía por WhatsApp, solo queda en BD) y devuelve además `publicToken` (UUID por lead, columna `leads.public_token`).
+- El frontend guarda `{leadId, publicToken, name, phone}` en `localStorage` con clave `pujamostucoche.lead.<carId>` y muestra `<CustomerChat>` debajo de la ficha.
+- Endpoints públicos blindados por token (no usan los hooks generados):
+  - `GET  /api/leads/:id/thread?token=<uuid>` — lista mensajes. 401 si falta token, 404 si token incorrecto.
+  - `POST /api/leads/:id/thread?token=<uuid>` body `{content}` — añade mensaje `incoming` (lo verá el comercial en su buzón). Mismas respuestas de error.
+- `<CustomerChat>` (`artifacts/asistente-ventas/src/components/customer-chat.tsx`) hace polling cada 5s con `fetch` directo y muestra burbujas estilo WhatsApp (incoming = verde a la derecha, outgoing dealer = blanco a la izquierda).
+- Los endpoints `GET/POST /api/leads/:id/messages` y `POST /api/leads/:id/incoming` siguen siendo del cockpit y no requieren token (uso interno del comercial).

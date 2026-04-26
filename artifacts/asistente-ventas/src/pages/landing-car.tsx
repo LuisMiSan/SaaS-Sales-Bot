@@ -20,7 +20,40 @@ import {
 import { CarThumb } from "@/components/car-thumb";
 import { MarketPriceCard } from "@/components/market-price-card";
 import { WhatsappWidget } from "@/components/whatsapp-widget";
+import { CustomerChat } from "@/components/customer-chat";
 import { formatPrice } from "@/lib/format";
+
+type StoredLead = { leadId: number; publicToken: string; name: string; phone: string };
+
+function loadStoredLead(carId: number): StoredLead | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(`pujamostucoche.lead.${carId}`);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<StoredLead>;
+    if (
+      typeof parsed.leadId === "number" &&
+      typeof parsed.publicToken === "string" &&
+      parsed.publicToken.length > 0 &&
+      typeof parsed.name === "string" &&
+      typeof parsed.phone === "string"
+    ) {
+      return { leadId: parsed.leadId, publicToken: parsed.publicToken, name: parsed.name, phone: parsed.phone };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function saveStoredLead(carId: number, value: StoredLead) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(`pujamostucoche.lead.${carId}`, JSON.stringify(value));
+  } catch {
+    /* noop */
+  }
+}
 
 export default function LandingCarPage() {
   const [, params] = useRoute("/tienda/coche/:id");
@@ -32,14 +65,17 @@ export default function LandingCarPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [accepted, setAccepted] = useState(false);
-  const [done, setDone] = useState<{ leadId: number } | null>(null);
+  const [stored, setStored] = useState<StoredLead | null>(null);
 
   useEffect(() => {
     document.documentElement.classList.remove("dark");
     return () => { document.documentElement.classList.add("dark"); };
   }, []);
 
-  useEffect(() => { window.scrollTo(0, 0); }, [id]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    if (id) setStored(loadStoredLead(id));
+  }, [id]);
 
   if (!car) {
     return <div className="min-h-screen bg-[#f5f7fa] flex items-center justify-center text-stone-500 font-jakarta">Cargando ficha…</div>;
@@ -48,13 +84,22 @@ export default function LandingCarPage() {
   const original = parseOriginal(car.notes);
   const discount = original ? Math.round(((original - car.price) / original) * 100) : null;
   const others = (allCars ?? []).filter((c) => c.id !== car.id && c.status !== "sold").slice(0, 4);
+  const isLockedByOther = car.status === "locked" && !stored;
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!accepted || !name.trim() || !phone.trim()) return;
     create.mutate(
       { data: { name: name.trim(), phone: phone.trim(), carId: car.id } },
-      { onSuccess: (lead) => setDone({ leadId: lead.id }) },
+      {
+        onSuccess: (lead) => {
+          const token = (lead as { publicToken?: string }).publicToken ?? "";
+          if (!token) return;
+          const value: StoredLead = { leadId: lead.id, publicToken: token, name: name.trim(), phone: phone.trim() };
+          saveStoredLead(car.id, value);
+          setStored(value);
+        },
+      },
     );
   };
 
@@ -174,17 +219,31 @@ export default function LandingCarPage() {
 
                   <div className="mt-4 inline-flex items-center gap-1.5 text-sm text-[#E74C3C] font-bold">
                     <Clock className="h-4 w-4" />
-                    Quedan {timeUntilLabel(car.availableUntil)} de outlet
+                    {car.status === "locked"
+                      ? `Reservada · vuelve al outlet en ${timeUntilLabel(car.lockedUntil ?? car.availableUntil)}`
+                      : `Quedan ${timeUntilLabel(car.availableUntil)} de outlet`}
                   </div>
 
-                  {done ? (
-                    <div className="mt-6 p-5 rounded-xl bg-[#27AE60]/10 border border-[#27AE60]/30 text-sm text-stone-800">
-                      <div className="font-extrabold text-[#27AE60] flex items-center gap-2 mb-1.5">
-                        <CheckCircle2 className="h-5 w-5" /> Solicitud recibida
+                  {stored ? (
+                    <div className="mt-6 p-4 rounded-xl bg-[#27AE60]/10 border border-[#27AE60]/30 text-sm text-stone-800">
+                      <div className="font-extrabold text-[#27AE60] flex items-center gap-2 mb-1">
+                        <CheckCircle2 className="h-5 w-5" /> Conversación abierta
                       </div>
-                      <p>Hemos creado tu petición de bloqueo. Un comercial te escribirá por WhatsApp al <strong>{phone}</strong> en los próximos minutos.</p>
-                      <Link href={`/inbox/${done.leadId}`} className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-[#C4621A] hover:underline">
-                        Ver conversación en el panel comercial →
+                      <p className="text-xs text-stone-600">
+                        Hablas con un comercial al <strong>{stored.phone}</strong>. La conversación está abajo, en vivo.
+                      </p>
+                    </div>
+                  ) : isLockedByOther ? (
+                    <div className="mt-6 p-5 rounded-xl bg-stone-100 border border-stone-200 text-sm text-stone-700">
+                      <div className="font-extrabold text-stone-900 flex items-center gap-2 mb-1.5">
+                        <Lock className="h-5 w-5" /> Reservado por otro cliente
+                      </div>
+                      <p className="text-xs text-stone-600">
+                        Esta unidad está bloqueada 2h. Si no se cierra la compra, vuelve al outlet automáticamente.
+                        Mientras tanto, mira el resto del catálogo.
+                      </p>
+                      <Link href="/tienda" className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-[#C4621A] hover:underline">
+                        Ver otros coches →
                       </Link>
                     </div>
                   ) : (
@@ -238,6 +297,21 @@ export default function LandingCarPage() {
               </div>
             </aside>
           </div>
+
+          {stored && (
+            <section className="mt-12">
+              <div className="flex items-center gap-2 mb-4">
+                <MessageSquare className="h-5 w-5 text-[#EE7B22]" />
+                <h2 className="text-2xl font-extrabold tracking-tight">Tu conversación con el comercial</h2>
+              </div>
+              <p className="text-sm text-stone-500 mb-5 max-w-2xl">
+                Lo que escribes aquí también le llega al comercial por WhatsApp. Te respondemos en minutos en horario comercial.
+              </p>
+              <div className="max-w-2xl">
+                <CustomerChat leadId={stored.leadId} publicToken={stored.publicToken} customerName={stored.name} />
+              </div>
+            </section>
+          )}
 
           {/* OTROS COCHES — corresponde a Inventario */}
           {others.length > 0 && (
