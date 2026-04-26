@@ -24,21 +24,21 @@ export default function InventoryPage() {
 
   return (
     <div className="flex-1 overflow-y-auto scrollbar-thin">
-      <div className="p-8 max-w-[1400px] mx-auto space-y-6">
-        <header className="flex items-end justify-between flex-wrap gap-4">
+      <div className="p-4 md:p-8 max-w-[1400px] mx-auto space-y-5 md:space-y-6">
+        <header className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
           <div>
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">Escaparate</div>
-            <h1 className="text-3xl font-semibold tracking-tight">Inventario</h1>
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Inventario</h1>
             <p className="text-sm text-muted-foreground mt-1">Cada coche con su ventana de oportunidad.</p>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex items-center gap-1 p-1 bg-secondary rounded-md">
+            <div className="flex items-center gap-1 p-1 bg-secondary rounded-md overflow-x-auto max-w-full">
               {FILTERS.map((f) => (
                 <button
                   key={f.label}
                   onClick={() => setStatus(f.value)}
                   className={cn(
-                    "px-3 py-1.5 text-xs font-medium rounded transition-colors",
+                    "shrink-0 px-3 py-1.5 text-xs font-medium rounded transition-colors whitespace-nowrap",
                     status === f.value ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
                   )}
                 >

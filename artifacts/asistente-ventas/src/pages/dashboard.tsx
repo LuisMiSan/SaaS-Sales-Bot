@@ -46,14 +46,14 @@ export default function DashboardPage() {
 
   return (
     <div className="flex-1 overflow-y-auto scrollbar-thin">
-      <div className="p-8 max-w-[1400px] mx-auto space-y-6">
-        <header className="flex items-end justify-between">
+      <div className="p-4 md:p-8 max-w-[1400px] mx-auto space-y-5 md:space-y-6">
+        <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
           <div>
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">Panel general</div>
-            <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Dashboard</h1>
             <p className="text-sm text-muted-foreground mt-1">Estado del escaparate, leads activos y tiempo de respuesta.</p>
           </div>
-          <Link href="/inbox" className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90">
+          <Link href="/inbox" className="self-start sm:self-auto inline-flex items-center gap-2 px-3 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90">
             Abrir buzón
           </Link>
         </header>
@@ -80,7 +80,7 @@ export default function DashboardPage() {
                 const count = row?.count ?? 0;
                 return (
                   <div key={stage} className="flex items-center gap-3">
-                    <div className="w-40 text-xs text-foreground/80">{stageLabel(stage)}</div>
+                    <div className="w-24 sm:w-40 text-xs text-foreground/80 truncate">{stageLabel(stage)}</div>
                     <div className="flex-1 h-6 bg-secondary rounded relative overflow-hidden">
                       <motion.div
                         className={`h-full ${STAGE_TONE[stage]} opacity-70`}
@@ -107,7 +107,7 @@ export default function DashboardPage() {
                 const count = row?.count ?? 0;
                 return (
                   <div key={status} className="flex items-center gap-3">
-                    <div className="w-32 text-xs text-foreground/80">{statusLabel(status)}</div>
+                    <div className="w-20 sm:w-32 text-xs text-foreground/80 truncate">{statusLabel(status)}</div>
                     <div className="flex-1 h-5 bg-secondary rounded overflow-hidden">
                       <motion.div
                         className={`h-full ${STATUS_TONE[status]} opacity-70`}

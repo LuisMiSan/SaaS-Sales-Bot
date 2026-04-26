@@ -107,17 +107,22 @@ export default function LandingCarPage() {
     <div className="bg-[#f5f7fa] text-[#222] font-jakarta min-h-screen">
       {/* HEADER */}
       <header className="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
-          <Link href="/tienda" className="text-xl font-extrabold tracking-tight">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between gap-3">
+          <Link href="/tienda" className="text-base sm:text-xl font-extrabold tracking-tight whitespace-nowrap min-w-0 truncate">
             Pujamos<span className="text-[#EE7B22]">tu</span>coche.es
           </Link>
-          <Link href="/tienda" className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-stone-600 hover:text-[#EE7B22]">
-            <ArrowLeft className="h-3.5 w-3.5" /> Volver al outlet
+          <Link
+            href="/tienda"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-stone-600 hover:text-[#EE7B22] whitespace-nowrap shrink-0"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span className="sm:hidden">Volver</span>
+            <span className="hidden sm:inline">Volver al outlet</span>
           </Link>
         </div>
       </header>
 
-      <main className="pt-24 pb-20 px-6">
+      <main className="pt-24 pb-20 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <nav className="text-xs text-stone-500 mb-5">
             <Link href="/tienda" className="hover:text-[#EE7B22]">Outlet</Link>
@@ -127,11 +132,11 @@ export default function LandingCarPage() {
             <span className="text-stone-800 font-semibold">{car.model}</span>
           </nav>
 
-          <div className="grid lg:grid-cols-5 gap-8">
+          <div className="grid lg:grid-cols-5 gap-6 lg:gap-8">
             {/* GALLERY + INFO */}
-            <div className="lg:col-span-3 space-y-6">
+            <div className="lg:col-span-3 space-y-6 order-2 lg:order-1">
               <div className="relative rounded-2xl overflow-hidden bg-white shadow-sm">
-                <CarThumb make={car.make} model={car.model} imageUrl={car.imageUrl} className="w-full h-[360px] md:h-[440px]" />
+                <CarThumb make={car.make} model={car.model} imageUrl={car.imageUrl} className="w-full h-[260px] sm:h-[360px] md:h-[440px]" />
                 {discount && discount > 0 && (
                   <span className="absolute top-4 left-4 bg-[#27AE60] text-white text-xs font-bold px-3 py-1.5 rounded-full">
                     -{discount}% outlet
@@ -200,9 +205,9 @@ export default function LandingCarPage() {
             </div>
 
             {/* SIDEBAR — bloqueo */}
-            <aside className="lg:col-span-2">
-              <div className="sticky top-24 space-y-4">
-                <div className="bg-white rounded-2xl p-7 shadow-sm border border-stone-200">
+            <aside className="lg:col-span-2 order-1 lg:order-2">
+              <div className="lg:sticky lg:top-24 space-y-4">
+                <div className="bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-stone-200">
                   <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22]">{car.make}</div>
                   <h1 className="text-2xl font-extrabold mt-1 leading-tight">{car.model}</h1>
                   <div className="text-xs text-stone-500 mt-1.5 inline-flex items-center gap-1.5"><MapPin className="h-3 w-3" />{car.location}</div>

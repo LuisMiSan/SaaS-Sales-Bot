@@ -11,6 +11,8 @@ import {
   CheckCircle2,
   LayoutDashboard,
   Car as CarIcon,
+  Menu,
+  X,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
 import { WhatsappWidget, buildWhatsappUrl } from "@/components/whatsapp-widget";
@@ -52,6 +54,16 @@ function useWeekCountdown() {
 export default function LandingPage() {
   const { data: allCars } = useListCars();
   const [filter, setFilter] = useState<string | undefined>(undefined);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
   const cars = useMemo(() => {
     const open = (allCars ?? []).filter((c) => c.status !== "sold");
     if (!filter) return open.slice(0, 15);
@@ -69,19 +81,39 @@ export default function LandingPage() {
     <div className="bg-[#f5f7fa] text-[#222] font-jakarta min-h-screen">
       {/* HEADER */}
       <header className="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
-          <Link href="/tienda" className="text-xl font-extrabold tracking-tight">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between gap-3">
+          <Link href="/tienda" className="text-base sm:text-xl font-extrabold tracking-tight whitespace-nowrap">
             Pujamos<span className="text-[#EE7B22]">tu</span>coche.es
           </Link>
-          <nav className="flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-stone-600">
+          <nav className="hidden md:flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-stone-600">
             <a href="#catalogo" className="hover:text-[#EE7B22]">Ver coches</a>
             <a href="#proceso" className="hover:text-[#EE7B22]">Cómo funciona</a>
             <a href="#sobre-nosotros" className="hover:text-[#EE7B22]">Sobre nosotros</a>
-            <Link href="/" className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-stone-900 text-white normal-case tracking-normal text-[11px]">
+            <Link href="/" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-stone-900 text-white normal-case tracking-normal text-[11px]">
               <LayoutDashboard className="h-3.5 w-3.5" /> Panel comercial
             </Link>
           </nav>
+          <button
+            type="button"
+            onClick={() => setMenuOpen((v) => !v)}
+            className="md:hidden h-9 w-9 -mr-1 inline-flex items-center justify-center rounded-md text-stone-700 hover:bg-stone-100"
+            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+          >
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
+        {menuOpen && (
+          <div className="md:hidden border-t border-stone-200 bg-white">
+            <nav className="px-4 py-3 flex flex-col gap-1 text-sm font-semibold text-stone-700">
+              <a href="#catalogo" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 rounded-md hover:bg-stone-100">Ver coches</a>
+              <a href="#proceso" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 rounded-md hover:bg-stone-100">Cómo funciona</a>
+              <a href="#sobre-nosotros" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 rounded-md hover:bg-stone-100">Sobre nosotros</a>
+              <Link href="/" onClick={() => setMenuOpen(false)} className="mt-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-md bg-stone-900 text-white text-sm">
+                <LayoutDashboard className="h-4 w-4" /> Panel comercial
+              </Link>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* HERO */}
@@ -118,22 +150,22 @@ export default function LandingPage() {
       </section>
 
       {/* CATÁLOGO — 15 coches (justo debajo del Hero) */}
-      <section id="catalogo" className="bg-white py-16 px-6">
+      <section id="catalogo" className="bg-white py-12 sm:py-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap items-end justify-between gap-4 mb-10">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10">
             <div>
-              <h2 className="text-3xl font-extrabold tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                 Outlet de la <em className="not-italic text-[#EE7B22]">semana</em>
               </h2>
               <p className="text-sm text-stone-500 mt-1">15 coches con ventana de oportunidad. Pulsa "Bloquear unidad" y queda reservada 2h para ti, sin pagar nada.</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap pb-1 sm:pb-0">
               {FILTERS.map((f) => (
                 <button
                   key={f.label}
                   onClick={() => setFilter(f.value)}
                   className={cn(
-                    "px-4 py-1.5 text-xs font-semibold rounded-full border-2 transition-all",
+                    "shrink-0 px-4 py-1.5 text-xs font-semibold rounded-full border-2 transition-all whitespace-nowrap",
                     filter === f.value
                       ? "bg-[#EE7B22] border-[#EE7B22] text-white"
                       : "bg-transparent border-stone-200 text-stone-600 hover:border-[#EE7B22]",

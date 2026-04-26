@@ -45,7 +45,7 @@ export default function CarDetailPage() {
   const [editNotes, setEditNotes] = useState("");
 
   if (!car) {
-    return <div className="p-8 text-sm text-muted-foreground">Cargando…</div>;
+    return <div className="p-4 md:p-8 text-sm text-muted-foreground">Cargando…</div>;
   }
 
   const target = car.status === "locked" ? car.lockedUntil : car.availableUntil;
@@ -54,7 +54,7 @@ export default function CarDetailPage() {
 
   return (
     <div className="flex-1 overflow-y-auto scrollbar-thin">
-      <div className="p-8 max-w-5xl mx-auto space-y-6">
+      <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-5 md:space-y-6">
         <Link href="/inventory" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Volver al inventario
         </Link>

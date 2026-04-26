@@ -28,6 +28,7 @@ import { Countdown } from "@/components/countdown";
 import { formatPrice, formatRelative, formatTime, initials, intentLabel, stageLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import {
+  ArrowLeft,
   ChevronDown,
   Lock,
   MessageSquarePlus,
@@ -95,8 +96,13 @@ export default function InboxPage() {
 
   return (
     <div className="flex h-full overflow-hidden">
-      {/* Left: lead list */}
-      <aside className="w-[340px] shrink-0 border-r border-border bg-card flex flex-col h-full">
+      {/* Left: lead list — full width on mobile when no selection, hidden when one is open */}
+      <aside
+        className={cn(
+          "w-full lg:w-[340px] shrink-0 border-r border-border bg-card flex-col h-full",
+          selectedId ? "hidden lg:flex" : "flex",
+        )}
+      >
         <div className="p-4 border-b border-border space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold tracking-tight">Conversaciones</h2>
@@ -182,8 +188,13 @@ export default function InboxPage() {
         </div>
       </aside>
 
-      {/* Right: conversation */}
-      <section className="flex-1 min-w-0">
+      {/* Right: conversation — full width on mobile when a lead is open, hidden when none */}
+      <section
+        className={cn(
+          "flex-1 min-w-0",
+          selectedId ? "flex flex-col" : "hidden lg:block",
+        )}
+      >
         {selectedId ? (
           <Conversation key={selectedId} leadId={selectedId} onClose={() => navigate("/inbox")} />
         ) : (
@@ -210,8 +221,7 @@ function EmptyConversation() {
   );
 }
 
-function Conversation({ leadId, onClose: _onClose }: { leadId: number; onClose: () => void }) {
-  void _onClose;
+function Conversation({ leadId, onClose }: { leadId: number; onClose: () => void }) {
   const qc = useQueryClient();
   const { data: lead } = useGetLead(leadId, { query: { enabled: !!leadId, queryKey: getGetLeadQueryKey(leadId) } });
   const send = useSendLeadMessage();
@@ -295,14 +305,22 @@ function Conversation({ leadId, onClose: _onClose }: { leadId: number; onClose: 
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Conversation header */}
-      <header className="px-5 py-3 border-b border-border flex items-center gap-3 bg-card">
-        <Avatar className="h-9 w-9">
+      <header className="px-3 sm:px-5 py-3 border-b border-border flex items-center gap-3 bg-card">
+        <button
+          type="button"
+          onClick={onClose}
+          className="lg:hidden h-9 w-9 -ml-1 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary"
+          aria-label="Volver al buzón"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        <Avatar className="h-9 w-9 shrink-0">
           <AvatarFallback style={{ backgroundColor: lead.avatarColor + "33", color: lead.avatarColor }}>
             {initials(lead.name)}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
-          <div className="font-semibold text-sm">{lead.name}</div>
+          <div className="font-semibold text-sm truncate">{lead.name}</div>
           <div className="text-xs text-muted-foreground inline-flex items-center gap-1.5">
             <Phone className="h-3 w-3" /> {lead.phone}
           </div>
@@ -311,7 +329,7 @@ function Conversation({ leadId, onClose: _onClose }: { leadId: number; onClose: 
       </header>
 
       {/* Pinned car card */}
-      <div className="px-5 pt-4">
+      <div className="px-3 sm:px-5 pt-4">
         <Card className="bg-card border-border overflow-hidden">
           <div className="flex gap-4 p-3">
             <Link href={`/cars/${car.id}`} className="shrink-0">
@@ -348,7 +366,7 @@ function Conversation({ leadId, onClose: _onClose }: { leadId: number; onClose: 
       </div>
 
       {/* Messages */}
-      <div ref={messagesRef} className="flex-1 overflow-y-auto scrollbar-thin px-5 py-4 space-y-1.5">
+      <div ref={messagesRef} className="flex-1 overflow-y-auto scrollbar-thin px-3 sm:px-5 py-4 space-y-1.5">
         {lead.messages.map((m) => {
           if (m.direction === "system") {
             return (
@@ -387,7 +405,7 @@ function Conversation({ leadId, onClose: _onClose }: { leadId: number; onClose: 
       </div>
 
       {/* Composer */}
-      <div className="border-t border-border bg-card px-4 py-3 space-y-2.5">
+      <div className="border-t border-border bg-card px-3 sm:px-4 py-3 space-y-2.5">
         {/* AI quick actions */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground inline-flex items-center gap-1 mr-1">
