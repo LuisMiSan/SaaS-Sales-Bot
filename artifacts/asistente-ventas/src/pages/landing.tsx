@@ -19,10 +19,14 @@ import {
   Inbox as InboxIcon,
   LayoutDashboard,
   Car as CarIcon,
+  ExternalLink,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
+
+const AUTO1_PARTNER_URL =
+  "https://www.auto1.com/es/home?utm_source=SEM&utm_medium=search&utm_campaign=ES_SES_2000_0_11_2-0-0-0-0-0_2-0-0-0-0-0_3&MID=ES_SES_2000_0_11_2-0-0-0-0-0_2-0-0-0-0-0_3&nw=g&kw=auto1&mt=e";
 
 const FILTERS = [
   { value: undefined, label: "Todos" },
@@ -188,6 +192,28 @@ export default function LandingPage() {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="mb-6 rounded-xl border-2 border-dashed border-[#EE7B22]/40 bg-gradient-to-r from-[#0E4F8E]/5 to-[#EE7B22]/10 p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
+            <div className="flex-1 min-w-0">
+              <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22] mb-1.5">
+                ¿No encuentras tu coche?
+              </div>
+              <div className="text-lg md:text-xl font-extrabold text-[#0E4F8E] leading-tight">
+                Más de 60.000 coches de ocasión en Auto1
+              </div>
+              <p className="text-sm text-stone-600 mt-1">
+                Si nuestro outlet semanal se queda corto, te recomendamos el catálogo de nuestro partner Auto1.
+              </p>
+            </div>
+            <a
+              href={AUTO1_PARTNER_URL}
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              className="shrink-0 inline-flex items-center gap-2 bg-[#0E4F8E] hover:bg-[#0A3D6E] text-white font-extrabold px-5 py-3 rounded-md transition-colors"
+            >
+              Ver Auto1 <ExternalLink className="h-4 w-4" />
+            </a>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
