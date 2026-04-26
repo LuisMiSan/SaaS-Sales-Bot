@@ -85,6 +85,8 @@ export const ListCarsResponseItem = zod.object({
   releasedAt: zod.coerce.date().nullish(),
   viewersNow: zod.number(),
   notes: zod.string().nullish(),
+  marketPriceMin: zod.number().nullish(),
+  marketPriceMax: zod.number().nullish(),
 });
 export const ListCarsResponse = zod.array(ListCarsResponseItem);
 
@@ -101,6 +103,8 @@ export const CreateCarBody = zod.object({
   imageUrl: zod.string().nullish(),
   depositCents: zod.number(),
   notes: zod.string().nullish(),
+  marketPriceMin: zod.number().nullish(),
+  marketPriceMax: zod.number().nullish(),
 });
 
 export const GetCarParams = zod.object({
@@ -129,6 +133,8 @@ export const GetCarResponse = zod.object({
   releasedAt: zod.coerce.date().nullish(),
   viewersNow: zod.number(),
   notes: zod.string().nullish(),
+  marketPriceMin: zod.number().nullish(),
+  marketPriceMax: zod.number().nullish(),
 });
 
 export const UpdateCarParams = zod.object({
@@ -140,6 +146,8 @@ export const UpdateCarBody = zod.object({
   attractiveness: zod.enum(["hot", "normal", "hard"]).optional(),
   notes: zod.string().nullish(),
   imageUrl: zod.string().nullish(),
+  marketPriceMin: zod.number().nullish(),
+  marketPriceMax: zod.number().nullish(),
 });
 
 export const UpdateCarResponse = zod.object({
@@ -164,6 +172,8 @@ export const UpdateCarResponse = zod.object({
   releasedAt: zod.coerce.date().nullish(),
   viewersNow: zod.number(),
   notes: zod.string().nullish(),
+  marketPriceMin: zod.number().nullish(),
+  marketPriceMax: zod.number().nullish(),
 });
 
 export const LockCarParams = zod.object({
@@ -197,6 +207,8 @@ export const LockCarResponse = zod.object({
   releasedAt: zod.coerce.date().nullish(),
   viewersNow: zod.number(),
   notes: zod.string().nullish(),
+  marketPriceMin: zod.number().nullish(),
+  marketPriceMax: zod.number().nullish(),
 });
 
 export const ReleaseCarParams = zod.object({
@@ -225,6 +237,8 @@ export const ReleaseCarResponse = zod.object({
   releasedAt: zod.coerce.date().nullish(),
   viewersNow: zod.number(),
   notes: zod.string().nullish(),
+  marketPriceMin: zod.number().nullish(),
+  marketPriceMax: zod.number().nullish(),
 });
 
 export const MarkCarSoldParams = zod.object({
@@ -253,6 +267,8 @@ export const MarkCarSoldResponse = zod.object({
   releasedAt: zod.coerce.date().nullish(),
   viewersNow: zod.number(),
   notes: zod.string().nullish(),
+  marketPriceMin: zod.number().nullish(),
+  marketPriceMax: zod.number().nullish(),
 });
 
 export const ListLeadsQueryParams = zod.object({
@@ -316,6 +332,8 @@ export const ListLeadsResponseItem = zod
         releasedAt: zod.coerce.date().nullish(),
         viewersNow: zod.number(),
         notes: zod.string().nullish(),
+        marketPriceMin: zod.number().nullish(),
+        marketPriceMax: zod.number().nullish(),
       }),
     }),
   );
@@ -378,6 +396,8 @@ export const GetLeadResponse = zod
         releasedAt: zod.coerce.date().nullish(),
         viewersNow: zod.number(),
         notes: zod.string().nullish(),
+        marketPriceMin: zod.number().nullish(),
+        marketPriceMax: zod.number().nullish(),
       }),
     }),
   )
@@ -465,6 +485,8 @@ export const UpdateLeadResponse = zod
         releasedAt: zod.coerce.date().nullish(),
         viewersNow: zod.number(),
         notes: zod.string().nullish(),
+        marketPriceMin: zod.number().nullish(),
+        marketPriceMax: zod.number().nullish(),
       }),
     }),
   );

@@ -13,7 +13,7 @@ import {
   MarkCarSoldParams,
 } from "@workspace/api-zod";
 import { serializeCar, windowHoursForAttractiveness } from "../lib/format";
-import { parseCarLine, fetchCarPage, isUrl } from "../lib/import-ai";
+import { parseCarLine, fetchCarPage, isUrl, normalizeMarketRange } from "../lib/import-ai";
 import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
@@ -29,10 +29,10 @@ router.post("/cars/bulk-import", async (req, res): Promise<void> => {
     res.status(400).json({ error: "text is required" });
     return;
   }
-  const lines = text
+  const lines: string[] = text
     .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter((l) => l.length > 0 && !l.startsWith("#"));
+    .map((l: string) => l.trim())
+    .filter((l: string) => l.length > 0 && !l.startsWith("#"));
 
   if (lines.length === 0) {
     res.status(400).json({ error: "no usable lines" });
@@ -65,6 +65,8 @@ router.post("/cars/bulk-import", async (req, res): Promise<void> => {
           location: parsed.location,
           depositCents: parsed.depositCents,
           notes: parsed.notes,
+          marketPriceMin: parsed.marketPriceMin,
+          marketPriceMax: parsed.marketPriceMax,
           status: "open",
           availableUntil: new Date(now.getTime() + hours * 3600_000),
           viewersNow: Math.floor(Math.random() * 8) + 1,
@@ -125,6 +127,7 @@ router.post("/cars", async (req, res): Promise<void> => {
       imageUrl: data.imageUrl ?? null,
       depositCents: data.depositCents,
       notes: data.notes ?? null,
+      ...normalizeMarketRange(data.marketPriceMin, data.marketPriceMax),
       status: "open",
       availableUntil,
       viewersNow: Math.floor(Math.random() * 8) + 1,
@@ -159,7 +162,13 @@ router.patch("/cars/:id", async (req, res): Promise<void> => {
     res.status(400).json({ error: body.error.message });
     return;
   }
-  const [car] = await db.update(carsTable).set(body.data).where(eq(carsTable.id, params.data.id)).returning();
+  const update = { ...body.data };
+  if ("marketPriceMin" in update || "marketPriceMax" in update) {
+    const normalized = normalizeMarketRange(update.marketPriceMin, update.marketPriceMax);
+    update.marketPriceMin = normalized.marketPriceMin;
+    update.marketPriceMax = normalized.marketPriceMax;
+  }
+  const [car] = await db.update(carsTable).set(update).where(eq(carsTable.id, params.data.id)).returning();
   if (!car) {
     res.status(404).json({ error: "Car not found" });
     return;

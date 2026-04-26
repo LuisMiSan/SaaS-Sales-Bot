@@ -20,6 +20,8 @@ export const carsTable = pgTable("cars", {
   releasedAt: timestamp("released_at", { withTimezone: true }),
   viewersNow: integer("viewers_now").notNull().default(0),
   notes: text("notes"),
+  marketPriceMin: integer("market_price_min"),
+  marketPriceMax: integer("market_price_max"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

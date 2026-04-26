@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useRoute } from "wouter";
-import { useGetCar, useCreateLead, useListCars } from "@workspace/api-client-react";
+import { useGetCar, useCreateLead, useListCars, getGetCarQueryKey } from "@workspace/api-client-react";
 import {
   ArrowLeft,
   Clock,
@@ -17,12 +17,13 @@ import {
   Calendar,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
+import { MarketPriceCard } from "@/components/market-price-card";
 import { formatDeposit, formatPrice } from "@/lib/format";
 
 export default function LandingCarPage() {
   const [, params] = useRoute("/tienda/coche/:id");
   const id = params ? Number(params.id) : 0;
-  const { data: car } = useGetCar(id, { query: { enabled: !!id } });
+  const { data: car } = useGetCar(id, { query: { enabled: !!id, queryKey: getGetCarQueryKey(id) } });
   const { data: allCars } = useListCars();
   const create = useCreateLead();
 
@@ -100,6 +101,12 @@ export default function LandingCarPage() {
                 <SpecCard icon={Fuel} label="Combustible" value={car.fuel} />
                 <SpecCard icon={Settings2} label="Cambio" value={car.transmission} />
               </div>
+
+              <MarketPriceCard
+                ourPrice={car.price}
+                marketMin={car.marketPriceMin}
+                marketMax={car.marketPriceMax}
+              />
 
               <section className="bg-white rounded-2xl p-7 shadow-sm">
                 <h2 className="text-xl font-extrabold mb-3">Sobre este coche</h2>

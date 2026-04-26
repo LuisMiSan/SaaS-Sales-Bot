@@ -14,4 +14,8 @@ export interface UpdateCarBody {
   notes?: string | null;
   /** @nullable */
   imageUrl?: string | null;
+  /** @nullable */
+  marketPriceMin?: number | null;
+  /** @nullable */
+  marketPriceMax?: number | null;
 }

@@ -78,6 +78,8 @@ export interface ParsedCar {
   attractiveness: "hot" | "normal" | "hard";
   depositCents: number;
   notes: string;
+  marketPriceMin: number;
+  marketPriceMax: number;
 }
 
 const SYSTEM_PROMPT = `Eres un experto del mercado español de coches de ocasión. Recibes una descripción libre de UN coche (puede venir muy mal escrita: solo marca/modelo/año/precio, una línea CSV, un anuncio entero, o el contenido scrapeado de una página web de portales como coches.net, autoscout24, milanuncios, wallapop o similares).
@@ -94,7 +96,9 @@ Devuelves SOLO un JSON con este formato exacto:
   "location": string,
   "attractiveness": "hot" | "normal" | "hard",
   "depositCents": number,
-  "notes": string
+  "notes": string,
+  "marketPriceMin": number,
+  "marketPriceMax": number
 }
 
 REGLAS:
@@ -109,6 +113,7 @@ REGLAS:
   - "normal" en el resto.
 - depositCents: 10000 (100€) si precio<10.000€, 20000 (200€) si 10.000-20.000€, 30000 (300€) si >20.000€.
 - notes: ficha comercial 2-4 frases en español de España, sin emojis, sin asteriscos. Tono profesional cercano. Destaca lo que vende este coche concreto (equipamiento si se menciona, ratio km/año, ventajas reales). NO inventes equipamiento que no esté insinuado en el texto. Si solo tienes marca+modelo+año+precio+km, redacta una ficha sobria sin inventar extras.
+- marketPriceMin / marketPriceMax: rango realista en EUROS al que se vende ESTE coche (mismo modelo/año/km/combustible/cambio aprox.) en portales españoles tipo coches.net, autoscout24.es, milanuncios y wallapop motor. Considera estado de mercado actual, depreciación por año (~12-15%/año), penalización por kms altos (>20k km/año = -5/-10%), prima por automático y por equipamiento premium. El rango debe abarcar la dispersión real (entre el más barato listado y un buen ejemplar particular o concesión), normalmente con una amplitud del 15-25% entre min y max. NUESTRO precio (price) suele estar igual o por debajo del min porque vendemos en outlet, pero NO fuerces eso: si el coche está caro, el precio puede caer dentro del rango. Devuelve enteros sin decimales.
 
 Devuelve SOLO el JSON. Nada más.`;
 
@@ -143,5 +148,30 @@ export async function parseCarLine(line: string): Promise<ParsedCar> {
     attractiveness: (data.attractiveness as ParsedCar["attractiveness"]) ?? "normal",
     depositCents: Number(data.depositCents ?? 20000),
     notes: String(data.notes ?? ""),
+    ...normalizeMarketRangeStrict(
+      Number(data.marketPriceMin ?? data.price ?? 0),
+      Number(data.marketPriceMax ?? data.price ?? 0),
+    ),
   };
+}
+
+export function normalizeMarketRange(
+  rawMin: number | null | undefined,
+  rawMax: number | null | undefined,
+): { marketPriceMin: number | null; marketPriceMax: number | null } {
+  const min = Number.isFinite(rawMin) ? Math.max(0, Math.round(rawMin as number)) : null;
+  const max = Number.isFinite(rawMax) ? Math.max(0, Math.round(rawMax as number)) : null;
+  if (min == null || max == null) return { marketPriceMin: min, marketPriceMax: max };
+  if (max < min) return { marketPriceMin: max, marketPriceMax: min };
+  return { marketPriceMin: min, marketPriceMax: max };
+}
+
+export function normalizeMarketRangeStrict(
+  rawMin: number,
+  rawMax: number,
+): { marketPriceMin: number; marketPriceMax: number } {
+  const min = Math.max(0, Math.round(Number.isFinite(rawMin) ? rawMin : 0));
+  const max = Math.max(0, Math.round(Number.isFinite(rawMax) ? rawMax : 0));
+  if (max < min) return { marketPriceMin: max, marketPriceMax: min };
+  return { marketPriceMin: min, marketPriceMax: max };
 }

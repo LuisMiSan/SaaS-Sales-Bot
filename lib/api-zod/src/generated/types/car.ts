@@ -34,4 +34,8 @@ export interface Car {
   viewersNow: number;
   /** @nullable */
   notes?: string | null;
+  /** @nullable */
+  marketPriceMin?: number | null;
+  /** @nullable */
+  marketPriceMax?: number | null;
 }

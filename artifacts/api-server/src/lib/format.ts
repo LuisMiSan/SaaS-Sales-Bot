@@ -39,6 +39,8 @@ export function serializeCar(car: DbCar) {
     releasedAt: car.releasedAt ? car.releasedAt.toISOString() : null,
     viewersNow: car.viewersNow,
     notes: car.notes,
+    marketPriceMin: car.marketPriceMin,
+    marketPriceMax: car.marketPriceMax,
   };
 }
 

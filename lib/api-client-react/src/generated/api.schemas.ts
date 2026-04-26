@@ -54,6 +54,10 @@ export interface Car {
   viewersNow: number;
   /** @nullable */
   notes?: string | null;
+  /** @nullable */
+  marketPriceMin?: number | null;
+  /** @nullable */
+  marketPriceMax?: number | null;
 }
 
 export type CreateCarBodyAttractiveness =
@@ -80,6 +84,10 @@ export interface CreateCarBody {
   depositCents: number;
   /** @nullable */
   notes?: string | null;
+  /** @nullable */
+  marketPriceMin?: number | null;
+  /** @nullable */
+  marketPriceMax?: number | null;
 }
 
 export type UpdateCarBodyAttractiveness =
@@ -98,6 +106,10 @@ export interface UpdateCarBody {
   notes?: string | null;
   /** @nullable */
   imageUrl?: string | null;
+  /** @nullable */
+  marketPriceMin?: number | null;
+  /** @nullable */
+  marketPriceMax?: number | null;
 }
 
 export interface LockCarBody {

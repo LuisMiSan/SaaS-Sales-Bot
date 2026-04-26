@@ -45,6 +45,12 @@ Cockpit comercial para concesionario de coches de ocasión. El equipo gestiona d
 - Helper `lib/import-ai.ts`:
   - `isUrl(line)` detecta `http(s)://…`.
   - `fetchCarPage(url)` descarga con `User-Agent` realista, extrae `<title>`, `og:title`, `og:description`, meta description y los primeros 5.000 caracteres de texto (HTML stripped).
-  - `parseCarLine(payload)` llama a `gpt-5.2` con `response_format: json_object` y devuelve `{ make, model, year, price, km, fuel, transmission, location, attractiveness, depositCents, notes }`. La IA estima campos faltantes con criterio de mercado español y redacta la ficha comercial sin inventar equipamiento.
+  - `parseCarLine(payload)` llama a `gpt-5.2` con `response_format: json_object` y devuelve `{ make, model, year, price, km, fuel, transmission, location, attractiveness, depositCents, notes, marketPriceMin, marketPriceMax }`. La IA estima campos faltantes con criterio de mercado español y redacta la ficha comercial sin inventar equipamiento.
 - Errores aislados por línea: si una URL falla (403 anti-bot, 404, timeout) o el JSON sale corrupto, esa línea entra en `failed[]` con el motivo y el resto se procesan.
 - Caveats: portales con Cloudflare agresivo (coches.net) pueden devolver 403; en ese caso el comercial pega el texto del anuncio en vez de la URL.
+
+## Precio de mercado por coche (`marketPriceMin` / `marketPriceMax`)
+- Columnas `cars.market_price_min` y `cars.market_price_max` (integers en euros, nullable).
+- Se rellenan automáticamente al importar coches por la IA (basadas en coches.net, AutoScout24, milanuncios, wallapop motor: depreciación, kms, equipamiento, automático). Amplitud típica 15-25%.
+- Backfill puntual de coches antiguos: `pnpm dlx tsx artifacts/api-server/scripts/backfill-market-prices.ts` (idempotente, solo procesa los que estén `NULL`).
+- Componente UI: `artifacts/asistente-ventas/src/components/market-price-card.tsx`. Renderiza una barra horizontal con rango azul (mín-máx portales), nuestro precio como pin naranja, tres KPIs (mín/tú pagas/máx) y el ahorro vs media. Solo se muestra si ambos campos están presentes y `max > min`.
