@@ -230,12 +230,13 @@ export default function LandingCarPage() {
                   </div>
 
                   {stored ? (
-                    <div className="mt-6 p-4 rounded-xl bg-[#27AE60]/10 border border-[#27AE60]/30 text-sm text-stone-800">
-                      <div className="font-extrabold text-[#27AE60] flex items-center gap-2 mb-1">
-                        <CheckCircle2 className="h-5 w-5" /> Conversación abierta
+                    <div className="mt-6">
+                      <div className="mb-3 inline-flex items-center gap-2 text-xs font-bold text-[#27AE60]">
+                        <CheckCircle2 className="h-4 w-4" /> Reserva confirmada · {stored.phone}
                       </div>
-                      <p className="text-xs text-stone-600">
-                        Hablas con un comercial al <strong>{stored.phone}</strong>. La conversación está abajo, en vivo.
+                      <CustomerChat leadId={stored.leadId} publicToken={stored.publicToken} customerName={stored.name} />
+                      <p className="text-[11px] text-stone-500 mt-2 leading-relaxed">
+                        Lo que escribes aquí también le llega al comercial por WhatsApp. Te respondemos en minutos en horario comercial.
                       </p>
                     </div>
                   ) : isLockedByOther ? (
@@ -303,20 +304,6 @@ export default function LandingCarPage() {
             </aside>
           </div>
 
-          {stored && (
-            <section className="mt-12">
-              <div className="flex items-center gap-2 mb-4">
-                <MessageSquare className="h-5 w-5 text-[#EE7B22]" />
-                <h2 className="text-2xl font-extrabold tracking-tight">Tu conversación con el comercial</h2>
-              </div>
-              <p className="text-sm text-stone-500 mb-5 max-w-2xl">
-                Lo que escribes aquí también le llega al comercial por WhatsApp. Te respondemos en minutos en horario comercial.
-              </p>
-              <div className="max-w-2xl">
-                <CustomerChat leadId={stored.leadId} publicToken={stored.publicToken} customerName={stored.name} />
-              </div>
-            </section>
-          )}
 
           {/* OTROS COCHES — corresponde a Inventario */}
           {others.length > 0 && (
