@@ -13,7 +13,7 @@ import {
   MarkCarSoldParams,
 } from "@workspace/api-zod";
 import { serializeCar, windowHoursForAttractiveness } from "../lib/format";
-import { parseCarLine } from "../lib/import-ai";
+import { parseCarLine, fetchCarPage, isUrl } from "../lib/import-ai";
 import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
@@ -47,7 +47,8 @@ router.post("/cars/bulk-import", async (req, res): Promise<void> => {
 
   for (const line of lines) {
     try {
-      const parsed = await parseCarLine(line);
+      const payload = isUrl(line) ? await fetchCarPage(line.trim()) : line;
+      const parsed = await parseCarLine(payload);
       const hours = windowHoursForAttractiveness(parsed.attractiveness);
       const now = new Date();
       const [car] = await db

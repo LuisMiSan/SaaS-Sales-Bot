@@ -6,13 +6,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { getListCarsQueryKey, getGetDashboardSummaryQueryKey, getGetRecentActivityQueryKey } from "@workspace/api-client-react";
 import { Sparkles, Upload, CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
 
-const PLACEHOLDER = `Pega un coche por línea. La IA rellena el resto.
+const PLACEHOLDER = `Un coche por línea. Acepta texto libre o URL del anuncio (coches.net, autoscout24, milanuncios, wallapop…). La IA rellena el resto.
 
 Audi Q3 35 TFSI S line 2020 92.000km gasolina automático 22500€ Madrid
 BMW Serie 1 118d 2019 110000km diesel manual 17800€ Barcelona
-Renault Captur 1.3 TCe Zen 2021 45000km gasolina manual 16900€
-Tesla Model 3 Long Range 2022 38000km eléctrico automático 32500€ Valencia
-Mercedes Clase A 180d 2020 78000km diésel automático 23500€`;
+https://www.coches.net/audi-a4-avant-2-0-tdi-2019-madrid-id-12345.htm
+https://www.autoscout24.es/anuncios/tesla-model-3-electrico-cd-1234567
+Renault Captur 1.3 TCe Zen 2021 45000km gasolina manual 16900€`;
 
 interface ImportResult {
   created: Array<{ id: number; make: string; model: string; year: number; price: number; notes: string | null; attractiveness: string }>;
@@ -77,7 +77,7 @@ export function BulkImportDialog() {
             <Sparkles className="h-4 w-4 text-primary" /> Carga masiva con IA
           </DialogTitle>
           <DialogDescription>
-            Pega un coche por línea como te venga: con texto libre, copiando del Excel del proveedor o de un anuncio. La IA extrae marca, modelo, año, precio, kilómetros, combustible, cambio, ubicación, atractivo y redacta la ficha comercial.
+            Pega un coche por línea: texto libre del proveedor, una línea de Excel, o directamente la URL del anuncio (coches.net, autoscout24, milanuncios, wallapop…). La IA descarga la página, extrae todos los campos y redacta la ficha comercial.
           </DialogDescription>
         </DialogHeader>
 
@@ -92,7 +92,7 @@ export function BulkImportDialog() {
               disabled={loading}
             />
             <div className="text-[11px] text-muted-foreground">
-              {lineCount} {lineCount === 1 ? "coche" : "coches"} detectados · máx. 50 por lote · {"~"}3-6s por coche
+              {lineCount} {lineCount === 1 ? "coche" : "coches"} detectados · máx. 50 por lote · {"~"}3-6s por línea de texto, {"~"}5-12s por URL
             </div>
           </>
         )}

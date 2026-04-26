@@ -38,3 +38,13 @@ Cockpit comercial para concesionario de coches de ocasión. El equipo gestiona d
   - `WHATSAPP_GRAPH_VERSION` — opcional, por defecto `v21.0`.
 - Sin token configurado → modo **sandbox**: los envíos solo se loguean. Permite probar el cockpit completo antes de tener credenciales reales.
 - URL del webhook a registrar en Meta una vez desplegado: `https://<dominio>/api/whatsapp/webhook`.
+
+## Carga masiva de coches (UI: "Subir en lote" en /inventory)
+- Backend: `POST /api/cars/bulk-import` body `{ text: string }`. Una línea por coche; máx. 50.
+- Cada línea puede ser texto libre, fila CSV, anuncio entero, o **URL de un anuncio**.
+- Helper `lib/import-ai.ts`:
+  - `isUrl(line)` detecta `http(s)://…`.
+  - `fetchCarPage(url)` descarga con `User-Agent` realista, extrae `<title>`, `og:title`, `og:description`, meta description y los primeros 5.000 caracteres de texto (HTML stripped).
+  - `parseCarLine(payload)` llama a `gpt-5.2` con `response_format: json_object` y devuelve `{ make, model, year, price, km, fuel, transmission, location, attractiveness, depositCents, notes }`. La IA estima campos faltantes con criterio de mercado español y redacta la ficha comercial sin inventar equipamiento.
+- Errores aislados por línea: si una URL falla (403 anti-bot, 404, timeout) o el JSON sale corrupto, esa línea entra en `failed[]` con el motivo y el resto se procesan.
+- Caveats: portales con Cloudflare agresivo (coches.net) pueden devolver 403; en ese caso el comercial pega el texto del anuncio en vez de la URL.

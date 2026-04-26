@@ -1,5 +1,62 @@
 import { openai } from "@workspace/integrations-openai-ai-server";
 
+export function isUrl(text: string): boolean {
+  return /^https?:\/\/\S+$/i.test(text.trim());
+}
+
+function pickMeta(html: string, names: string[]): string | null {
+  for (const name of names) {
+    const re = new RegExp(`<meta[^>]+(?:property|name)=["']${name}["'][^>]+content=["']([^"']+)["']`, "i");
+    const m = html.match(re);
+    if (m) return m[1];
+    const re2 = new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']${name}["']`, "i");
+    const m2 = html.match(re2);
+    if (m2) return m2[1];
+  }
+  return null;
+}
+
+function stripHtml(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ")
+    .replace(/<svg[\s\S]*?<\/svg>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&euro;/g, "€")
+    .replace(/&#\d+;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export async function fetchCarPage(url: string): Promise<string> {
+  const res = await fetch(url, {
+    redirect: "follow",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (compatible; AsistenteVentasBot/1.0; +https://replit.com)",
+      Accept: "text/html,application/xhtml+xml",
+      "Accept-Language": "es-ES,es;q=0.9",
+    },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status} al descargar ${url}`);
+  const html = await res.text();
+  const title = (html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] ?? "").trim();
+  const ogTitle = pickMeta(html, ["og:title", "twitter:title"]);
+  const ogDesc = pickMeta(html, ["og:description", "twitter:description", "description"]);
+  const text = stripHtml(html).slice(0, 5000);
+  return [
+    `URL: ${url}`,
+    title && `TÍTULO: ${title}`,
+    ogTitle && ogTitle !== title && `OG_TITLE: ${ogTitle}`,
+    ogDesc && `DESCRIPCIÓN: ${ogDesc}`,
+    `CONTENIDO:\n${text}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
 export interface ParsedCar {
   make: string;
   model: string;
@@ -14,7 +71,7 @@ export interface ParsedCar {
   notes: string;
 }
 
-const SYSTEM_PROMPT = `Eres un experto del mercado español de coches de ocasión. Recibes una descripción libre de UN coche (puede venir muy mal escrita: solo marca/modelo/año/precio, o un anuncio entero, o una línea CSV).
+const SYSTEM_PROMPT = `Eres un experto del mercado español de coches de ocasión. Recibes una descripción libre de UN coche (puede venir muy mal escrita: solo marca/modelo/año/precio, una línea CSV, un anuncio entero, o el contenido scrapeado de una página web de portales como coches.net, autoscout24, milanuncios, wallapop o similares).
 
 Devuelves SOLO un JSON con este formato exacto:
 {
