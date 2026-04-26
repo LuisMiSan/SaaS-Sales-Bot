@@ -4,14 +4,23 @@ export function isUrl(text: string): boolean {
   return /^https?:\/\/\S+$/i.test(text.trim());
 }
 
+const META_RE = /<meta\b[^>]*>/gi;
+const NAME_ATTR_RE = /\b(?:property|name)\s*=\s*["']([^"']+)["']/i;
+const CONTENT_ATTR_RE = /\bcontent\s*=\s*["']([^"']*)["']/i;
+
 function pickMeta(html: string, names: string[]): string | null {
-  for (const name of names) {
-    const re = new RegExp(`<meta[^>]+(?:property|name)=["']${name}["'][^>]+content=["']([^"']+)["']`, "i");
-    const m = html.match(re);
-    if (m) return m[1];
-    const re2 = new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']${name}["']`, "i");
-    const m2 = html.match(re2);
-    if (m2) return m2[1];
+  const wanted = new Set(names.map((n) => n.toLowerCase()));
+  const tags = html.match(META_RE);
+  if (!tags) return null;
+  for (const candidate of names) {
+    const target = candidate.toLowerCase();
+    for (const tag of tags) {
+      const nm = tag.match(NAME_ATTR_RE);
+      if (!nm || nm[1].toLowerCase() !== target) continue;
+      if (!wanted.has(nm[1].toLowerCase())) continue;
+      const ct = tag.match(CONTENT_ATTR_RE);
+      if (ct && ct[1]) return ct[1];
+    }
   }
   return null;
 }
