@@ -70,6 +70,6 @@ Cockpit comercial para concesionario de coches de ocasión. El equipo gestiona d
 - El frontend guarda `{leadId, publicToken, name, phone}` en `localStorage` con clave `pujamostucoche.lead.<carId>` y muestra `<CustomerChat>` debajo de la ficha.
 - Endpoints públicos blindados por token (no usan los hooks generados):
   - `GET  /api/leads/:id/thread?token=<uuid>` — lista mensajes. 401 si falta token, 404 si token incorrecto.
-  - `POST /api/leads/:id/thread?token=<uuid>` body `{content}` — añade mensaje `incoming` (lo verá el comercial en su buzón). Mismas respuestas de error.
+  - `POST /api/leads/:id/thread?token=<uuid>` body `{content}` — añade mensaje `incoming` (lo verá el comercial en su buzón). Mismas respuestas de error. **Tras guardar el mensaje del cliente, dispara `respondAsAgent(leadId)` (fire-and-forget) que genera y guarda automáticamente una respuesta del agente IA** (mismo `generateDraft` + `pickAutoIntent` que el cockpit). Tiene guarda anti-carrera por lead (`autoReplyInFlight`) y bucle hasta 5 iteraciones para responder a varios mensajes seguidos.
 - `<CustomerChat>` (`artifacts/asistente-ventas/src/components/customer-chat.tsx`) hace polling cada 5s con `fetch` directo y muestra burbujas estilo WhatsApp (incoming = verde a la derecha, outgoing dealer = blanco a la izquierda).
 - Los endpoints `GET/POST /api/leads/:id/messages` y `POST /api/leads/:id/incoming` siguen siendo del cockpit y no requieren token (uso interno del comercial).

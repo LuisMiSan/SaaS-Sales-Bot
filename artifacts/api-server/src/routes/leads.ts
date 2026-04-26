@@ -17,6 +17,7 @@ import {
 } from "@workspace/api-zod";
 import { serializeLead, serializeCar, serializeMessage } from "../lib/format";
 import { generateDraft } from "../lib/draft";
+import { pickAutoIntent } from "../lib/auto-intent";
 import { sendWhatsAppText } from "../lib/whatsapp";
 import { logger } from "../lib/logger";
 
@@ -130,8 +131,77 @@ router.post("/leads/:id/thread", async (req, res): Promise<void> => {
     })
     .returning();
   await db.update(leadsTable).set({ unreadCount: sql`${leadsTable.unreadCount} + 1`, updatedAt: sql`now()` }).where(eq(leadsTable.id, lead.id));
+
+  // Fire-and-forget: AI agent responds automatically to the customer.
+  // The customer chat polls every 5s and will pick up the reply.
+  void respondAsAgent(lead.id).catch((err) => {
+    logger.error({ err, leadId: lead.id }, "Auto-respond failed");
+  });
+
   res.status(201).json(serializeMessage(msg));
 });
+
+// Per-lead in-flight guard: prevents two concurrent auto-replies from
+// generating duplicate messages when the customer sends quickly.
+const autoReplyInFlight = new Map<number, boolean>();
+
+async function respondAsAgent(leadId: number): Promise<void> {
+  if (autoReplyInFlight.get(leadId)) return;
+  autoReplyInFlight.set(leadId, true);
+  try {
+    // Loop: keep replying while there are unanswered incoming messages.
+    // This covers the case where the customer sends a second message while
+    // we're still generating the reply to the first one.
+    // Hard cap at 5 iterations as a safety net against runaway loops.
+    for (let iter = 0; iter < 5; iter++) {
+      const [lead] = await db.select().from(leadsTable).where(eq(leadsTable.id, leadId));
+      if (!lead) return;
+      const [car] = await db.select().from(carsTable).where(eq(carsTable.id, lead.carId));
+      if (!car) return;
+      const history = await db
+        .select()
+        .from(messagesTable)
+        .where(eq(messagesTable.leadId, lead.id))
+        .orderBy(messagesTable.createdAt);
+
+      const lastIncoming = [...history].reverse().find((m) => m.direction === "incoming") ?? null;
+      const lastOutgoing = [...history].reverse().find((m) => m.direction === "outgoing") ?? null;
+
+      // Nothing to answer, or we already answered after the last incoming.
+      if (!lastIncoming) return;
+      if (lastOutgoing && lastOutgoing.createdAt >= lastIncoming.createdAt) return;
+
+      const intent = pickAutoIntent({
+        stage: lead.stage,
+        depositPaid: lead.depositPaid,
+        carStatus: car.status,
+        lastIncoming: lastIncoming.content,
+        hasMessages: history.length > 0,
+      });
+
+      const draft = await generateDraft({ intent, car, lead, history });
+
+      await db.insert(messagesTable).values({
+        leadId: lead.id,
+        direction: "outgoing",
+        content: draft.content,
+        aiGenerated: true,
+      });
+      await db
+        .update(leadsTable)
+        .set({ updatedAt: sql`now()` })
+        .where(eq(leadsTable.id, lead.id));
+      await db.insert(activityTable).values({
+        kind: "auto_reply",
+        text: `Agente IA respondió a ${lead.name} (${intent})`,
+        leadName: lead.name,
+        carLabel: `${car.make} ${car.model}`,
+      });
+    }
+  } finally {
+    autoReplyInFlight.delete(leadId);
+  }
+}
 
 router.get("/leads/:id", async (req, res): Promise<void> => {
   const params = GetLeadParams.safeParse(req.params);
