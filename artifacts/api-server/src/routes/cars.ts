@@ -187,7 +187,7 @@ router.post("/cars/:id/lock", async (req, res): Promise<void> => {
     res.status(400).json({ error: body.error.message });
     return;
   }
-  const lockedUntil = new Date(Date.now() + 12 * 3600_000);
+  const lockedUntil = new Date(Date.now() + 2 * 3600_000);
   const [car] = await db
     .update(carsTable)
     .set({ status: "locked", lockedUntil, releasedAt: null })
@@ -197,18 +197,18 @@ router.post("/cars/:id/lock", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Car not found" });
     return;
   }
-  await db.update(leadsTable).set({ stage: "locked", depositPaid: true }).where(eq(leadsTable.id, body.data.leadId));
+  await db.update(leadsTable).set({ stage: "locked" }).where(eq(leadsTable.id, body.data.leadId));
   const [lead] = await db.select().from(leadsTable).where(eq(leadsTable.id, body.data.leadId));
   await db.insert(activityTable).values({
     kind: "lock",
-    text: `${lead?.name ?? "Lead"} bloqueó ${car.make} ${car.model} por 12h`,
+    text: `${lead?.name ?? "Lead"} bloqueó ${car.make} ${car.model} por 2h`,
     leadName: lead?.name ?? null,
     carLabel: `${car.make} ${car.model}`,
   });
   await db.insert(messagesTable).values({
     leadId: body.data.leadId,
     direction: "system",
-    content: `Unidad bloqueada durante 12h. Depósito recibido.`,
+    content: `Unidad bloqueada durante 2h. El cliente puede cerrar la compra dentro de la ventana.`,
     aiGenerated: false,
   });
   res.json(serializeCar(car));

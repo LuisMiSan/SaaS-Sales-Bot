@@ -40,7 +40,7 @@ import {
 
 const INTENTS = [
   { value: "first_response", label: "Primera respuesta" },
-  { value: "ask_deposit", label: "Pedir depósito" },
+  { value: "ask_deposit", label: "Pedir cierre" },
   { value: "confirm_lock", label: "Confirmar bloqueo" },
   { value: "handle_doubt", label: "Cliente duda" },
   { value: "post_release", label: "Post liberación" },
@@ -338,7 +338,7 @@ function Conversation({ leadId, onClose: _onClose }: { leadId: number; onClose: 
                   {car.status !== "sold" && <Countdown target={target} variant={variant} />}
                   {(car.status === "open" || car.status === "released") && lead.depositPaid === false && (
                     <Button size="sm" variant="secondary" onClick={onLock} disabled={lockCar.isPending}>
-                      <Lock className="h-3.5 w-3.5 mr-1.5" /> Bloquear 12h
+                      <Lock className="h-3.5 w-3.5 mr-1.5" /> Bloquear 2h
                     </Button>
                   )}
                 </div>

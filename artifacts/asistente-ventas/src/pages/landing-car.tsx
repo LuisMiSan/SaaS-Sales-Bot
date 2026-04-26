@@ -15,10 +15,12 @@ import {
   Fuel,
   Settings2,
   Calendar,
+  Timer,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
 import { MarketPriceCard } from "@/components/market-price-card";
-import { formatDeposit, formatPrice } from "@/lib/format";
+import { WhatsappWidget } from "@/components/whatsapp-widget";
+import { formatPrice } from "@/lib/format";
 
 export default function LandingCarPage() {
   const [, params] = useRoute("/tienda/coche/:id");
@@ -121,17 +123,34 @@ export default function LandingCarPage() {
                 </div>
               </section>
 
-              {/* PROCESO — corresponde a Buzón del SaaS */}
-              <section className="bg-white rounded-2xl p-7 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-extrabold">Cómo funciona el bloqueo</h2>
-                  <span className="text-[10px] uppercase tracking-widest text-[#C4621A] bg-[#EE7B22]/10 px-2 py-0.5 rounded-full font-bold">Buzón · SaaS</span>
+              {/* PROCESO — caja Cómo funciona el bloqueo (rediseñada) */}
+              <section className="bg-white rounded-2xl shadow-sm overflow-hidden border border-stone-200">
+                <header className="px-7 pt-6 pb-4 border-b border-stone-100">
+                  <h2 className="text-xl font-extrabold leading-tight">Cómo funciona el bloqueo</h2>
+                  <p className="text-sm text-stone-500 mt-1.5">
+                    Sin pagar nada. Solo bloquéalo, te escribimos en minutos y tienes 2h para cerrar.
+                  </p>
+                </header>
+                <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-stone-100">
+                  <LockStep
+                    n={1}
+                    icon={Lock}
+                    title="Bloquéalo gratis"
+                    body="Pulsas el botón y la unidad queda solo para ti. Sin pagar nada. Sin compromiso."
+                  />
+                  <LockStep
+                    n={2}
+                    icon={MessageSquare}
+                    title="Te escribimos por WhatsApp"
+                    body="En minutos un comercial te llama o escribe para resolver dudas y agendar visita."
+                  />
+                  <LockStep
+                    n={3}
+                    icon={Timer}
+                    title="Tienes 2h para cerrar"
+                    body="Visita, financiación o transferencia. Si pasan las 2h sin cerrar, vuelve al outlet."
+                  />
                 </div>
-                <ol className="space-y-3 text-sm">
-                  <Process n={1} icon={Lock}>Dejas {formatDeposit(car.depositCents)} de depósito y la unidad sale del escaparate solo para ti.</Process>
-                  <Process n={2} icon={MessageSquare}>En minutos un comercial te escribe por WhatsApp. Resolvéis dudas, organizáis prueba o entrega.</Process>
-                  <Process n={3} icon={CheckCircle2}>En 12h decides. Si cierras, el depósito va a cuenta. Si no, se devuelve y la unidad vuelve al outlet.</Process>
-                </ol>
               </section>
             </div>
 
@@ -149,7 +168,9 @@ export default function LandingCarPage() {
                       <div className="text-base text-stone-400 line-through tabular-nums">{formatPrice(original)}</div>
                     )}
                   </div>
-                  <div className="mt-1 text-xs text-stone-500">Depósito reembolsable: <strong className="text-stone-800 font-bold">{formatDeposit(car.depositCents)}</strong></div>
+                  <div className="mt-1 text-xs text-[#27AE60] font-bold inline-flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Bloqueo gratuito · Sin pagar nada
+                  </div>
 
                   <div className="mt-4 inline-flex items-center gap-1.5 text-sm text-[#E74C3C] font-bold">
                     <Clock className="h-4 w-4" />
@@ -189,7 +210,7 @@ export default function LandingCarPage() {
                       </Field>
                       <label className="flex items-start gap-2 text-xs text-stone-500 cursor-pointer">
                         <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className="mt-0.5" />
-                        <span>Acepto que un comercial me contacte por WhatsApp y entiendo que reservo {formatDeposit(car.depositCents)} durante 12h.</span>
+                        <span>Acepto que un comercial me contacte por WhatsApp para gestionar el bloqueo gratuito de 2h.</span>
                       </label>
                       <button
                         type="submit"
@@ -197,10 +218,10 @@ export default function LandingCarPage() {
                         className="w-full py-3.5 rounded-lg bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                       >
                         <Lock className="h-4 w-4" />
-                        {create.isPending ? "Enviando…" : "Bloquear unidad 12h"}
+                        {create.isPending ? "Enviando…" : "Bloquear unidad 2h"}
                       </button>
                       <div className="flex items-center justify-center gap-1.5 text-[11px] text-stone-500">
-                        <ShieldCheck className="h-3.5 w-3.5 text-[#27AE60]" /> Pago seguro · Cancelas cuando quieras
+                        <ShieldCheck className="h-3.5 w-3.5 text-[#27AE60]" /> Sin pagos · Cancelas cuando quieras
                       </div>
                     </form>
                   )}
@@ -256,6 +277,11 @@ export default function LandingCarPage() {
           <p className="text-white/40 text-xs">© {new Date().getFullYear()} Pujamostucoche. Todos los derechos reservados.</p>
         </div>
       </footer>
+
+      <WhatsappWidget
+        message={`Hola, me interesa el ${car.make} ${car.model} ${car.year} (${formatPrice(car.price)}). ¿Sigue disponible?`}
+        label={`Pregunta por este ${car.make}`}
+      />
     </div>
   );
 }
@@ -279,16 +305,18 @@ function Bullet({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Process({ n, icon: Icon, children }: { n: number; icon: React.ElementType; children: React.ReactNode }) {
+function LockStep({ n, icon: Icon, title, body }: { n: number; icon: React.ElementType; title: string; body: string }) {
   return (
-    <li className="flex items-start gap-3">
-      <div className="h-9 w-9 shrink-0 rounded-lg bg-[#EE7B22]/10 text-[#EE7B22] flex items-center justify-center font-black">
-        <Icon className="h-4 w-4" />
+    <div className="px-6 py-6">
+      <div className="flex items-center gap-3 mb-2.5">
+        <div className="h-10 w-10 rounded-lg bg-[#EE7B22]/10 text-[#EE7B22] flex items-center justify-center">
+          <Icon className="h-5 w-5" strokeWidth={2.25} />
+        </div>
+        <span className="text-[10px] uppercase tracking-widest text-stone-400 font-bold">Paso {n}</span>
       </div>
-      <div className="text-stone-600 leading-relaxed pt-1.5">
-        <strong className="text-stone-900 font-bold">Paso {n}.</strong> {children}
-      </div>
-    </li>
+      <h3 className="text-base font-extrabold text-stone-900">{title}</h3>
+      <p className="text-xs text-stone-500 mt-1.5 leading-relaxed">{body}</p>
+    </div>
   );
 }
 

@@ -2,31 +2,21 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { useListCars } from "@workspace/api-client-react";
 import {
-  Search,
-  Heart,
   CreditCard,
-  Wrench,
   Clock,
   ArrowRight,
-  ShieldCheck,
   Lock,
   Eye,
   MessageSquare,
-  Gauge,
-  Fuel,
-  Settings2,
   CheckCircle2,
   Inbox as InboxIcon,
   LayoutDashboard,
   Car as CarIcon,
-  ExternalLink,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
+import { WhatsappWidget } from "@/components/whatsapp-widget";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
-
-const AUTO1_PARTNER_URL =
-  "https://www.auto1.com/es/home?utm_source=SEM&utm_medium=search&utm_campaign=ES_SES_2000_0_11_2-0-0-0-0-0_2-0-0-0-0-0_3&MID=ES_SES_2000_0_11_2-0-0-0-0-0_2-0-0-0-0-0_3&nw=g&kw=auto1&mt=e";
 
 const FILTERS = [
   { value: undefined, label: "Todos" },
@@ -87,7 +77,7 @@ export default function LandingPage() {
           <nav className="flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-stone-600">
             <a href="#catalogo" className="hover:text-[#EE7B22]">Ver coches</a>
             <a href="#proceso" className="hover:text-[#EE7B22]">Cómo funciona</a>
-            <a href="#confianza" className="hover:text-[#EE7B22]">Sobre nosotros</a>
+            <a href="#sobre-nosotros" className="hover:text-[#EE7B22]">Sobre nosotros</a>
             <Link href="/" className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-stone-900 text-white normal-case tracking-normal text-[11px]">
               <LayoutDashboard className="h-3.5 w-3.5" /> Panel comercial
             </Link>
@@ -110,7 +100,7 @@ export default function LandingPage() {
               Coches de <em className="not-italic text-[#EE7B22]">oportunidad</em><br /> cada semana
             </h1>
             <p className="mt-5 text-lg text-white/70">
-              Miércoles a sábado. Bloqueas la unidad 12h con un pequeño depósito. Ningún precio sube. Lo que pierdes es la oportunidad.
+              Miércoles a sábado. Bloqueas la unidad 2 horas sin pagar nada. Ningún precio sube. Lo que pierdes es la oportunidad.
             </p>
             <a href="#catalogo" className="mt-8 inline-flex items-center gap-2 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold px-7 py-3.5 rounded-md transition-colors">
               Ver ofertas Flash <ArrowRight className="h-4 w-4" />
@@ -128,45 +118,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* QUICK ACTIONS — corresponden a las secciones del SaaS */}
-      <section className="bg-white py-14 px-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-5">
-          <QuickAction icon={CarIcon} title="Catálogo outlet" desc="15 coches esta semana" href="#catalogo" tag="Inventario" />
-          <QuickAction icon={InboxIcon} title="Mi bloqueo" desc="Habla con tu comercial" href="#proceso" tag="Buzón" />
-          <QuickAction icon={LayoutDashboard} title="Estado en vivo" desc="Cuántas unidades quedan" href="#proceso" tag="Dashboard" />
-          <QuickAction icon={CreditCard} title="Financiación" desc="Planes a tu medida" href="#confianza" />
-        </div>
-      </section>
-
-      {/* MARCAS */}
-      <section className="py-14 px-6" style={{ background: "#eef2f7" }}>
-        <h2 className="text-center text-3xl font-extrabold tracking-tight">
-          Marcas <em className="not-italic text-[#EE7B22]">disponibles</em>
-        </h2>
-        <p className="text-center text-sm text-stone-500 mt-1">Las mejores marcas del mercado pasan por el escaparate</p>
-        <div className="mt-10 max-w-7xl mx-auto bg-white rounded-xl overflow-hidden">
-          <div className="flex items-center gap-16 py-10 px-8 overflow-hidden">
-            <div className="flex items-center gap-16 animate-[scroll_30s_linear_infinite] shrink-0">
-              {[...BRANDS, ...BRANDS].map((b, i) => (
-                <div key={i} className="shrink-0 h-12 flex items-center justify-center min-w-[90px] text-stone-400 hover:text-stone-700 transition-colors" title={b.name}>
-                  {b.svg ? (
-                    <div className="h-9 w-9 opacity-60 hover:opacity-100 transition-opacity">{b.svg}</div>
-                  ) : (
-                    <img
-                      src={`https://cdn.simpleicons.org/${b.slug}/9CA3AF`}
-                      alt={b.name}
-                      className="h-9 w-auto opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
-                      loading="lazy"
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CATÁLOGO — 15 coches */}
+      {/* CATÁLOGO — 15 coches (justo debajo del Hero) */}
       <section id="catalogo" className="bg-white py-16 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-wrap items-end justify-between gap-4 mb-10">
@@ -174,7 +126,7 @@ export default function LandingPage() {
               <h2 className="text-3xl font-extrabold tracking-tight">
                 Outlet de la <em className="not-italic text-[#EE7B22]">semana</em>
               </h2>
-              <p className="text-sm text-stone-500 mt-1">15 coches con ventana de oportunidad. Pulsa "Bloquear unidad" y queda solo para ti durante 12h.</p>
+              <p className="text-sm text-stone-500 mt-1">15 coches con ventana de oportunidad. Pulsa "Bloquear unidad" y queda reservada 2h para ti, sin pagar nada.</p>
             </div>
             <div className="flex gap-2">
               {FILTERS.map((f) => (
@@ -192,28 +144,6 @@ export default function LandingPage() {
                 </button>
               ))}
             </div>
-          </div>
-
-          <div className="mb-6 rounded-xl border-2 border-dashed border-[#EE7B22]/40 bg-gradient-to-r from-[#0E4F8E]/5 to-[#EE7B22]/10 p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
-            <div className="flex-1 min-w-0">
-              <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22] mb-1.5">
-                ¿No encuentras tu coche?
-              </div>
-              <div className="text-lg md:text-xl font-extrabold text-[#0E4F8E] leading-tight">
-                Más de 60.000 coches de ocasión en Auto1
-              </div>
-              <p className="text-sm text-stone-600 mt-1">
-                Si nuestro outlet semanal se queda corto, te recomendamos el catálogo de nuestro partner Auto1.
-              </p>
-            </div>
-            <a
-              href={AUTO1_PARTNER_URL}
-              target="_blank"
-              rel="noopener noreferrer sponsored"
-              className="shrink-0 inline-flex items-center gap-2 bg-[#0E4F8E] hover:bg-[#0A3D6E] text-white font-extrabold px-5 py-3 rounded-md transition-colors"
-            >
-              Ver Auto1 <ExternalLink className="h-4 w-4" />
-            </a>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
@@ -274,6 +204,44 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* QUICK ACTIONS — corresponden a las secciones del SaaS */}
+      <section className="bg-white py-14 px-6 border-t border-stone-200">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-5">
+          <QuickAction icon={CarIcon} title="Catálogo outlet" desc="15 coches esta semana" href="#catalogo" tag="Inventario" />
+          <QuickAction icon={InboxIcon} title="Mi bloqueo" desc="Habla con tu comercial" href="#proceso" tag="Buzón" />
+          <QuickAction icon={LayoutDashboard} title="Estado en vivo" desc="Cuántas unidades quedan" href="#proceso" tag="Dashboard" />
+          <QuickAction icon={CreditCard} title="Financiación" desc="Planes a tu medida" href="#sobre-nosotros" />
+        </div>
+      </section>
+
+      {/* MARCAS */}
+      <section className="py-14 px-6" style={{ background: "#eef2f7" }}>
+        <h2 className="text-center text-3xl font-extrabold tracking-tight">
+          Marcas <em className="not-italic text-[#EE7B22]">disponibles</em>
+        </h2>
+        <p className="text-center text-sm text-stone-500 mt-1">Las mejores marcas del mercado pasan por el escaparate</p>
+        <div className="mt-10 max-w-7xl mx-auto bg-white rounded-xl overflow-hidden">
+          <div className="flex items-center gap-16 py-10 px-8 overflow-hidden">
+            <div className="flex items-center gap-16 animate-[scroll_30s_linear_infinite] shrink-0">
+              {[...BRANDS, ...BRANDS].map((b, i) => (
+                <div key={i} className="shrink-0 h-12 flex items-center justify-center min-w-[90px] text-stone-400 hover:text-stone-700 transition-colors" title={b.name}>
+                  {b.svg ? (
+                    <div className="h-9 w-9 opacity-60 hover:opacity-100 transition-opacity">{b.svg}</div>
+                  ) : (
+                    <img
+                      src={`https://cdn.simpleicons.org/${b.slug}/9CA3AF`}
+                      alt={b.name}
+                      className="h-9 w-auto opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
+                      loading="lazy"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* PROCESO — corresponde a Buzón + Dashboard */}
       <section id="proceso" className="bg-[#0E4F8E] text-white py-20 px-6">
         <div className="max-w-6xl mx-auto">
@@ -282,20 +250,20 @@ export default function LandingPage() {
               Cómo funciona
             </div>
             <h2 className="text-4xl font-extrabold tracking-tight">
-              Una ventana de <em className="not-italic text-[#EE7B22]">12 horas</em>
+              Una ventana de <em className="not-italic text-[#EE7B22]">2 horas</em>
             </h2>
             <p className="mt-3 text-white/60 max-w-xl mx-auto">
-              Aquí no sube el precio. Aquí pierdes la oportunidad. Bloqueas la unidad, hablamos por WhatsApp, decides con calma.
+              Aquí no sube el precio. Aquí pierdes la oportunidad. Bloqueas la unidad sin pagar nada, hablamos por WhatsApp y decides con calma.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <Step n={1} icon={Lock} title="Bloqueas la unidad" body="Pulsas el botón y dejas un pequeño depósito (100-300€). La retiramos del escaparate solo para ti." tag="Inventario" />
+            <Step n={1} icon={Lock} title="Bloqueas la unidad" body="Pulsas el botón y la unidad queda reservada solo para ti durante 2h. Sin pagar nada. Sin compromiso." tag="Inventario" />
             <Step n={2} icon={MessageSquare} title="Hablamos por WhatsApp" body="Un comercial te escribe en minutos. Resolvéis dudas, planificáis prueba o entrega." tag="Buzón" />
-            <Step n={3} icon={CheckCircle2} title="Cierras o liberas" body="En 12h decides. Si cierras, el depósito va a cuenta. Si no, vuelve al escaparate como liberado." tag="Dashboard" />
+            <Step n={3} icon={CheckCircle2} title="Cierras la compra" body="Tienes 2h para cerrar (visita, financiación o transferencia). Si no cierras, vuelve al escaparate como liberada." tag="Dashboard" />
           </div>
 
-          <div id="confianza" className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-white/10 pt-12">
+          <div id="sobre-nosotros" className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-white/10 pt-12">
             <Stat n="14 días" l="Garantía mecánica" />
             <Stat n="+1.200" l="Coches vendidos" />
             <Stat n="4,8/5" l="Reseñas Google" />
@@ -314,6 +282,11 @@ export default function LandingPage() {
           <p className="text-white/40 text-xs">© {new Date().getFullYear()} Pujamostucoche. Todos los derechos reservados.</p>
         </div>
       </footer>
+
+      <WhatsappWidget
+        message="Hola, vengo del outlet de Pujamostucoche.es y me gustaría que me ayudéis a encontrar coche."
+        label="Habla con nosotros"
+      />
 
       <style>{`
         @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }

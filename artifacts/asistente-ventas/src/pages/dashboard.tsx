@@ -60,7 +60,7 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Kpi icon={Car} label="En escaparate" value={String(summary?.openCars ?? "·")} hint="Disponibles para bloquear" accent="bg-emerald-500/15 text-emerald-400" />
-          <Kpi icon={Lock} label="Bloqueadas 12h" value={String(summary?.lockedCars ?? "·")} hint={summary ? `${formatDeposit(summary.depositValueCents)} en depósitos` : undefined} accent="bg-rose-500/15 text-rose-400" />
+          <Kpi icon={Lock} label="Bloqueadas 2h" value={String(summary?.lockedCars ?? "·")} hint={summary ? `${formatDeposit(summary.depositValueCents)} en depósitos` : undefined} accent="bg-rose-500/15 text-rose-400" />
           <Kpi icon={Users} label="Leads activos" value={String(summary?.activeLeads ?? "·")} hint={`${summary?.awaitingDeposit ?? 0} esperando depósito`} accent="bg-sky-500/15 text-sky-400" />
           <Kpi icon={TrendingUp} label="Ventas 7 días" value={String(summary?.wonLast7d ?? "·")} hint={summary ? `Conversión ${(summary.conversionRate * 100).toFixed(0)}%` : undefined} accent="bg-primary/15 text-primary" />
         </div>

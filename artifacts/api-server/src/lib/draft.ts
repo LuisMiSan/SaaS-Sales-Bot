@@ -4,15 +4,15 @@ import { eurFormatter } from "./format";
 
 const INTENT_GUIDES: Record<string, string> = {
   first_response:
-    "Primera respuesta cuando el cliente acaba de pulsar 'Bloquear unidad' y entra por WhatsApp. Confirmar disponibilidad, explicar el bloqueo de 12h y mencionar el depósito (sin presionar). Tono firme pero cercano.",
+    "Primera respuesta cuando el cliente acaba de pulsar 'Bloquear unidad' y entra por WhatsApp. Confirmar disponibilidad y explicar que el bloqueo es totalmente gratuito y dura 2h sin compromiso. Tono firme pero cercano.",
   ask_deposit:
-    "El cliente ha dicho que sigue interesado. Pasarle los datos para hacer el depósito (Bizum / transferencia). Explicar que en cuanto pague, retiramos la unidad del escaparate durante 12h.",
+    "El cliente sigue interesado y quiere avanzar. Confirmar que la unidad está bloqueada para él y proponer cerrar la compra (visita al concesionario, financiación o transferencia bancaria) dentro de la ventana de 2h. NO pedir ningún pago previo para reservar.",
   confirm_lock:
-    "El cliente ha hecho el depósito. Confirmar bloqueo de 12h, retirada del escaparate, y proponer ver detalles con calma para cerrar.",
+    "Confirmar al cliente que la unidad está reservada para él durante 2h sin coste y proponer los siguientes pasos para cerrar (visita, financiación o transferencia).",
   handle_doubt:
     "El cliente duda. NO presionar agresivamente. Reconocer la duda, recordar que si otro cliente bloquea antes deja de estar disponible, ofrecer asegurar la unidad sin agobiar.",
   post_release:
-    "Han pasado las 12h y el cliente no ha cerrado. La unidad ha sido liberada. Avisar con naturalidad, generar un FOMO sutil mencionando que sigue disponible si encaja, sin sonar desesperado.",
+    "Han pasado las 2h y el cliente no ha cerrado. La unidad ha sido liberada. Avisar con naturalidad, generar un FOMO sutil mencionando que sigue disponible si encaja, sin sonar desesperado.",
   custom:
     "Responder al cliente siguiendo las instrucciones específicas que se indican.",
 };
@@ -22,8 +22,10 @@ Tu trabajo es redactar mensajes de WhatsApp en nombre del comercial, en español
 
 REGLAS DEL SISTEMA:
 - Aquí no sube el precio. Aquí pierdes la oportunidad.
-- Bloqueo de unidad dura 12h, requiere depósito (100-300€).
-- Si no compra en 12h, el coche vuelve a "Ventana abierta" como "Liberado recientemente".
+- El bloqueo de unidad dura 2h, es totalmente gratuito y sin compromiso. Basta con bloquearla para reservar la compra durante esa ventana.
+- Si no compra en 2h, el coche vuelve a "Ventana abierta" como "Liberado recientemente".
+- PROHIBIDO mencionar cualquier pago para reservar (ni señal, ni Bizum, ni transferencia previa, ni ningún tipo de cantidad para asegurar la unidad). El bloqueo es siempre gratis.
+- Si el cliente pregunta "¿hay que pagar algo para reservar?", responder claramente que no, que el bloqueo es gratuito.
 - Sin presión agresiva. La urgencia viene de tiempo + disponibilidad real, nunca de marketing barato.
 - Tono: profesional, cercano, directo. Como un comercial bueno de toda la vida, no como un call-center.
 
@@ -48,7 +50,6 @@ export async function generateDraft(args: {
 
   const guide = INTENT_GUIDES[intent] ?? INTENT_GUIDES.custom;
   const carLine = `${car.make} ${car.model} ${car.year} (${eurFormatter.format(Number(car.price))})`;
-  const depositEuros = (car.depositCents / 100).toFixed(0);
 
   const transcript = history
     .slice(-12)
@@ -65,8 +66,6 @@ export async function generateDraft(args: {
 - Coche de interés: ${carLine}
 - Estado del coche: ${car.status}
 - Estado del lead: ${lead.stage}
-- Depósito sugerido: ${depositEuros}€
-- Depósito pagado: ${lead.depositPaid ? "sí" : "no"}
 
 CONVERSACIÓN HASTA AHORA:
 ${transcript || "(aún no hay mensajes)"}
@@ -78,7 +77,7 @@ ${instructions ? `INSTRUCCIONES ADICIONALES DEL COMERCIAL: ${instructions}` : ""
 Redacta ahora el mensaje de WhatsApp.`;
 
   let content = "";
-  let rationale = `Mensaje "${intent}" basado en la metodología (bloqueo 12h, depósito ${depositEuros}€, sin subir precio).`;
+  let rationale = `Mensaje "${intent}" basado en la metodología (bloqueo gratuito de 2h, sin subir precio).`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -104,18 +103,17 @@ Redacta ahora el mensaje de WhatsApp.`;
 
 function fallbackDraft(intent: string, lead: DbLead, car: DbCar): string {
   const carLine = `${car.make} ${car.model} ${car.year} (${eurFormatter.format(Number(car.price))})`;
-  const dep = (car.depositCents / 100).toFixed(0);
   const name = lead.name.split(" ")[0];
 
   switch (intent) {
     case "first_response":
-      return `Hola ${name}, sí, el ${carLine} sigue disponible.\nPuedo bloqueártelo 12h para que nadie más acceda mientras decides.\nPara hacerlo pedimos un pequeño depósito de ${dep}€ que asegura la unidad.\nSi quieres te explico el proceso en un minuto.`;
+      return `Hola ${name}, sí, el ${carLine} sigue disponible.\nLo tienes bloqueado 2h sin pagar nada para que nadie más acceda mientras decides.\nDime qué prefieres: una llamada rápida, venir a verlo o cerrar por aquí.`;
     case "ask_deposit":
-      return `Perfecto.\nEn cuanto haces el depósito (${dep}€) la retiramos del escaparate y queda solo para ti durante 12h.\nTe paso ahora los datos para bloquearla.`;
+      return `Perfecto, ${name}.\nLa unidad está reservada para ti durante 2h sin coste.\nSi te encaja, vamos cerrando: financiación, visita o reserva por transferencia, lo que prefieras.`;
     case "confirm_lock":
-      return `Listo, unidad bloqueada.\nDurante las próximas 12h nadie más puede acceder a ella.\nVamos viendo contigo los detalles para cerrar con calma.`;
+      return `Listo, unidad bloqueada para ti durante 2h.\nNadie más puede acceder a ella en esa ventana.\nDime cómo quieres cerrar: pasarte por el concesionario, financiación o transferencia.`;
     case "handle_doubt":
-      return `Sin problema, ${name}.\nSolo ten en cuenta que si otro cliente la bloquea antes, deja de estar disponible.\nSi quieres asegurarla, aún estás a tiempo.`;
+      return `Sin problema, ${name}.\nSolo ten en cuenta que si otro cliente la bloquea antes, deja de estar disponible.\nSi quieres asegurarla, aún estás a tiempo y no te cuesta nada.`;
     case "post_release":
       return `La unidad ha sido liberada nuevamente.\nSi sigue encajando contigo, aún puedes acceder si no se bloquea otra vez.`;
     default:

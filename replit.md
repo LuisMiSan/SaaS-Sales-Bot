@@ -1,6 +1,16 @@
 # Asistente Ventas WhatsApp
 
-Cockpit comercial para concesionario de coches de ocasión. El equipo gestiona desde aquí los leads que pulsan "Bloquear unidad" en la web, redacta respuestas de WhatsApp asistidas por IA y controla el inventario con sus ventanas de bloqueo de 12 horas.
+Cockpit comercial para concesionario de coches de ocasión. El equipo gestiona desde aquí los leads que pulsan "Bloquear unidad" en la web, redacta respuestas de WhatsApp asistidas por IA y controla el inventario con sus ventanas de bloqueo gratuitas de **2 horas**.
+
+## Ventana de bloqueo (regla de producto)
+- Duración: **2 horas** (`artifacts/api-server/src/routes/cars.ts` → POST `/cars/:id/lock`).
+- Es **gratuita y sin compromiso**: no se pide señal, fianza, depósito, transferencia ni Bizum para reservar. La columna `cars.depositCents` se mantiene en BD como referencia interna pero NO aparece en la web pública (`/tienda`, `/tienda/coche/:id`) ni en los prompts de la IA (`artifacts/api-server/src/lib/draft.ts`).
+- En el cockpit (dashboard, inbox, car-detail) sí se sigue mostrando para uso interno del comercial.
+
+## Web pública "Pujamostucoche.es" (`/tienda` y `/tienda/coche/:id`)
+- Orden de secciones del landing: Hero+Countdown → Outlet de la semana (catálogo de 15 coches) → Quick actions → Marcas → Cómo funciona (3 pasos, 2h) → Sobre nosotros → Footer.
+- Per-car: caja "Cómo funciona el bloqueo" rediseñada en 3 columnas horizontales (`LockStep`): Bloquéalo gratis · Te escribimos por WhatsApp · Tienes 2h para cerrar.
+- Widget WhatsApp flotante (`src/components/whatsapp-widget.tsx`): fijo abajo a la derecha. Lee `VITE_WHATSAPP_PUBLIC_NUMBER` (var de entorno expuesta a Vite) y se oculta si está vacío o inválido. Mensaje genérico en `/tienda`, mensaje pre-rellenado por coche en `/tienda/coche/:id`.
 
 ## Stack
 - Monorepo pnpm (`pnpm-workspace`).
