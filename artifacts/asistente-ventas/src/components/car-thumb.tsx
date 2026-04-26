@@ -1,8 +1,15 @@
 import { Car as CarIcon } from "lucide-react";
 
+function resolveImage(url: string): string {
+  if (/^(?:https?:)?\/\//i.test(url) || url.startsWith("data:")) return url;
+  const base = import.meta.env.BASE_URL || "/";
+  const trimmed = url.startsWith("/") ? url.slice(1) : url;
+  return base.endsWith("/") ? base + trimmed : base + "/" + trimmed;
+}
+
 export function CarThumb({ make, model, imageUrl, className = "h-32 w-full" }: { make: string; model: string; imageUrl?: string | null; className?: string }) {
   if (imageUrl) {
-    return <img src={imageUrl} alt={`${make} ${model}`} className={`${className} object-cover rounded-md`} />;
+    return <img src={resolveImage(imageUrl)} alt={`${make} ${model}`} className={`${className} object-cover object-top rounded-md`} />;
   }
   // Deterministic color from make
   const hash = (make + model).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
