@@ -1,0 +1,50 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "8J4xJMgDE3VPrQX_Kw1Zu"
+uri = "file://artifacts/asistente-ventas/public/body-types/suv.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "_UQEXAvB4goofi4kh2GXb"
+uri = "file://artifacts/asistente-ventas/public/body-types/van.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "9irS6zRnFm1ce7rCxeAOt"
+uri = "file://artifacts/asistente-ventas/public/body-types/compact.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "YPUTB_drG8XctX1u2UiyG"
+uri = "file://artifacts/asistente-ventas/public/body-types/wagon.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "rcrqI-bXRs5y25WmYroUN"
+uri = "file://artifacts/asistente-ventas/public/body-types/cabrio.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "4vRJTpf5c8QMZ3BA3zlMt"
+uri = "file://artifacts/asistente-ventas/public/body-types/sedan.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "vzmtyFLw6PiTQJPewddpI"
+uri = "file://artifacts/asistente-ventas/public/body-types/coupe.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "9ExwG6hfePNnp1_zcy_xi"
+uri = "file://artifacts/asistente-ventas/public/body-types/pickup.png"
+type = "image"
+title = "generated_image"
