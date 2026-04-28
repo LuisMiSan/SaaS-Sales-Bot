@@ -8,6 +8,7 @@ import DashboardPage from "@/pages/dashboard";
 import InboxPage from "@/pages/inbox";
 import InventoryPage from "@/pages/inventory";
 import CarDetailPage from "@/pages/car-detail";
+import PipelinePage from "@/pages/pipeline";
 import LandingPage from "@/pages/landing";
 import LandingCarPage from "@/pages/landing-car";
 
@@ -34,6 +35,7 @@ function Router() {
     <Layout>
       <Switch>
         <Route path="/" component={DashboardPage} />
+        <Route path="/pipeline" component={PipelinePage} />
         <Route path="/inbox" component={InboxPage} />
         <Route path="/inbox/:id" component={InboxPage} />
         <Route path="/inventory" component={InventoryPage} />
