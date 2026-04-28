@@ -69,7 +69,6 @@ export default function LandingCarPage() {
 
   useEffect(() => {
     document.documentElement.classList.remove("dark");
-    return () => { document.documentElement.classList.add("dark"); };
   }, []);
 
   useEffect(() => {

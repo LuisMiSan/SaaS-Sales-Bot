@@ -100,7 +100,6 @@ export default function LandingPage() {
 
   useEffect(() => {
     document.documentElement.classList.remove("dark");
-    return () => { document.documentElement.classList.add("dark"); };
   }, []);
 
   return (

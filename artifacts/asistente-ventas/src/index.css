@@ -56,43 +56,43 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* LIGHT MODE — fallback only; app forces dark */
+/* LIGHT MODE — cockpit: neutral gray background + dark sidebar + signal-amber */
 :root {
-  --background: 30 25% 97%;
-  --foreground: 222 30% 14%;
+  --background: 0 0% 93%;
+  --foreground: 0 0% 8%;
   --card: 0 0% 100%;
-  --card-foreground: 222 30% 14%;
+  --card-foreground: 0 0% 8%;
   --popover: 0 0% 100%;
-  --popover-foreground: 222 30% 14%;
-  --primary: 25 95% 53%;
-  --primary-foreground: 30 30% 99%;
-  --secondary: 30 20% 92%;
-  --secondary-foreground: 222 30% 14%;
-  --muted: 30 20% 94%;
-  --muted-foreground: 215 16% 40%;
-  --accent: 30 20% 92%;
-  --accent-foreground: 222 30% 14%;
-  --destructive: 0 84% 55%;
-  --destructive-foreground: 30 30% 99%;
-  --border: 30 15% 86%;
-  --input: 30 15% 88%;
-  --ring: 25 95% 53%;
+  --popover-foreground: 0 0% 8%;
+  --primary: 28 94% 55%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 89%;
+  --secondary-foreground: 0 0% 8%;
+  --muted: 0 0% 91%;
+  --muted-foreground: 0 0% 42%;
+  --accent: 0 0% 87%;
+  --accent-foreground: 0 0% 8%;
+  --destructive: 0 75% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 83%;
+  --input: 0 0% 87%;
+  --ring: 28 94% 55%;
   --radius: 0.625rem;
 
-  --chart-1: 25 95% 53%;
-  --chart-2: 142 71% 45%;
-  --chart-3: 198 93% 60%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 0 84% 55%;
+  --chart-1: 28 94% 55%;
+  --chart-2: 142 65% 42%;
+  --chart-3: 198 88% 48%;
+  --chart-4: 280 65% 55%;
+  --chart-5: 0 75% 55%;
 
-  --sidebar: 30 18% 96%;
-  --sidebar-foreground: 222 30% 14%;
-  --sidebar-border: 30 15% 86%;
-  --sidebar-primary: 25 95% 53%;
-  --sidebar-primary-foreground: 30 30% 99%;
-  --sidebar-accent: 30 20% 92%;
-  --sidebar-accent-foreground: 222 30% 14%;
-  --sidebar-ring: 25 95% 53%;
+  --sidebar: 0 0% 16%;
+  --sidebar-foreground: 0 0% 92%;
+  --sidebar-border: 0 0% 23%;
+  --sidebar-primary: 28 94% 55%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 23%;
+  --sidebar-accent-foreground: 0 0% 92%;
+  --sidebar-ring: 28 94% 55%;
 
   --app-font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --app-font-mono: "JetBrains Mono", "Menlo", monospace;
