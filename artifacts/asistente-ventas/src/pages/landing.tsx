@@ -13,6 +13,9 @@ import {
   Car as CarIcon,
   Menu,
   X,
+  Mail,
+  MapPin,
+  Phone,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
 import { WhatsappWidget, buildWhatsappUrl } from "@/components/whatsapp-widget";
@@ -112,6 +115,7 @@ export default function LandingPage() {
             <a href="#catalogo" className="hover:text-[#EE7B22]">Ver coches</a>
             <a href="#proceso" className="hover:text-[#EE7B22]">Cómo funciona</a>
             <a href="#sobre-nosotros" className="hover:text-[#EE7B22]">Sobre nosotros</a>
+            <a href="#contacto" className="hover:text-[#EE7B22]">Contacto</a>
             <Link href="/" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-stone-900 text-white normal-case tracking-normal text-[11px]">
               <LayoutDashboard className="h-3.5 w-3.5" /> Panel comercial
             </Link>
@@ -411,13 +415,63 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* CONTACTO */}
+      <section id="contacto" className="bg-white py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-[#EE7B22] font-bold uppercase tracking-widest text-sm mb-3">Contacto</p>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-[#0A3D6E]">
+              ¿Tienes <span className="text-[#EE7B22]">dudas</span>? Escríbenos.
+            </h2>
+            <p className="text-stone-600 mt-4 max-w-2xl mx-auto">
+              Te respondemos en menos de 24h. Sin compromiso, sin presión, solo respuestas claras.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <a
+              href="mailto:pujamostucoche@gmail.com"
+              className="group bg-stone-50 hover:bg-[#0A3D6E] hover:text-white border border-stone-200 rounded-2xl p-8 text-center transition-colors"
+            >
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#EE7B22]/10 group-hover:bg-[#EE7B22]/20 text-[#EE7B22] mb-4">
+                <Mail className="w-6 h-6" />
+              </div>
+              <div className="text-sm uppercase tracking-widest text-stone-500 group-hover:text-white/70 mb-2">Email</div>
+              <div className="font-bold text-[#0A3D6E] group-hover:text-white break-all">pujamostucoche@gmail.com</div>
+            </a>
+
+            <a
+              href={buildWhatsappUrl("Hola, vengo de Pujamostucoche.es y me gustaría más información.") ?? "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-stone-50 hover:bg-[#0A3D6E] hover:text-white border border-stone-200 rounded-2xl p-8 text-center transition-colors"
+            >
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#EE7B22]/10 group-hover:bg-[#EE7B22]/20 text-[#EE7B22] mb-4">
+                <Phone className="w-6 h-6" />
+              </div>
+              <div className="text-sm uppercase tracking-widest text-stone-500 group-hover:text-white/70 mb-2">WhatsApp</div>
+              <div className="font-bold text-[#0A3D6E] group-hover:text-white">Habla con un comercial</div>
+            </a>
+
+            <div className="bg-stone-50 border border-stone-200 rounded-2xl p-8 text-center">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#EE7B22]/10 text-[#EE7B22] mb-4">
+                <MapPin className="w-6 h-6" />
+              </div>
+              <div className="text-sm uppercase tracking-widest text-stone-500 mb-2">Dirección</div>
+              <div className="font-bold text-[#0A3D6E]">Madrid · España</div>
+              <div className="text-sm text-stone-600 mt-1">Lun a Sáb · 10:00–20:00</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FOOTER */}
       <footer className="bg-[#0A3D6E] text-white/60 py-10 px-6 text-center text-sm">
         <div className="max-w-5xl mx-auto space-y-3">
           <div className="text-white font-extrabold text-lg">
             Pujamos<span className="text-[#EE7B22]">tu</span>coche.es
           </div>
-          <p>Concesionario de coches de ocasión · Madrid · <a className="text-[#EE7B22] hover:underline" href="mailto:hola@pujamostucoche.es">hola@pujamostucoche.es</a></p>
+          <p>Concesionario de coches de ocasión · Madrid · <a className="text-[#EE7B22] hover:underline" href="mailto:pujamostucoche@gmail.com">pujamostucoche@gmail.com</a></p>
           <p className="text-white/40 text-xs">© {new Date().getFullYear()} Pujamostucoche. Todos los derechos reservados.</p>
         </div>
       </footer>
