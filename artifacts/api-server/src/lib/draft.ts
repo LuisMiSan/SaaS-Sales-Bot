@@ -1,8 +1,9 @@
 import { openai } from "@workspace/integrations-openai-ai-server";
 import type { Car as DbCar, Lead as DbLead, Message as DbMessage } from "@workspace/db";
+import { db, settingsTable } from "@workspace/db";
 import { eurFormatter } from "./format";
 
-const INTENT_GUIDES: Record<string, string> = {
+export const DEFAULT_INTENT_GUIDES: Record<string, string> = {
   first_response:
     "Primera respuesta cuando el cliente acaba de pulsar 'Bloquear unidad' y entra por WhatsApp. Confirmar disponibilidad y explicar que el bloqueo es totalmente gratuito y dura 2h sin compromiso. Tono firme pero cercano.",
   ask_deposit:
@@ -17,7 +18,7 @@ const INTENT_GUIDES: Record<string, string> = {
     "Responder al cliente siguiendo las instrucciones específicas que se indican.",
 };
 
-const SYSTEM_PROMPT = `Eres un asistente de ventas para un concesionario español de coches de ocasión.
+export const DEFAULT_SYSTEM_PROMPT = `Eres un asistente de ventas para un concesionario español de coches de ocasión.
 Tu trabajo es redactar mensajes de WhatsApp en nombre del comercial, en español de España, siguiendo esta metodología:
 
 REGLAS DEL SISTEMA:
@@ -39,6 +40,17 @@ REGLAS DE FORMATO:
 
 DEVUELVES SOLO el texto del mensaje de WhatsApp listo para enviar. Nada más.`;
 
+async function loadSettings(): Promise<Record<string, string>> {
+  try {
+    const rows = await db.select().from(settingsTable);
+    const map: Record<string, string> = {};
+    for (const r of rows) map[r.key] = r.value;
+    return map;
+  } catch {
+    return {};
+  }
+}
+
 export async function generateDraft(args: {
   intent: string;
   instructions?: string | null;
@@ -48,7 +60,14 @@ export async function generateDraft(args: {
 }): Promise<{ content: string; rationale: string }> {
   const { intent, instructions, car, lead, history } = args;
 
-  const guide = INTENT_GUIDES[intent] ?? INTENT_GUIDES.custom;
+  const settings = await loadSettings();
+  const systemPrompt = settings["system_prompt"] ?? DEFAULT_SYSTEM_PROMPT;
+  const intentGuides = { ...DEFAULT_INTENT_GUIDES };
+  for (const key of Object.keys(DEFAULT_INTENT_GUIDES)) {
+    if (settings[`guide_${key}`]) intentGuides[key] = settings[`guide_${key}`];
+  }
+
+  const guide = intentGuides[intent] ?? intentGuides.custom;
   const carLine = `${car.make} ${car.model} ${car.year} (${eurFormatter.format(Number(car.price))})`;
 
   const transcript = history
@@ -84,7 +103,7 @@ Redacta ahora el mensaje de WhatsApp.`;
       model: "gpt-5.2",
       max_completion_tokens: 800,
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
     });

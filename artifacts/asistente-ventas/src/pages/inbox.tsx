@@ -365,11 +365,11 @@ function Conversation({ leadId, onClose }: { leadId: number; onClose: () => void
       </div>
 
       {/* Messages */}
-      <div ref={messagesRef} className="flex-1 overflow-y-auto scrollbar-thin px-4 sm:px-6 py-5 space-y-3">
+      <div ref={messagesRef} className="flex-1 overflow-y-auto scrollbar-thin px-4 sm:px-8 py-6 space-y-5">
         {lead.messages.map((m) => {
           if (m.direction === "system") {
             return (
-              <div key={m.id} className="text-center my-4">
+              <div key={m.id} className="text-center my-5">
                 <span className="text-[11px] text-muted-foreground bg-secondary/60 px-3 py-1 rounded-full">
                   {m.content} · {formatTime(m.createdAt)}
                 </span>
@@ -381,14 +381,14 @@ function Conversation({ leadId, onClose }: { leadId: number; onClose: () => void
             <div key={m.id} className={cn("flex", isOutgoing ? "justify-end" : "justify-start")}>
               <div
                 className={cn(
-                  "max-w-[85%] sm:max-w-[72%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap leading-relaxed shadow-sm",
+                  "max-w-[85%] sm:max-w-[68%] rounded-2xl px-5 py-3.5 text-[14px] whitespace-pre-wrap leading-loose shadow-sm",
                   isOutgoing
                     ? "bg-primary/85 text-primary-foreground rounded-tr-sm"
                     : "bg-card border border-border rounded-tl-sm",
                 )}
               >
                 <div>{m.content}</div>
-                <div className={cn("text-[10px] mt-1.5 inline-flex items-center gap-1", isOutgoing ? "text-primary-foreground/70" : "text-muted-foreground")}>
+                <div className={cn("text-[10px] mt-2 inline-flex items-center gap-1", isOutgoing ? "text-primary-foreground/70" : "text-muted-foreground")}>
                   {m.aiGenerated && <Sparkles className="h-2.5 w-2.5" />}
                   {formatTime(m.createdAt)}
                 </div>

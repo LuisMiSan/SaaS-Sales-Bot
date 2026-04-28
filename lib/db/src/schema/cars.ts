@@ -68,3 +68,11 @@ export const activityTable = pgTable("activity", {
 });
 
 export type Activity = typeof activityTable.$inferSelect;
+
+export const settingsTable = pgTable("settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export type Setting = typeof settingsTable.$inferSelect;

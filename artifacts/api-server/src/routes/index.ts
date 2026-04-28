@@ -4,6 +4,7 @@ import carsRouter from "./cars";
 import leadsRouter from "./leads";
 import dashboardRouter from "./dashboard";
 import whatsappRouter from "./whatsapp";
+import settingsRouter from "./settings";
 
 const router: IRouter = Router();
 
@@ -12,5 +13,6 @@ router.use(carsRouter);
 router.use(leadsRouter);
 router.use(dashboardRouter);
 router.use(whatsappRouter);
+router.use(settingsRouter);
 
 export default router;

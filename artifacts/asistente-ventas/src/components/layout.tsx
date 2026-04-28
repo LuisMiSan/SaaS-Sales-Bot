@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, MessageSquare, Car, Sparkles, Menu, X, Kanban } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Car, Sparkles, Menu, X, Kanban, Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -31,6 +31,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     { href: "/pipeline", label: "Pipeline", icon: Kanban },
     { href: "/inbox", label: "Buzón", icon: MessageSquare },
     { href: "/inventory", label: "Inventario", icon: Car },
+    { href: "/settings", label: "Configuración", icon: Settings2 },
   ];
 
   const navContent = (

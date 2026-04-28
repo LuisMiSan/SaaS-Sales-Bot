@@ -9,6 +9,7 @@ import InboxPage from "@/pages/inbox";
 import InventoryPage from "@/pages/inventory";
 import CarDetailPage from "@/pages/car-detail";
 import PipelinePage from "@/pages/pipeline";
+import SettingsPage from "@/pages/settings";
 import LandingPage from "@/pages/landing";
 import LandingCarPage from "@/pages/landing-car";
 
@@ -40,6 +41,7 @@ function Router() {
         <Route path="/inbox/:id" component={InboxPage} />
         <Route path="/inventory" component={InventoryPage} />
         <Route path="/cars/:id" component={CarDetailPage} />
+        <Route path="/settings" component={SettingsPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
