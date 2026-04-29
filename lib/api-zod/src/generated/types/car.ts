@@ -21,10 +21,34 @@ export interface Car {
   /** @nullable */
   imageUrl?: string | null;
   photos?: string[];
+  /** @nullable */
+  videoUrl?: string | null;
   km: number;
   fuel: string;
   transmission: string;
   location: string;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  horsepower?: number | null;
+  /** @nullable */
+  doors?: number | null;
+  /** @nullable */
+  seats?: number | null;
+  /** @nullable */
+  color?: string | null;
+  /** @nullable */
+  bodyType?: string | null;
+  /** @nullable */
+  engineCc?: number | null;
+  /** @nullable */
+  co2?: number | null;
+  /** @nullable */
+  consumptionUrban?: number | null;
+  /** @nullable */
+  consumptionHighway?: number | null;
+  /** @nullable */
+  consumptionMixed?: number | null;
   depositCents: number;
   publishedAt: Date;
   availableUntil: Date;

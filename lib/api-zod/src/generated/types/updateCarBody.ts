@@ -8,14 +8,46 @@
 import type { UpdateCarBodyAttractiveness } from "./updateCarBodyAttractiveness";
 
 export interface UpdateCarBody {
+  make?: string;
+  model?: string;
+  year?: number;
   price?: number;
   attractiveness?: UpdateCarBodyAttractiveness;
+  km?: number;
+  fuel?: string;
+  transmission?: string;
+  location?: string;
+  /** @nullable */
+  imageUrl?: string | null;
+  /** @nullable */
+  videoUrl?: string | null;
+  /** @nullable */
+  description?: string | null;
   /** @nullable */
   notes?: string | null;
   /** @nullable */
-  imageUrl?: string | null;
+  horsepower?: number | null;
+  /** @nullable */
+  doors?: number | null;
+  /** @nullable */
+  seats?: number | null;
+  /** @nullable */
+  color?: string | null;
+  /** @nullable */
+  bodyType?: string | null;
+  /** @nullable */
+  engineCc?: number | null;
+  /** @nullable */
+  co2?: number | null;
+  /** @nullable */
+  consumptionUrban?: number | null;
+  /** @nullable */
+  consumptionHighway?: number | null;
+  /** @nullable */
+  consumptionMixed?: number | null;
   /** @nullable */
   marketPriceMin?: number | null;
   /** @nullable */
   marketPriceMax?: number | null;
+  photos?: string[];
 }

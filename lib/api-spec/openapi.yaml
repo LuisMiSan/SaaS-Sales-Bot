@@ -385,10 +385,22 @@ components:
         status: { type: string, enum: [open, locking, locked] }
         imageUrl: { type: ["string", "null"] }
         photos: { type: array, items: { type: string } }
+        videoUrl: { type: ["string", "null"] }
         km: { type: integer }
         fuel: { type: string }
         transmission: { type: string }
         location: { type: string }
+        description: { type: ["string", "null"] }
+        horsepower: { type: ["integer", "null"] }
+        doors: { type: ["integer", "null"] }
+        seats: { type: ["integer", "null"] }
+        color: { type: ["string", "null"] }
+        bodyType: { type: ["string", "null"] }
+        engineCc: { type: ["integer", "null"] }
+        co2: { type: ["integer", "null"] }
+        consumptionUrban: { type: ["number", "null"] }
+        consumptionHighway: { type: ["number", "null"] }
+        consumptionMixed: { type: ["number", "null"] }
         publishedAt: { type: string, format: date-time }
       required: [id, make, model, year, price, priceLabel, status, km, fuel, transmission, location, publishedAt]
 
@@ -406,10 +418,22 @@ components:
         status: { type: string, enum: [open, locking, locked, released, sold] }
         imageUrl: { type: ["string", "null"] }
         photos: { type: array, items: { type: string } }
+        videoUrl: { type: ["string", "null"] }
         km: { type: integer }
         fuel: { type: string }
         transmission: { type: string }
         location: { type: string }
+        description: { type: ["string", "null"] }
+        horsepower: { type: ["integer", "null"] }
+        doors: { type: ["integer", "null"] }
+        seats: { type: ["integer", "null"] }
+        color: { type: ["string", "null"] }
+        bodyType: { type: ["string", "null"] }
+        engineCc: { type: ["integer", "null"] }
+        co2: { type: ["integer", "null"] }
+        consumptionUrban: { type: ["number", "null"] }
+        consumptionHighway: { type: ["number", "null"] }
+        consumptionMixed: { type: ["number", "null"] }
         depositCents: { type: integer }
         publishedAt: { type: string, format: date-time }
         availableUntil: { type: string, format: date-time }
@@ -434,8 +458,20 @@ components:
         transmission: { type: string }
         location: { type: string }
         imageUrl: { type: ["string", "null"] }
+        videoUrl: { type: ["string", "null"] }
         depositCents: { type: integer }
+        description: { type: ["string", "null"] }
         notes: { type: ["string", "null"] }
+        horsepower: { type: ["integer", "null"] }
+        doors: { type: ["integer", "null"] }
+        seats: { type: ["integer", "null"] }
+        color: { type: ["string", "null"] }
+        bodyType: { type: ["string", "null"] }
+        engineCc: { type: ["integer", "null"] }
+        co2: { type: ["integer", "null"] }
+        consumptionUrban: { type: ["number", "null"] }
+        consumptionHighway: { type: ["number", "null"] }
+        consumptionMixed: { type: ["number", "null"] }
         marketPriceMin: { type: ["integer", "null"] }
         marketPriceMax: { type: ["integer", "null"] }
       required: [make, model, year, price, attractiveness, km, fuel, transmission, location, depositCents]
@@ -443,12 +479,32 @@ components:
     UpdateCarBody:
       type: object
       properties:
+        make: { type: string }
+        model: { type: string }
+        year: { type: integer }
         price: { type: number }
         attractiveness: { type: string, enum: [hot, normal, hard] }
-        notes: { type: ["string", "null"] }
+        km: { type: integer }
+        fuel: { type: string }
+        transmission: { type: string }
+        location: { type: string }
         imageUrl: { type: ["string", "null"] }
+        videoUrl: { type: ["string", "null"] }
+        description: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+        horsepower: { type: ["integer", "null"] }
+        doors: { type: ["integer", "null"] }
+        seats: { type: ["integer", "null"] }
+        color: { type: ["string", "null"] }
+        bodyType: { type: ["string", "null"] }
+        engineCc: { type: ["integer", "null"] }
+        co2: { type: ["integer", "null"] }
+        consumptionUrban: { type: ["number", "null"] }
+        consumptionHighway: { type: ["number", "null"] }
+        consumptionMixed: { type: ["number", "null"] }
         marketPriceMin: { type: ["integer", "null"] }
         marketPriceMax: { type: ["integer", "null"] }
+        photos: { type: array, items: { type: string } }
 
     LockCarBody:
       type: object

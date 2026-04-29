@@ -19,9 +19,33 @@ export interface CreateCarBody {
   location: string;
   /** @nullable */
   imageUrl?: string | null;
+  /** @nullable */
+  videoUrl?: string | null;
   depositCents: number;
   /** @nullable */
+  description?: string | null;
+  /** @nullable */
   notes?: string | null;
+  /** @nullable */
+  horsepower?: number | null;
+  /** @nullable */
+  doors?: number | null;
+  /** @nullable */
+  seats?: number | null;
+  /** @nullable */
+  color?: string | null;
+  /** @nullable */
+  bodyType?: string | null;
+  /** @nullable */
+  engineCc?: number | null;
+  /** @nullable */
+  co2?: number | null;
+  /** @nullable */
+  consumptionUrban?: number | null;
+  /** @nullable */
+  consumptionHighway?: number | null;
+  /** @nullable */
+  consumptionMixed?: number | null;
   /** @nullable */
   marketPriceMin?: number | null;
   /** @nullable */

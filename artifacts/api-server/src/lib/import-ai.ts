@@ -354,9 +354,21 @@ export interface ParsedCar {
   location: string;
   attractiveness: "hot" | "normal" | "hard";
   depositCents: number;
+  description: string;
   notes: string;
   marketPriceMin: number;
   marketPriceMax: number;
+  // Extended specs — null means not found in source
+  horsepower: number | null;
+  doors: number | null;
+  seats: number | null;
+  color: string | null;
+  bodyType: string | null;
+  engineCc: number | null;
+  co2: number | null;
+  consumptionUrban: number | null;
+  consumptionHighway: number | null;
+  consumptionMixed: number | null;
 }
 
 const SYSTEM_PROMPT = `Eres un experto del mercado español de coches de ocasión. Recibes una descripción libre de UN coche (puede venir muy mal escrita: solo marca/modelo/año/precio, una línea CSV, un anuncio entero, o el contenido scrapeado de una página web de portales como coches.net, autoscout24, milanuncios, wallapop o similares).
@@ -373,9 +385,20 @@ Devuelves SOLO un JSON con este formato exacto:
   "location": string,
   "attractiveness": "hot" | "normal" | "hard",
   "depositCents": number,
+  "description": string,
   "notes": string,
   "marketPriceMin": number,
-  "marketPriceMax": number
+  "marketPriceMax": number,
+  "horsepower": number | null,
+  "doors": number | null,
+  "seats": number | null,
+  "color": string | null,
+  "bodyType": string | null,
+  "engineCc": number | null,
+  "co2": number | null,
+  "consumptionUrban": number | null,
+  "consumptionHighway": number | null,
+  "consumptionMixed": number | null
 }
 
 REGLAS:
@@ -389,8 +412,19 @@ REGLAS:
   - "hard" si es coche difícil de vender (>150.000km, motor problemático conocido, marca/modelo poco demandado, precio alto para lo que es).
   - "normal" en el resto.
 - depositCents: 10000 (100€) si precio<10.000€, 20000 (200€) si 10.000-20.000€, 30000 (300€) si >20.000€.
-- notes: ficha comercial 2-4 frases en español de España, sin emojis, sin asteriscos. Tono profesional cercano. Destaca lo que vende este coche concreto (equipamiento si se menciona, ratio km/año, ventajas reales). NO inventes equipamiento que no esté insinuado en el texto. Si solo tienes marca+modelo+año+precio+km, redacta una ficha sobria sin inventar extras.
+- description: descripción comercial completa del vehículo en 3-6 frases en español de España, sin emojis, sin asteriscos. Tono profesional cercano. Incluye el equipamiento destacado si se menciona, ratio km/año, estado del vehículo, ventajas reales. Si hay descripción original en el anuncio, úsala como base y mejórala. NO inventes equipamiento que no esté insinuado en el texto.
+- notes: 1-2 frases internas para el comercial (no se muestra al público). Destaca puntos fuertes de venta o alertas.
 - marketPriceMin / marketPriceMax: rango realista en EUROS al que se vende ESTE coche (mismo modelo/año/km/combustible/cambio aprox.) en portales españoles tipo coches.net, autoscout24.es, milanuncios y wallapop motor. Considera estado de mercado actual, depreciación por año (~12-15%/año), penalización por kms altos (>20k km/año = -5/-10%), prima por automático y por equipamiento premium. El rango debe abarcar la dispersión real (entre el más barato listado y un buen ejemplar particular o concesión), normalmente con una amplitud del 15-25% entre min y max. NUESTRO precio (price) suele estar igual o por debajo del min porque vendemos en outlet, pero NO fuerces eso: si el coche está caro, el precio puede caer dentro del rango. Devuelve enteros sin decimales.
+- horsepower: CV del motor, entero. null si no se menciona.
+- doors: número de puertas (3, 5, 2, 4...). null si no se menciona.
+- seats: número de plazas. null si no se menciona.
+- color: color exterior en español (p.ej. "Blanco", "Gris Plata", "Negro"). null si no se menciona.
+- bodyType: carrocería en español (p.ej. "Berlina", "SUV", "Familiar", "Furgoneta", "Monovolumen", "Descapotable", "Coupé"). null si no se puede deducir.
+- engineCc: cilindrada en cc, entero. null si no se menciona.
+- co2: emisiones CO2 en g/km, entero. null si no se menciona.
+- consumptionUrban: consumo urbano en L/100km, número decimal. null si no se menciona.
+- consumptionHighway: consumo carretera en L/100km, número decimal. null si no se menciona.
+- consumptionMixed: consumo mixto en L/100km, número decimal. null si no se menciona.
 
 Devuelve SOLO el JSON. Nada más.`;
 
@@ -416,6 +450,21 @@ export async function parseCarLine(line: string): Promise<ParsedCar> {
   if (!data.make || !data.model || typeof data.year !== "number" || typeof data.price !== "number") {
     throw new Error(`AI omitted required fields (make/model/year/price)`);
   }
+  function nullableInt(v: unknown): number | null {
+    if (v == null) return null;
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? Math.round(n) : null;
+  }
+  function nullableFloat(v: unknown): number | null {
+    if (v == null) return null;
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? n : null;
+  }
+  function nullableStr(v: unknown): string | null {
+    if (v == null || String(v).trim() === "" || String(v) === "null") return null;
+    return String(v).trim();
+  }
+
   return {
     make: String(data.make),
     model: String(data.model),
@@ -427,11 +476,22 @@ export async function parseCarLine(line: string): Promise<ParsedCar> {
     location: String(data.location ?? "Madrid"),
     attractiveness: (data.attractiveness as ParsedCar["attractiveness"]) ?? "normal",
     depositCents: Number(data.depositCents ?? 20000),
+    description: String(data.description ?? ""),
     notes: String(data.notes ?? ""),
     ...normalizeMarketRangeStrict(
       Number(data.marketPriceMin ?? data.price ?? 0),
       Number(data.marketPriceMax ?? data.price ?? 0),
     ),
+    horsepower: nullableInt(data.horsepower),
+    doors: nullableInt(data.doors),
+    seats: nullableInt(data.seats),
+    color: nullableStr(data.color),
+    bodyType: nullableStr(data.bodyType),
+    engineCc: nullableInt(data.engineCc),
+    co2: nullableInt(data.co2),
+    consumptionUrban: nullableFloat(data.consumptionUrban),
+    consumptionHighway: nullableFloat(data.consumptionHighway),
+    consumptionMixed: nullableFloat(data.consumptionMixed),
   };
 }
 

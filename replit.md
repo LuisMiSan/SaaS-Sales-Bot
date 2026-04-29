@@ -23,6 +23,14 @@ Cockpit comercial para concesionario de coches de ocasión. El equipo gestiona d
 - Spec: `lib/api-spec/openapi.yaml` → `@workspace/api-client-react` (orval) + `@workspace/api-zod`.
 - Esquema BD: `lib/db/src/schema/cars.ts` (cars, leads, messages, activity).
 
+## Campos extendidos de vehículo (cars table)
+Campos básicos: `make`, `model`, `year`, `price`, `km`, `fuel`, `transmission`, `location`, `imageUrl`, `photos[]`, `videoUrl`, `depositCents`, `status`, `attractiveness`.
+Ficha técnica: `description` (texto público), `horsepower`, `doors`, `seats`, `color`, `bodyType`, `engineCc`.
+Consumo y emisiones: `consumptionUrban`, `consumptionHighway`, `consumptionMixed` (L/100), `co2` (g/km).
+Internos: `notes` (solo staff), `marketPriceMin`, `marketPriceMax`, `viewersNow`.
+
+La IA de importación extrae todos estos campos automáticamente al importar por URL. El editor de ficha staff tiene 5 pestañas: Ficha / Técnica / Consumo / Fotos+Vídeo / Comercial.
+
 ## Convenciones
 - Idioma de la UI y los mensajes: español de España. Sin emojis.
 - Modo oscuro por defecto (gris grafito + acento ámbar).

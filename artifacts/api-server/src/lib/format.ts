@@ -16,6 +16,23 @@ export function windowHoursForAttractiveness(a: string): number {
   return 48;
 }
 
+function extendedSpecFields(car: DbCar) {
+  return {
+    description: car.description ?? null,
+    videoUrl: car.videoUrl ?? null,
+    horsepower: car.horsepower ?? null,
+    doors: car.doors ?? null,
+    seats: car.seats ?? null,
+    color: car.color ?? null,
+    bodyType: car.bodyType ?? null,
+    engineCc: car.engineCc ?? null,
+    co2: car.co2 ?? null,
+    consumptionUrban: car.consumptionUrban ?? null,
+    consumptionHighway: car.consumptionHighway ?? null,
+    consumptionMixed: car.consumptionMixed ?? null,
+  };
+}
+
 export function serializeCar(car: DbCar) {
   return {
     id: car.id,
@@ -42,6 +59,7 @@ export function serializeCar(car: DbCar) {
     notes: car.notes,
     marketPriceMin: car.marketPriceMin,
     marketPriceMax: car.marketPriceMax,
+    ...extendedSpecFields(car),
   };
 }
 
@@ -61,6 +79,7 @@ export function serializePublicCar(car: DbCar) {
     transmission: car.transmission,
     location: car.location,
     publishedAt: car.publishedAt.toISOString(),
+    ...extendedSpecFields(car),
   };
 }
 
@@ -102,4 +121,19 @@ export function serializeActivity(a: DbActivity) {
     carLabel: a.carLabel,
     at: a.at.toISOString(),
   };
+}
+
+export function formatRelative(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const diff = Date.now() - new Date(iso).getTime();
+  if (diff < 60_000) return "ahora";
+  if (diff < 3_600_000) return `hace ${Math.floor(diff / 60_000)} min`;
+  if (diff < 86_400_000) return `hace ${Math.floor(diff / 3_600_000)} h`;
+  return `hace ${Math.floor(diff / 86_400_000)} d`;
+}
+
+export function attractivenessLabel(a: string): string {
+  if (a === "hot") return "Alta demanda";
+  if (a === "hard") return "Difícil venta";
+  return "Demanda normal";
 }
