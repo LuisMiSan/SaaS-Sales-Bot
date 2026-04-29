@@ -66,6 +66,7 @@ export function intentLabel(intent: string): string {
     case "first_response": return "Primera respuesta";
     case "ask_deposit": return "Pedir depósito";
     case "confirm_lock": return "Confirmar bloqueo";
+    case "confirm_relock": return "Re-bloquear";
     case "handle_doubt": return "Cliente duda";
     case "post_release": return "Post liberación";
     case "custom": return "Personalizado";

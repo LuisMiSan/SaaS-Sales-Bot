@@ -13,7 +13,9 @@ export const DEFAULT_INTENT_GUIDES: Record<string, string> = {
   handle_doubt:
     "El cliente duda. NO presionar agresivamente. Reconocer la duda, recordar que si otro cliente bloquea antes deja de estar disponible, ofrecer asegurar la unidad sin agobiar.",
   post_release:
-    "Han pasado las 2h y el cliente no ha cerrado. La unidad ha sido liberada. Avisar con naturalidad, generar un FOMO sutil mencionando que sigue disponible si encaja, sin sonar desesperado.",
+    "Han pasado las 2h y el cliente no ha cerrado. La unidad ha sido liberada. Avisar con naturalidad, generar un FOMO sutil mencionando que sigue disponible si encaja, sin sonar desesperado. NO usar esta guía si el cliente acaba de pedir que le bloquees el coche.",
+  confirm_relock:
+    "El cliente quiere que le vuelvas a bloquear la unidad después de que el bloqueo anterior expiró. Confirma de forma natural que le vuelves a bloquear ahora mismo o que lo gestionas enseguida. Recuérdale que sigue siendo gratuito y sin compromiso, 2h desde ahora. Tono cercano y resolutivo, sin recrearte en que el anterior bloqueo expiró.",
   custom:
     "Responder al cliente siguiendo las instrucciones específicas que se indican.",
 };
@@ -137,6 +139,8 @@ function fallbackDraft(intent: string, lead: DbLead, car: DbCar): string {
       return `Listo, unidad bloqueada para ti durante 2h.\nNadie más puede acceder a ella en esa ventana.\nDime cómo quieres cerrar: pasarte por el concesionario, financiación o transferencia.`;
     case "handle_doubt":
       return `Sin problema, ${name}.\nSolo ten en cuenta que si otro cliente la bloquea antes, deja de estar disponible.\nSi quieres asegurarla, aún estás a tiempo y no te cuesta nada.`;
+    case "confirm_relock":
+      return `Ahora mismo te la vuelvo a bloquear, ${name}.\nSon otras 2h sin coste, sin compromiso.\nDime si prefieres pasarte por el concesionario o lo cerramos por aquí.`;
     case "post_release":
       return `La unidad ha sido liberada nuevamente.\nSi sigue encajando contigo, aún puedes acceder si no se bloquea otra vez.`;
     default:
