@@ -8,7 +8,7 @@ export function isUrl(text: string): boolean {
   return /^https?:\/\/\S+$/i.test(text.trim());
 }
 
-const FETCH_TIMEOUT_MS = 10_000;
+const FETCH_TIMEOUT_MS = 20_000;
 const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 const MAX_REDIRECTS = 5;
 
@@ -125,9 +125,12 @@ function httpGetRaw(parsed: URL, signal: AbortSignal): Promise<RawResponse> {
       path: (parsed.pathname || "/") + parsed.search,
       method: "GET",
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; AsistenteVentasBot/1.0; +https://replit.com)",
-        Accept: "text/html,application/xhtml+xml",
-        "Accept-Language": "es-ES,es;q=0.9",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
+        "Accept-Encoding": "identity",
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
       },
       agent,
     });
@@ -255,12 +258,23 @@ export async function fetchCarPage(url: string): Promise<string> {
       const title = (html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] ?? "").trim();
       const ogTitle = pickMeta(html, ["og:title", "twitter:title"]);
       const ogDesc = pickMeta(html, ["og:description", "twitter:description", "description"]);
-      const text = stripHtml(html).slice(0, 5000);
+
+      // Extract JSON-LD structured data (most reliable source for car listings)
+      const jsonLdMatches = [...html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
+      const jsonLdSnippets = jsonLdMatches
+        .map((m) => {
+          try { return JSON.stringify(JSON.parse(m[1]), null, 0).slice(0, 800); } catch { return null; }
+        })
+        .filter(Boolean)
+        .join("\n");
+
+      const text = stripHtml(html).slice(0, 8000);
       return [
         `URL: ${url}`,
         title && `TÍTULO: ${title}`,
         ogTitle && ogTitle !== title && `OG_TITLE: ${ogTitle}`,
         ogDesc && `DESCRIPCIÓN: ${ogDesc}`,
+        jsonLdSnippets && `DATOS_ESTRUCTURADOS:\n${jsonLdSnippets}`,
         `CONTENIDO:\n${text}`,
       ]
         .filter(Boolean)
