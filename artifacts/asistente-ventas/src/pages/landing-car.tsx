@@ -133,7 +133,7 @@ export default function LandingCarPage() {
             {/* GALLERY + INFO */}
             <div className="lg:col-span-3 space-y-6 order-2 lg:order-1">
               <div className="relative rounded-2xl overflow-hidden bg-white shadow-sm">
-                <CarThumb make={car.make} model={car.model} imageUrl={car.imageUrl} className="w-full h-[260px] sm:h-[360px] md:h-[440px]" />
+                <CarThumb make={car.make} model={car.model} imageUrl={car.imageUrl} photos={car.photos} className="w-full h-[260px] sm:h-[360px] md:h-[440px]" />
                 {discount && discount > 0 && (
                   <span className="absolute top-4 left-4 bg-[#27AE60] text-white text-xs font-bold px-3 py-1.5 rounded-full">
                     -{discount}% outlet
@@ -305,7 +305,7 @@ export default function LandingCarPage() {
                 {others.map((o) => (
                   <Link key={o.id} href={`/tienda/coche/${o.id}`}>
                     <article className="bg-white border border-stone-200 rounded-xl overflow-hidden hover:shadow-lg hover:border-[#EE7B22] hover:-translate-y-1 transition-all">
-                      <CarThumb make={o.make} model={o.model} imageUrl={o.imageUrl} className="h-32 w-full" />
+                      <CarThumb make={o.make} model={o.model} imageUrl={o.imageUrl} photos={o.photos} className="h-32 w-full" />
                       <div className="p-3">
                         <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22]">{o.make}</div>
                         <div className="text-sm font-extrabold leading-tight mt-0.5 line-clamp-1">{o.model}</div>

@@ -225,6 +225,7 @@ export default function LandingPage() {
                         make={car.make}
                         model={car.model}
                         imageUrl={car.imageUrl}
+                        photos={car.photos}
                         className={cn("h-44 w-full", isLocked && "grayscale")}
                       />
                       {isLocked ? (

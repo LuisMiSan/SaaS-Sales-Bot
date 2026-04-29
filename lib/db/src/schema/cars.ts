@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, timestamp, boolean, doublePrecision } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, timestamp, boolean, doublePrecision, jsonb } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 export const carsTable = pgTable("cars", {
@@ -13,6 +13,7 @@ export const carsTable = pgTable("cars", {
   transmission: text("transmission").notNull().default("Manual"),
   location: text("location").notNull().default("Madrid"),
   imageUrl: text("image_url"),
+  photos: text("photos").array(),
   depositCents: integer("deposit_cents").notNull().default(20000),
   status: text("status").notNull().default("open"),
   publishedAt: timestamp("published_at", { withTimezone: true }).notNull().defaultNow(),

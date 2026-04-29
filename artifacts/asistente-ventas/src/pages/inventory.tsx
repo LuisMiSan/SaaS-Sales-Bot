@@ -62,7 +62,7 @@ export default function InventoryPage() {
               <Link key={car.id} href={`/cars/${car.id}`}>
                 <Card className="overflow-hidden bg-card border-border hover:border-primary/40 transition-colors cursor-pointer group">
                   <div className="relative">
-                    <CarThumb make={car.make} model={car.model} imageUrl={car.imageUrl} className="h-40 w-full" />
+                    <CarThumb make={car.make} model={car.model} imageUrl={car.imageUrl} photos={car.photos} className="h-40 w-full" />
                     <div className="absolute top-2 left-2"><StatusBadge status={car.status} /></div>
                     <div className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/40 backdrop-blur text-[10px] text-white/90">
                       <Eye className="h-3 w-3" /> {car.viewersNow}

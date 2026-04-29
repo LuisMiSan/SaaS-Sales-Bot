@@ -7,9 +7,10 @@ function resolveImage(url: string): string {
   return base.endsWith("/") ? base + trimmed : base + "/" + trimmed;
 }
 
-export function CarThumb({ make, model, imageUrl, className = "h-32 w-full" }: { make: string; model: string; imageUrl?: string | null; className?: string }) {
-  if (imageUrl) {
-    return <img src={resolveImage(imageUrl)} alt={`${make} ${model}`} className={`${className} object-cover object-top rounded-md`} />;
+export function CarThumb({ make, model, imageUrl, photos, className = "h-32 w-full" }: { make: string; model: string; imageUrl?: string | null; photos?: string[] | null; className?: string }) {
+  const displayUrl = imageUrl || (photos && photos.length > 0 ? photos[0] : null);
+  if (displayUrl) {
+    return <img src={resolveImage(displayUrl)} alt={`${make} ${model}`} className={`${className} object-cover object-top rounded-md`} />;
   }
   // Deterministic color from make
   const hash = (make + model).split("").reduce((a, c) => a + c.charCodeAt(0), 0);

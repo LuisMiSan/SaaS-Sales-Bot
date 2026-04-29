@@ -7,5 +7,9 @@
  */
 
 export interface SimulateIncomingBody {
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
   content: string;
 }

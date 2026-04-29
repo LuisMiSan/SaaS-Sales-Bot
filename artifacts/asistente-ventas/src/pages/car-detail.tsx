@@ -20,7 +20,7 @@ import { CarThumb } from "@/components/car-thumb";
 import { StatusBadge, StageBadge } from "@/components/badges";
 import { Countdown } from "@/components/countdown";
 import { attractivenessLabel, formatPrice, formatRelative } from "@/lib/format";
-import { ArrowLeft, Check, Eye, MapPin, MessageSquare, Pencil, Unlock } from "lucide-react";
+import { ArrowLeft, Check, Eye, Images, MapPin, MessageSquare, Pencil, Unlock } from "lucide-react";
 
 export default function CarDetailPage() {
   const [, params] = useRoute("/cars/:id");
@@ -62,7 +62,7 @@ export default function CarDetailPage() {
         <Card className="overflow-hidden bg-card border-border">
           <div className="grid md:grid-cols-2 gap-0">
             <div className="relative">
-              <CarThumb make={car.make} model={car.model} imageUrl={car.imageUrl} className="h-72 w-full md:h-full" />
+              <CarThumb make={car.make} model={car.model} imageUrl={car.imageUrl} photos={car.photos} className="h-72 w-full md:h-full" />
               <div className="absolute top-3 left-3"><StatusBadge status={car.status} /></div>
               <div className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/40 backdrop-blur text-[11px] text-white">
                 <Eye className="h-3 w-3" /> {car.viewersNow} viendo
@@ -143,6 +143,27 @@ export default function CarDetailPage() {
             </div>
           </div>
         </Card>
+
+        {car.photos && car.photos.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Images className="h-4 w-4 text-primary" />
+              <h2 className="text-sm font-semibold">Fotos del anuncio ({car.photos.length})</h2>
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
+              {car.photos.map((url, i) => (
+                <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+                  <img
+                    src={url}
+                    alt={`Foto ${i + 1} de ${car.make} ${car.model}`}
+                    className="h-40 w-60 object-cover rounded-lg border border-border hover:opacity-90 transition-opacity"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div>
           <div className="flex items-center gap-2 mb-3">

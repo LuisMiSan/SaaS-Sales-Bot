@@ -373,6 +373,7 @@ components:
         priceLabel: { type: string }
         status: { type: string, enum: [open, locking, locked] }
         imageUrl: { type: ["string", "null"] }
+        photos: { type: array, items: { type: string } }
         km: { type: integer }
         fuel: { type: string }
         transmission: { type: string }
@@ -393,6 +394,7 @@ components:
         windowHours: { type: integer }
         status: { type: string, enum: [open, locking, locked, released, sold] }
         imageUrl: { type: ["string", "null"] }
+        photos: { type: array, items: { type: string } }
         km: { type: integer }
         fuel: { type: string }
         transmission: { type: string }

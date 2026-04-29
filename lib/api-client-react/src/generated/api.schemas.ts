@@ -28,6 +28,7 @@ export interface PublicCar {
   status: PublicCarStatus;
   /** @nullable */
   imageUrl?: string | null;
+  photos?: string[];
   km: number;
   fuel: string;
   transmission: string;
@@ -66,6 +67,7 @@ export interface Car {
   status: CarStatus;
   /** @nullable */
   imageUrl?: string | null;
+  photos?: string[];
   km: number;
   fuel: string;
   transmission: string;
@@ -234,6 +236,10 @@ export interface SendMessageBody {
 }
 
 export interface SimulateIncomingBody {
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
   content: string;
 }
 

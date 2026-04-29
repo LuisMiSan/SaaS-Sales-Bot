@@ -17,6 +17,7 @@ export interface PublicCar {
   status: PublicCarStatus;
   /** @nullable */
   imageUrl?: string | null;
+  photos?: string[];
   km: number;
   fuel: string;
   transmission: string;

@@ -217,7 +217,71 @@ function stripHtml(html: string): string {
     .trim();
 }
 
-export async function fetchCarPage(url: string): Promise<string> {
+export interface FetchedPage {
+  text: string;
+  photos: string[];
+}
+
+function extractPhotos(html: string, baseUrl: string): string[] {
+  const photos: string[] = [];
+  const seen = new Set<string>();
+
+  function addPhoto(src: string | null | undefined) {
+    if (!src) return;
+    src = src.trim();
+    if (!src || src.startsWith("data:")) return;
+    try {
+      const abs = new URL(src, baseUrl).href;
+      if (!abs.startsWith("http")) return;
+      if (seen.has(abs)) return;
+      seen.add(abs);
+      photos.push(abs);
+    } catch { /* ignore invalid URLs */ }
+  }
+
+  // 1. og:image (most reliable)
+  const metaTags = html.match(/<meta\b[^>]*>/gi) ?? [];
+  for (const tag of metaTags) {
+    const prop = tag.match(/(?:property|name)\s*=\s*["']([^"']+)["']/i)?.[1]?.toLowerCase();
+    if (prop === "og:image" || prop === "twitter:image") {
+      addPhoto(tag.match(/content\s*=\s*["']([^"']*)["']/i)?.[1]);
+    }
+  }
+
+  // 2. JSON-LD image arrays
+  const jsonLdMatches = [...html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
+  for (const m of jsonLdMatches) {
+    try {
+      const obj = JSON.parse(m[1]);
+      const imgs: unknown[] = Array.isArray(obj.image) ? obj.image : obj.image ? [obj.image] : [];
+      for (const img of imgs) {
+        if (typeof img === "string") addPhoto(img);
+        else if (img && typeof img === "object" && "url" in img) addPhoto((img as { url: string }).url);
+      }
+    } catch { /* ignore */ }
+  }
+
+  // 3. Large <img> or lazy-load data-src on known gallery patterns
+  const imgRe = /<img\b[^>]*>/gi;
+  const imgTags = html.match(imgRe) ?? [];
+  for (const tag of imgTags) {
+    // Only pick images that look like car photos (large, not icons/logos)
+    const src = tag.match(/(?:data-src|data-lazy|data-original|src)\s*=\s*["']([^"']+)["']/i)?.[1];
+    if (!src || src.length < 10) continue;
+    const lc = src.toLowerCase();
+    if (lc.includes("logo") || lc.includes("icon") || lc.includes("avatar") || lc.includes("sprite") || lc.includes("banner")) continue;
+    // Prefer large images
+    const widthMatch = tag.match(/width\s*=\s*["']?(\d+)/i);
+    const width = widthMatch ? parseInt(widthMatch[1]) : 0;
+    if (width > 0 && width < 200) continue;
+    addPhoto(src);
+    if (photos.length >= 20) break;
+  }
+
+  return photos.slice(0, 20);
+}
+
+export async function fetchCarPage(url: string): Promise<FetchedPage> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
@@ -259,7 +323,9 @@ export async function fetchCarPage(url: string): Promise<string> {
         .join("\n");
 
       const text = stripHtml(html).slice(0, 8000);
-      return [
+      const photos = extractPhotos(html, currentParsed.href);
+
+      const textPayload = [
         `URL: ${url}`,
         title && `TÍTULO: ${title}`,
         ogTitle && ogTitle !== title && `OG_TITLE: ${ogTitle}`,
@@ -269,6 +335,8 @@ export async function fetchCarPage(url: string): Promise<string> {
       ]
         .filter(Boolean)
         .join("\n");
+
+      return { text: textPayload, photos };
     }
 
     throw new Error("Demasiadas redirecciones");

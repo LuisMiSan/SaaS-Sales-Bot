@@ -20,6 +20,7 @@ export interface Car {
   status: CarStatus;
   /** @nullable */
   imageUrl?: string | null;
+  photos?: string[];
   km: number;
   fuel: string;
   transmission: string;
