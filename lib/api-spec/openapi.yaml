@@ -205,6 +205,17 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Car" }
+    delete:
+      operationId: deleteCar
+      tags: [cars]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
 
   /leads:
     get:

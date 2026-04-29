@@ -993,6 +993,84 @@ export function useGetCarStaff<
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
+export const getDeleteCarUrl = (id: number) => {
+  return `/api/staff/cars/${id}`;
+};
+
+export const deleteCar = async (
+  id: number,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteCarUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteCarMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteCar>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteCar>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteCar"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteCar>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteCar(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteCarMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteCar>>
+>;
+
+export type DeleteCarMutationError = ErrorType<unknown>;
+
+export const useDeleteCar = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteCar>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteCar>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteCarMutationOptions(options));
+};
+
 export const getListLeadsUrl = (params?: ListLeadsParams) => {
   const normalizedParams = new URLSearchParams();
 

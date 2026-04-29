@@ -12,6 +12,7 @@ import {
   LockCarBody,
   ReleaseCarParams,
   MarkCarSoldParams,
+  DeleteCarParams,
 } from "@workspace/api-zod";
 import { serializeCar, serializePublicCar, windowHoursForAttractiveness } from "../lib/format";
 import { parseCarLine, fetchCarPage, isUrl, normalizeMarketRange } from "../lib/import-ai";
@@ -358,6 +359,25 @@ router.post("/cars/:id/sell", requireStaffAuth, async (req, res): Promise<void> 
     carLabel: `${car.make} ${car.model}`,
   });
   res.json(serializeCar(car));
+});
+
+router.delete("/staff/cars/:id", requireStaffAuth, async (req, res): Promise<void> => {
+  const params = DeleteCarParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const [car] = await db.delete(carsTable).where(eq(carsTable.id, params.data.id)).returning();
+  if (!car) {
+    res.status(404).json({ error: "Car not found" });
+    return;
+  }
+  await db.insert(activityTable).values({
+    kind: "sale",
+    text: `${car.make} ${car.model} eliminado del inventario`,
+    carLabel: `${car.make} ${car.model}`,
+  });
+  res.status(204).end();
 });
 
 export default router;

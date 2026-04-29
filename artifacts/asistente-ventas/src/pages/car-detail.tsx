@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useRoute } from "wouter";
+import { Link, useRoute, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useGetCarStaff,
@@ -7,6 +7,7 @@ import {
   useReleaseCar,
   useMarkCarSold,
   useUpdateCar,
+  useDeleteCar,
   getGetCarStaffQueryKey,
   getListCarsStaffQueryKey,
   getListLeadsQueryKey,
@@ -15,17 +16,18 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { CarThumb } from "@/components/car-thumb";
 import { StatusBadge, StageBadge } from "@/components/badges";
 import { Countdown } from "@/components/countdown";
 import { attractivenessLabel, formatPrice, formatRelative } from "@/lib/format";
-import { ArrowLeft, Check, Eye, Images, MapPin, MessageSquare, Pencil, Unlock } from "lucide-react";
+import { ArrowLeft, Check, Eye, Images, MapPin, MessageSquare, Pencil, Trash2, Unlock } from "lucide-react";
 
 export default function CarDetailPage() {
   const [, params] = useRoute("/cars/:id");
   const id = params ? Number(params.id) : 0;
   const qc = useQueryClient();
+  const [, navigate] = useLocation();
 
   const { data: car } = useGetCarStaff(id, { query: { enabled: !!id, queryKey: getGetCarStaffQueryKey(id) } });
   const { data: leads } = useListLeads();
@@ -33,6 +35,7 @@ export default function CarDetailPage() {
   const release = useReleaseCar();
   const sell = useMarkCarSold();
   const update = useUpdateCar();
+  const deleteCar = useDeleteCar();
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: getGetCarStaffQueryKey(id) });
@@ -43,6 +46,7 @@ export default function CarDetailPage() {
   const [editOpen, setEditOpen] = useState(false);
   const [editPrice, setEditPrice] = useState("");
   const [editNotes, setEditNotes] = useState("");
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   if (!car) {
     return <div className="p-4 md:p-8 text-sm text-muted-foreground">Cargando…</div>;
@@ -136,6 +140,42 @@ export default function CarDetailPage() {
                         }}
                         disabled={update.isPending}
                       >Guardar</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                      <Trash2 className="h-4 w-4 mr-1.5" /> Eliminar
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Eliminar del inventario</DialogTitle>
+                      <DialogDescription>
+                        ¿Seguro que quieres eliminar <strong>{car.make} {car.model} {car.year}</strong> del inventario? Esta acción no se puede deshacer.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button variant="ghost" onClick={() => setDeleteOpen(false)}>Cancelar</Button>
+                      <Button
+                        variant="destructive"
+                        disabled={deleteCar.isPending}
+                        onClick={() => {
+                          deleteCar.mutate(
+                            { id: car.id },
+                            {
+                              onSuccess: () => {
+                                qc.invalidateQueries({ queryKey: getListCarsStaffQueryKey() });
+                                navigate("/inventory");
+                              },
+                            },
+                          );
+                        }}
+                      >
+                        {deleteCar.isPending ? "Eliminando…" : "Sí, eliminar"}
+                      </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>

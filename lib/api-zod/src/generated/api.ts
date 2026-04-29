@@ -320,6 +320,10 @@ export const GetCarStaffResponse = zod.object({
   marketPriceMax: zod.number().nullish(),
 });
 
+export const DeleteCarParams = zod.object({
+  id: zod.coerce.number(),
+});
+
 export const ListLeadsQueryParams = zod.object({
   stage: zod
     .enum([
