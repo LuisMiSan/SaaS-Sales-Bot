@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Textarea } from "@/components/ui/textarea";
 import { getListCarsQueryKey, getGetDashboardSummaryQueryKey, getGetRecentActivityQueryKey } from "@workspace/api-client-react";
 import { Sparkles, Upload, CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
+import { getStoredToken } from "@/lib/staff-auth";
 
 const PLACEHOLDER = `Un coche por línea. Acepta texto libre o URL del anuncio (coches.net, autoscout24, milanuncios, wallapop…). La IA rellena el resto.
 
@@ -33,10 +34,14 @@ export function BulkImportDialog() {
     setLoading(true);
     setResult(null);
     try {
-      const base = import.meta.env.BASE_URL ?? "/";
-      const res = await fetch(`${base}api/cars/bulk-import`, {
+      const base = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "");
+      const token = getStoredToken();
+      const res = await fetch(`${base}/api/cars/bulk-import`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ text }),
       });
       const json = (await res.json()) as ImportResult | { error: string };

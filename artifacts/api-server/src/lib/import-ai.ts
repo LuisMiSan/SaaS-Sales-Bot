@@ -318,7 +318,7 @@ Devuelve SOLO el JSON. Nada más.`;
 
 export async function parseCarLine(line: string): Promise<ParsedCar> {
   const response = await openai.chat.completions.create({
-    model: "gpt-5.2",
+    model: "gpt-4.1",
     response_format: { type: "json_object" },
     messages: [
       { role: "system", content: SYSTEM_PROMPT },

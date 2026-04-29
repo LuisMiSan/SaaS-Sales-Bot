@@ -3,6 +3,7 @@ import { Save, RotateCcw, ChevronDown, ChevronUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { getStoredToken } from "@/lib/staff-auth";
 
 const BASE = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "");
 
@@ -61,7 +62,10 @@ export default function SettingsPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetch(`${BASE}/api/settings`)
+    const token = getStoredToken();
+    fetch(`${BASE}/api/settings`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
       .then((r) => r.json())
       .then((data: Record<string, string>) => {
         const loaded: Record<string, string> = { ...DEFAULT_GUIDES };
@@ -91,9 +95,13 @@ export default function SettingsPage() {
       for (const key of Object.keys(guides)) {
         body[`guide_${key}`] = guides[key];
       }
+      const token = getStoredToken();
       const res = await fetch(`${BASE}/api/settings`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error("Error al guardar");
