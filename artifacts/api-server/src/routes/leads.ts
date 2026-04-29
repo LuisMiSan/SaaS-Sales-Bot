@@ -122,6 +122,10 @@ router.post("/leads/:id/thread", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Conversation not found" });
     return;
   }
+  if (isPublicMessageRateLimited(lead.id)) {
+    res.status(429).json({ error: "Too many messages. Please wait before sending again." });
+    return;
+  }
   const [msg] = await db
     .insert(messagesTable)
     .values({
@@ -141,6 +145,40 @@ router.post("/leads/:id/thread", async (req, res): Promise<void> => {
 
   res.status(201).json(serializeMessage(msg));
 });
+
+// Per-lead rate limiter for the public chat endpoint.
+// Allows at most 5 messages per lead per 60 seconds.
+const PUBLIC_RATE_LIMIT_MAX = 5;
+const PUBLIC_RATE_LIMIT_WINDOW_MS = 60_000;
+const publicMessageTimestamps = new Map<number, number[]>();
+
+function isPublicMessageRateLimited(leadId: number): boolean {
+  const now = Date.now();
+  const recent = (publicMessageTimestamps.get(leadId) ?? []).filter((t) => now - t < PUBLIC_RATE_LIMIT_WINDOW_MS);
+  if (recent.length >= PUBLIC_RATE_LIMIT_MAX) {
+    publicMessageTimestamps.set(leadId, recent);
+    return true;
+  }
+  recent.push(now);
+  publicMessageTimestamps.set(leadId, recent);
+  return false;
+}
+
+// Periodically evict expired rate-limit entries to prevent unbounded map growth.
+setInterval(
+  () => {
+    const cutoff = Date.now() - PUBLIC_RATE_LIMIT_WINDOW_MS;
+    for (const [leadId, timestamps] of publicMessageTimestamps) {
+      const remaining = timestamps.filter((t) => t > cutoff);
+      if (remaining.length === 0) {
+        publicMessageTimestamps.delete(leadId);
+      } else {
+        publicMessageTimestamps.set(leadId, remaining);
+      }
+    }
+  },
+  5 * 60_000, // run every 5 minutes
+).unref();
 
 // Per-lead in-flight guard: prevents two concurrent auto-replies from
 // generating duplicate messages when the customer sends quickly.

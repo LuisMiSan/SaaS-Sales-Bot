@@ -66,6 +66,7 @@ app.use(
 );
 app.use(
   express.json({
+    limit: "8kb",
     verify(_req, _res, buf) {
       (_req as import("express").Request).rawBody = buf;
     },

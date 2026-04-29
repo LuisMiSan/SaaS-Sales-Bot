@@ -590,5 +590,5 @@ export const SimulateIncomingMessageParams = zod.object({
 });
 
 export const SimulateIncomingMessageBody = zod.object({
-  content: zod.string(),
+  content: zod.string().min(1).max(2000),
 });
