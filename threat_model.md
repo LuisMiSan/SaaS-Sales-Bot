@@ -18,7 +18,7 @@ Production assumptions for future scans: `NODE_ENV=production`; TLS is handled b
 
 - **Browser to API** — all frontend requests cross from an untrusted browser into `/api`. Public storefront users and internet attackers can reach these endpoints unless the server enforces authentication and authorization.
 - **Public storefront to internal cockpit** — `/tienda` is intentionally public, while the dashboard/inbox/inventory/settings surfaces are internal business tooling. This boundary must be enforced server-side, not just by route naming or UI placement.
-- **Customer public chat to lead records** — `/api/leads/:id/thread?token=...` exposes a limited conversation channel guarded by a per-lead token. That token boundary must not be bypassable through other lead/message endpoints.
+- **Customer public chat to lead records** — `/api/leads/:id/thread?token=...` exposes a limited conversation channel guarded by a per-lead token. That token boundary must not be bypassable through other lead/message endpoints, and possession of one valid token must not grant unlimited AI-triggering abuse.
 - **API to PostgreSQL** — the API has broad authority over cars, leads, messages, activity, and settings. Missing authorization or unsafe query composition here yields full data compromise.
 - **Meta/WhatsApp to webhook endpoint** — `/api/whatsapp/webhook` is internet-facing. The server must distinguish authentic Meta-signed traffic from attacker-crafted POSTs.
 - **API to external URLs / OpenAI** — bulk import fetches arbitrary pages and forwards extracted content into AI parsing. This boundary is high risk for SSRF, unintended data disclosure, and resource abuse.
@@ -27,7 +27,7 @@ Production assumptions for future scans: `NODE_ENV=production`; TLS is handled b
 
 - **Production entry points:** `artifacts/api-server/src/app.ts`, `artifacts/api-server/src/routes/*.ts`, `artifacts/asistente-ventas/src/App.tsx`, public pages under `artifacts/asistente-ventas/src/pages/landing*.tsx`.
 - **Highest-risk areas:** `src/routes/leads.ts`, `src/routes/cars.ts`, `src/routes/whatsapp.ts`, `src/routes/settings.ts`, `src/lib/import-ai.ts`, `src/lib/draft.ts`.
-- **Public surfaces:** `/tienda`, `/tienda/coche/:id`, `POST /api/leads`, `GET/POST /api/leads/:id/thread`, `GET /api/cars`, `GET /api/cars/:id`, WhatsApp webhook endpoints.
+- **Public surfaces:** `/tienda`, `/tienda/coche/:id`, `GET/POST /api/leads/:id/thread`, `GET /api/cars`, `GET /api/cars/:id`, WhatsApp webhook endpoints. Product docs mention public lead creation, but current server code gates `POST /api/leads` behind staff auth.
 - **Internal surfaces that must be protected:** dashboard, inbox, pipeline, inventory, settings pages; `/api/dashboard/*`, `/api/leads*` except public thread endpoints, mutating `/api/cars*`, `/api/settings`, `/api/whatsapp/status`, `/api/whatsapp/sandbox/inbound`.
 - **Usually dev-only / out of scope:** `artifacts/mockup-sandbox`, `.agents`, attached assets, local skills, generated scanner noise outside production paths.
 
@@ -43,11 +43,11 @@ Cars, leads, stages, lock windows, settings, and outbound AI messaging behavior 
 
 ### Information Disclosure
 
-The API stores and serves PII, sales conversations, internal inventory metadata, and configuration values. Only the minimum fields required for each public route should be exposed, and internal endpoints must not be reachable anonymously. Error responses and logs must avoid leaking secrets, auth material, or full query strings.
+The API stores and serves PII, sales conversations, internal inventory metadata, and configuration values. Only the minimum fields required for each public route should be exposed, and public catalog endpoints must use storefront-safe serializers rather than reusing internal inventory views. Internal endpoints must not be reachable anonymously. Error responses and logs must avoid leaking secrets, auth material, or full query strings.
 
 ### Denial of Service
 
-Publicly reachable creation and polling endpoints (`POST /api/leads`, public chat posting, webhook ingestion, bulk import, AI draft generation) can consume database, network, and model resources. The production system must bound request sizes, iteration counts, and traffic rates so unauthenticated users cannot exhaust inventory workflows or AI/network budgets.
+Publicly reachable polling and chat endpoints, webhook ingestion, and AI-backed drafting can consume database, network, and model resources. The production system must bound request sizes, transcript growth, iteration counts, and traffic rates so public users or token holders cannot exhaust AI/network budgets or force unbounded auto-reply work.
 
 ### Elevation of Privilege
 
