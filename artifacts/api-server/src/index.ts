@@ -19,7 +19,7 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-async function autoRelaseExpiredLocks(): Promise<void> {
+async function autoReleaseExpiredLocks(): Promise<void> {
   const now = new Date();
   const expired = await db
     .select()
@@ -54,7 +54,7 @@ async function autoRelaseExpiredLocks(): Promise<void> {
 }
 
 setInterval(() => {
-  autoRelaseExpiredLocks().catch((err) => {
+  autoReleaseExpiredLocks().catch((err) => {
     logger.error({ err }, "Auto-release check failed");
   });
 }, 60_000).unref();
@@ -72,7 +72,7 @@ app.listen(port, async (err) => {
     logger.error({ err: e }, "Seed failed");
   }
 
-  autoRelaseExpiredLocks().catch((err) => {
+  autoReleaseExpiredLocks().catch((err) => {
     logger.error({ err }, "Initial auto-release check failed");
   });
 });

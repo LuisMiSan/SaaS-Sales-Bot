@@ -47,6 +47,8 @@ const INTENTS = [
   { value: "post_release", label: "Post liberación" },
 ] as const;
 
+// Mirrors server-side auto-intent.ts logic; kept here for instant UI feedback
+// in the draft panel without a round-trip. Keep in sync with the server version.
 function pickAutoIntent(args: {
   stage: string;
   depositPaid: boolean;

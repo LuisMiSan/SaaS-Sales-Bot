@@ -22,6 +22,7 @@ import { BodyTypePicker, BrandPicker, inferBodyType } from "@/components/car-pic
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
+const MAX_CARS_SHOWN = 15;
 
 function endOfWeek(): Date {
   const d = new Date();
@@ -66,7 +67,7 @@ export default function LandingPage() {
     let open = allCars ?? [];
     if (bodyFilter) open = open.filter((c) => inferBodyType(c.make, c.model) === bodyFilter);
     if (brandFilter) open = open.filter((c) => c.make.toLowerCase() === brandFilter.toLowerCase());
-    return open.slice(0, 15);
+    return open.slice(0, MAX_CARS_SHOWN);
   }, [allCars, bodyFilter, brandFilter]);
 
   const onPickBody = (value: string | undefined) => {

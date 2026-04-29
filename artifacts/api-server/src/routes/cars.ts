@@ -21,6 +21,8 @@ import { requireStaffAuth } from "../middleware/auth";
 
 const router: IRouter = Router();
 
+const LOCK_DURATION_MS = 2 * 3600_000; // 2-hour lock window
+
 const BULK_IMPORT_WINDOW_MS = 60 * 60 * 1000;
 const BULK_IMPORT_PER_USER_LIMIT = 5;
 const BULK_IMPORT_GLOBAL_LIMIT = 20;
@@ -275,7 +277,7 @@ router.post("/cars/:id/lock", requireStaffAuth, async (req, res): Promise<void> 
     res.status(400).json({ error: body.error.message });
     return;
   }
-  const lockedUntil = new Date(Date.now() + 2 * 3600_000);
+  const lockedUntil = new Date(Date.now() + LOCK_DURATION_MS);
   const [car] = await db
     .update(carsTable)
     .set({ status: "locked", lockedUntil, releasedAt: null })
@@ -309,7 +311,6 @@ router.post("/cars/:id/release", requireStaffAuth, async (req, res): Promise<voi
     return;
   }
   const now = new Date();
-  const hours = 48;
   const [existing] = await db.select().from(carsTable).where(eq(carsTable.id, params.data.id));
   if (!existing) {
     res.status(404).json({ error: "Car not found" });

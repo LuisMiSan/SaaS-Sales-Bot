@@ -51,6 +51,10 @@ async function loadSettings(): Promise<Record<string, string>> {
   }
 }
 
+function carLabel(car: DbCar): string {
+  return `${car.make} ${car.model} ${car.year} (${eurFormatter.format(Number(car.price))})`;
+}
+
 export async function generateDraft(args: {
   intent: string;
   instructions?: string | null;
@@ -68,7 +72,7 @@ export async function generateDraft(args: {
   }
 
   const guide = intentGuides[intent] ?? intentGuides.custom;
-  const carLine = `${car.make} ${car.model} ${car.year} (${eurFormatter.format(Number(car.price))})`;
+  const carLine = carLabel(car);
 
   const transcript = history
     .slice(-12)
@@ -121,7 +125,7 @@ Redacta ahora el mensaje de WhatsApp.`;
 }
 
 function fallbackDraft(intent: string, lead: DbLead, car: DbCar): string {
-  const carLine = `${car.make} ${car.model} ${car.year} (${eurFormatter.format(Number(car.price))})`;
+  const carLine = carLabel(car);
   const name = lead.name.split(" ")[0];
 
   switch (intent) {

@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { requireStaffAuth } from "../middleware/auth";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, inArray } from "drizzle-orm";
 import { db, leadsTable, carsTable, messagesTable, activityTable } from "@workspace/db";
 import {
   ListLeadsQueryParams,
@@ -41,13 +41,36 @@ router.get("/leads", requireStaffAuth, async (req, res): Promise<void> => {
     ? await db.select().from(leadsTable).where(eq(leadsTable.stage, parsed.data.stage)).orderBy(desc(leadsTable.updatedAt))
     : await db.select().from(leadsTable).orderBy(desc(leadsTable.updatedAt));
 
-  const out = await Promise.all(
-    rows.map(async (lead) => {
-      const last = await getLastMessage(lead.id);
-      const [car] = await db.select().from(carsTable).where(eq(carsTable.id, lead.carId));
-      return { ...serializeLead(lead, last), car: serializeCar(car) };
-    }),
-  );
+  if (rows.length === 0) {
+    res.json([]);
+    return;
+  }
+
+  // Batch-fetch all related cars and messages in two queries instead of N+1
+  const carIds = [...new Set(rows.map((l) => l.carId))];
+  const leadIds = rows.map((l) => l.id);
+
+  const [allCars, allMessages] = await Promise.all([
+    db.select().from(carsTable).where(inArray(carsTable.id, carIds)),
+    db.select().from(messagesTable).where(inArray(messagesTable.leadId, leadIds)).orderBy(desc(messagesTable.createdAt)),
+  ]);
+
+  const carById = new Map(allCars.map((c) => [c.id, c]));
+
+  // Keep only the most-recent message per lead
+  const lastMessageByLead = new Map<number, typeof allMessages[number]>();
+  for (const msg of allMessages) {
+    if (!lastMessageByLead.has(msg.leadId)) {
+      lastMessageByLead.set(msg.leadId, msg);
+    }
+  }
+
+  const out = rows.map((lead) => {
+    const car = carById.get(lead.carId);
+    const last = lastMessageByLead.get(lead.id) ?? null;
+    return { ...serializeLead(lead, last), car: car ? serializeCar(car) : null };
+  });
+
   res.json(out);
 });
 

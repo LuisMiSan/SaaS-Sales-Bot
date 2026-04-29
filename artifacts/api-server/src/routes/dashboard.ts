@@ -1,14 +1,36 @@
 import { Router, type IRouter } from "express";
 import { requireStaffAuth } from "../middleware/auth";
 import { sql, desc } from "drizzle-orm";
-import { db, carsTable, leadsTable, activityTable } from "@workspace/db";
+import { db, carsTable, leadsTable, activityTable, messagesTable } from "@workspace/db";
 import { serializeActivity } from "../lib/format";
 
 const router: IRouter = Router();
 
 router.get("/dashboard/summary", requireStaffAuth, async (_req, res): Promise<void> => {
-  const cars = await db.select().from(carsTable);
-  const leads = await db.select().from(leadsTable);
+  const [cars, leads, avgResult] = await Promise.all([
+    db.select().from(carsTable),
+    db.select().from(leadsTable),
+    // Average time (minutes) between an incoming message and the next outgoing reply for the same lead
+    db.execute(sql`
+      SELECT COALESCE(
+        AVG(EXTRACT(EPOCH FROM (reply.created_at - incoming.created_at)) / 60),
+        0
+      )::float AS avg_minutes
+      FROM messages incoming
+      JOIN LATERAL (
+        SELECT created_at
+        FROM messages r
+        WHERE r.lead_id = incoming.lead_id
+          AND r.direction = 'outgoing'
+          AND r.created_at > incoming.created_at
+        ORDER BY r.created_at
+        LIMIT 1
+      ) reply ON true
+      WHERE incoming.direction = 'incoming'
+    `),
+  ]);
+
+  const avgResponseMinutes = Number((avgResult.rows[0] as { avg_minutes: string } | undefined)?.avg_minutes ?? 0);
 
   const carsByStatus = ["open", "locking", "locked", "released", "sold"].map((status) => ({
     status,
@@ -42,7 +64,7 @@ router.get("/dashboard/summary", requireStaffAuth, async (_req, res): Promise<vo
     awaitingDeposit,
     wonLast7d,
     depositValueCents,
-    avgResponseMinutes: 7.4,
+    avgResponseMinutes,
     conversionRate,
     leadsByStage,
     carsByStatus,

@@ -186,7 +186,6 @@ const NAME_ATTR_RE = /\b(?:property|name)\s*=\s*["']([^"']+)["']/i;
 const CONTENT_ATTR_RE = /\bcontent\s*=\s*["']([^"']*)["']/i;
 
 function pickMeta(html: string, names: string[]): string | null {
-  const wanted = new Set(names.map((n) => n.toLowerCase()));
   const tags = html.match(META_RE);
   if (!tags) return null;
   for (const candidate of names) {
@@ -194,7 +193,6 @@ function pickMeta(html: string, names: string[]): string | null {
     for (const tag of tags) {
       const nm = tag.match(NAME_ATTR_RE);
       if (!nm || nm[1].toLowerCase() !== target) continue;
-      if (!wanted.has(nm[1].toLowerCase())) continue;
       const ct = tag.match(CONTENT_ATTR_RE);
       if (ct && ct[1]) return ct[1];
     }
