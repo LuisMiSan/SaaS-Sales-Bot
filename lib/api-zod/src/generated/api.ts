@@ -58,9 +58,7 @@ export const GetRecentActivityResponse = zod.array(
 );
 
 export const ListCarsQueryParams = zod.object({
-  status: zod
-    .enum(["open", "locking", "locked", "released", "sold"])
-    .optional(),
+  status: zod.enum(["open", "locking", "locked"]).optional(),
 });
 
 export const ListCarsResponseItem = zod.object({
@@ -70,23 +68,13 @@ export const ListCarsResponseItem = zod.object({
   year: zod.number(),
   price: zod.number(),
   priceLabel: zod.string(),
-  attractiveness: zod.enum(["hot", "normal", "hard"]),
-  windowHours: zod.number(),
-  status: zod.enum(["open", "locking", "locked", "released", "sold"]),
+  status: zod.enum(["open", "locking", "locked"]),
   imageUrl: zod.string().nullish(),
   km: zod.number(),
   fuel: zod.string(),
   transmission: zod.string(),
   location: zod.string(),
-  depositCents: zod.number(),
   publishedAt: zod.coerce.date(),
-  availableUntil: zod.coerce.date(),
-  lockedUntil: zod.coerce.date().nullish(),
-  releasedAt: zod.coerce.date().nullish(),
-  viewersNow: zod.number(),
-  notes: zod.string().nullish(),
-  marketPriceMin: zod.number().nullish(),
-  marketPriceMax: zod.number().nullish(),
 });
 export const ListCarsResponse = zod.array(ListCarsResponseItem);
 
@@ -118,23 +106,13 @@ export const GetCarResponse = zod.object({
   year: zod.number(),
   price: zod.number(),
   priceLabel: zod.string(),
-  attractiveness: zod.enum(["hot", "normal", "hard"]),
-  windowHours: zod.number(),
-  status: zod.enum(["open", "locking", "locked", "released", "sold"]),
+  status: zod.enum(["open", "locking", "locked"]),
   imageUrl: zod.string().nullish(),
   km: zod.number(),
   fuel: zod.string(),
   transmission: zod.string(),
   location: zod.string(),
-  depositCents: zod.number(),
   publishedAt: zod.coerce.date(),
-  availableUntil: zod.coerce.date(),
-  lockedUntil: zod.coerce.date().nullish(),
-  releasedAt: zod.coerce.date().nullish(),
-  viewersNow: zod.number(),
-  notes: zod.string().nullish(),
-  marketPriceMin: zod.number().nullish(),
-  marketPriceMax: zod.number().nullish(),
 });
 
 export const UpdateCarParams = zod.object({
@@ -246,6 +224,69 @@ export const MarkCarSoldParams = zod.object({
 });
 
 export const MarkCarSoldResponse = zod.object({
+  id: zod.number(),
+  make: zod.string(),
+  model: zod.string(),
+  year: zod.number(),
+  price: zod.number(),
+  priceLabel: zod.string(),
+  attractiveness: zod.enum(["hot", "normal", "hard"]),
+  windowHours: zod.number(),
+  status: zod.enum(["open", "locking", "locked", "released", "sold"]),
+  imageUrl: zod.string().nullish(),
+  km: zod.number(),
+  fuel: zod.string(),
+  transmission: zod.string(),
+  location: zod.string(),
+  depositCents: zod.number(),
+  publishedAt: zod.coerce.date(),
+  availableUntil: zod.coerce.date(),
+  lockedUntil: zod.coerce.date().nullish(),
+  releasedAt: zod.coerce.date().nullish(),
+  viewersNow: zod.number(),
+  notes: zod.string().nullish(),
+  marketPriceMin: zod.number().nullish(),
+  marketPriceMax: zod.number().nullish(),
+});
+
+export const ListCarsStaffQueryParams = zod.object({
+  status: zod
+    .enum(["open", "locking", "locked", "released", "sold"])
+    .optional(),
+});
+
+export const ListCarsStaffResponseItem = zod.object({
+  id: zod.number(),
+  make: zod.string(),
+  model: zod.string(),
+  year: zod.number(),
+  price: zod.number(),
+  priceLabel: zod.string(),
+  attractiveness: zod.enum(["hot", "normal", "hard"]),
+  windowHours: zod.number(),
+  status: zod.enum(["open", "locking", "locked", "released", "sold"]),
+  imageUrl: zod.string().nullish(),
+  km: zod.number(),
+  fuel: zod.string(),
+  transmission: zod.string(),
+  location: zod.string(),
+  depositCents: zod.number(),
+  publishedAt: zod.coerce.date(),
+  availableUntil: zod.coerce.date(),
+  lockedUntil: zod.coerce.date().nullish(),
+  releasedAt: zod.coerce.date().nullish(),
+  viewersNow: zod.number(),
+  notes: zod.string().nullish(),
+  marketPriceMin: zod.number().nullish(),
+  marketPriceMax: zod.number().nullish(),
+});
+export const ListCarsStaffResponse = zod.array(ListCarsStaffResponseItem);
+
+export const GetCarStaffParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetCarStaffResponse = zod.object({
   id: zod.number(),
   make: zod.string(),
   model: zod.string(),

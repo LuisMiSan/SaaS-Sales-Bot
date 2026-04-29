@@ -22,12 +22,6 @@ import { BodyTypePicker, BrandPicker, inferBodyType } from "@/components/car-pic
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-const FILTERS = [
-  { value: undefined, label: "Todos" },
-  { value: "hot" as const, label: "Termina hoy" },
-  { value: "normal" as const, label: "Quedan 2 días" },
-  { value: "hard" as const, label: "Quedan 3 días" },
-];
 
 function endOfWeek(): Date {
   const d = new Date();
@@ -56,7 +50,6 @@ function useWeekCountdown() {
 
 export default function LandingPage() {
   const { data: allCars } = useListCars();
-  const [filter, setFilter] = useState<string | undefined>(undefined);
   const [bodyFilter, setBodyFilter] = useState<string | undefined>(undefined);
   const [brandFilter, setBrandFilter] = useState<string | undefined>(undefined);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -70,12 +63,11 @@ export default function LandingPage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [menuOpen]);
   const cars = useMemo(() => {
-    let open = (allCars ?? []).filter((c) => c.status !== "sold");
-    if (filter) open = open.filter((c) => c.attractiveness === filter);
+    let open = allCars ?? [];
     if (bodyFilter) open = open.filter((c) => inferBodyType(c.make, c.model) === bodyFilter);
     if (brandFilter) open = open.filter((c) => c.make.toLowerCase() === brandFilter.toLowerCase());
     return open.slice(0, 15);
-  }, [allCars, filter, bodyFilter, brandFilter]);
+  }, [allCars, bodyFilter, brandFilter]);
 
   const onPickBody = (value: string | undefined) => {
     setBodyFilter(value);
@@ -197,22 +189,6 @@ export default function LandingPage() {
                 </button>
               )}
             </div>
-            <div className="flex gap-2 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap pb-1 sm:pb-0">
-              {FILTERS.map((f) => (
-                <button
-                  key={f.label}
-                  onClick={() => setFilter(f.value)}
-                  className={cn(
-                    "shrink-0 px-4 py-1.5 text-xs font-semibold rounded-full border-2 transition-all whitespace-nowrap",
-                    filter === f.value
-                      ? "bg-[#EE7B22] border-[#EE7B22] text-white"
-                      : "bg-transparent border-stone-200 text-stone-600 hover:border-[#EE7B22]",
-                  )}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
           </div>
 
           {cars.length === 0 ? (
@@ -224,7 +200,7 @@ export default function LandingPage() {
               <p className="text-xs text-stone-500 mt-1">Prueba a cambiar de carrocería o marca, o quita los filtros.</p>
               <button
                 type="button"
-                onClick={() => { setBodyFilter(undefined); setBrandFilter(undefined); setFilter(undefined); }}
+                onClick={() => { setBodyFilter(undefined); setBrandFilter(undefined); }}
                 className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#EE7B22] hover:bg-[#C4621A] text-white text-xs font-extrabold transition-colors"
               >
                 Quitar todos los filtros
@@ -233,8 +209,6 @@ export default function LandingPage() {
           ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
             {cars.map((car, idx) => {
-              const original = parseOriginal(car.notes);
-              const discount = original ? Math.round(((original - car.price) / original) * 100) : null;
               const isLocked = car.status === "locked";
               return (
                 <Link key={car.id} href={`/tienda/coche/${car.id}`}>
@@ -264,22 +238,7 @@ export default function LandingPage() {
                               Flash
                             </span>
                           )}
-                          {idx >= 3 && car.status === "open" && car.attractiveness === "hard" && (
-                            <span className="absolute top-3 left-3 bg-[#F39C12] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
-                              Última
-                            </span>
-                          )}
                         </>
-                      )}
-                      {!isLocked && discount && discount > 0 && (
-                        <span className="absolute top-3 right-3 bg-[#27AE60] text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
-                          -{discount}%
-                        </span>
-                      )}
-                      {!isLocked && (
-                        <span className="absolute bottom-3 right-3 bg-black/45 backdrop-blur text-white text-[10px] font-medium px-2 py-1 rounded-full inline-flex items-center gap-1">
-                          <Eye className="h-3 w-3" /> {car.viewersNow} viendo
-                        </span>
                       )}
                     </div>
                     <div className="p-4 flex-1 flex flex-col">
@@ -292,19 +251,16 @@ export default function LandingPage() {
                       </div>
                       <div className="mt-3 flex items-baseline gap-2">
                         <span className={cn("text-2xl font-black tabular-nums", isLocked && "text-stone-500")}>{formatPrice(car.price)}</span>
-                        {!isLocked && original && (
-                          <span className="text-sm text-stone-400 line-through tabular-nums">{formatPrice(original)}</span>
-                        )}
                       </div>
                       {isLocked ? (
                         <div className="mt-2 inline-flex items-center gap-1.5 text-xs text-stone-600 font-bold">
                           <Lock className="h-3.5 w-3.5" />
-                          Vuelve al outlet en {timeUntilLabel(car.lockedUntil ?? car.availableUntil)}
+                          Reservada temporalmente
                         </div>
                       ) : (
                         <div className="mt-2 inline-flex items-center gap-1.5 text-xs text-[#E74C3C] font-bold">
                           <Clock className="h-3.5 w-3.5" />
-                          Quedan {timeUntilLabel(car.availableUntil)}
+                          Disponible esta semana
                         </div>
                       )}
                       {isLocked ? (
@@ -555,10 +511,4 @@ function timeUntilLabel(iso: string): string {
   const h = Math.floor(ms / 3600_000);
   if (h >= 24) return `${Math.floor(h / 24)} días`;
   return `${h}h`;
-}
-
-function parseOriginal(notes: string | null | undefined): number | null {
-  if (!notes) return null;
-  const m = notes.match(/Precio original\s+(\d+)€/i);
-  return m ? Number(m[1]) : null;
 }

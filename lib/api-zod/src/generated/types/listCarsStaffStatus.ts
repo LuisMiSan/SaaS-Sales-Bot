@@ -6,11 +6,13 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type ListCarsStatus =
-  (typeof ListCarsStatus)[keyof typeof ListCarsStatus];
+export type ListCarsStaffStatus =
+  (typeof ListCarsStaffStatus)[keyof typeof ListCarsStaffStatus];
 
-export const ListCarsStatus = {
+export const ListCarsStaffStatus = {
   open: "open",
   locking: "locking",
   locked: "locked",
+  released: "released",
+  sold: "sold",
 } as const;

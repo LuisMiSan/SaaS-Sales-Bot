@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { useListCars } from "@workspace/api-client-react";
+import { useListCarsStaff } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
 import { CarThumb } from "@/components/car-thumb";
 import { StatusBadge } from "@/components/badges";
@@ -20,7 +20,7 @@ const FILTERS = [
 
 export default function InventoryPage() {
   const [status, setStatus] = useState<"open" | "locked" | "released" | "sold" | undefined>(undefined);
-  const { data: cars, isLoading } = useListCars(status ? { status } : undefined);
+  const { data: cars, isLoading } = useListCarsStaff(status ? { status } : undefined);
 
   return (
     <div className="flex-1 overflow-y-auto scrollbar-thin">

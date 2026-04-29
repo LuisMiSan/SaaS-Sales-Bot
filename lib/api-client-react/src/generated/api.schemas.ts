@@ -9,6 +9,32 @@ export interface HealthStatus {
   status: string;
 }
 
+export type PublicCarStatus =
+  (typeof PublicCarStatus)[keyof typeof PublicCarStatus];
+
+export const PublicCarStatus = {
+  open: "open",
+  locking: "locking",
+  locked: "locked",
+} as const;
+
+export interface PublicCar {
+  id: number;
+  make: string;
+  model: string;
+  year: number;
+  price: number;
+  priceLabel: string;
+  status: PublicCarStatus;
+  /** @nullable */
+  imageUrl?: string | null;
+  km: number;
+  fuel: string;
+  transmission: string;
+  location: string;
+  publishedAt: string;
+}
+
 export type CarAttractiveness =
   (typeof CarAttractiveness)[keyof typeof CarAttractiveness];
 
@@ -291,6 +317,19 @@ export type ListCarsStatus =
   (typeof ListCarsStatus)[keyof typeof ListCarsStatus];
 
 export const ListCarsStatus = {
+  open: "open",
+  locking: "locking",
+  locked: "locked",
+} as const;
+
+export type ListCarsStaffParams = {
+  status?: ListCarsStaffStatus;
+};
+
+export type ListCarsStaffStatus =
+  (typeof ListCarsStaffStatus)[keyof typeof ListCarsStaffStatus];
+
+export const ListCarsStaffStatus = {
   open: "open",
   locking: "locking",
   locked: "locked",

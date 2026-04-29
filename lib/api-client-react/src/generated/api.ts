@@ -28,9 +28,11 @@ import type {
   LeadDetail,
   LeadWithCar,
   ListCarsParams,
+  ListCarsStaffParams,
   ListLeadsParams,
   LockCarBody,
   Message,
+  PublicCar,
   SendMessageBody,
   SimulateIncomingBody,
   UpdateCarBody,
@@ -290,8 +292,8 @@ export const getListCarsUrl = (params?: ListCarsParams) => {
 export const listCars = async (
   params?: ListCarsParams,
   options?: RequestInit,
-): Promise<Car[]> => {
-  return customFetch<Car[]>(getListCarsUrl(params), {
+): Promise<PublicCar[]> => {
+  return customFetch<PublicCar[]>(getListCarsUrl(params), {
     ...options,
     method: "GET",
   });
@@ -445,8 +447,8 @@ export const getGetCarUrl = (id: number) => {
 export const getCar = async (
   id: number,
   options?: RequestInit,
-): Promise<Car> => {
-  return customFetch<Car>(getGetCarUrl(id), {
+): Promise<PublicCar> => {
+  return customFetch<PublicCar>(getGetCarUrl(id), {
     ...options,
     method: "GET",
   });
@@ -823,6 +825,173 @@ export const useMarkCarSold = <
 > => {
   return useMutation(getMarkCarSoldMutationOptions(options));
 };
+
+export const getListCarsStaffUrl = (params?: ListCarsStaffParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/staff/cars?${stringifiedParams}`
+    : `/api/staff/cars`;
+};
+
+export const listCarsStaff = async (
+  params?: ListCarsStaffParams,
+  options?: RequestInit,
+): Promise<Car[]> => {
+  return customFetch<Car[]>(getListCarsStaffUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListCarsStaffQueryKey = (params?: ListCarsStaffParams) => {
+  return [`/api/staff/cars`, ...(params ? [params] : [])] as const;
+};
+
+export const getListCarsStaffQueryOptions = <
+  TData = Awaited<ReturnType<typeof listCarsStaff>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListCarsStaffParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listCarsStaff>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListCarsStaffQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listCarsStaff>>> = ({
+    signal,
+  }) => listCarsStaff(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listCarsStaff>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListCarsStaffQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listCarsStaff>>
+>;
+export type ListCarsStaffQueryError = ErrorType<unknown>;
+
+export function useListCarsStaff<
+  TData = Awaited<ReturnType<typeof listCarsStaff>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListCarsStaffParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listCarsStaff>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListCarsStaffQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const getGetCarStaffUrl = (id: number) => {
+  return `/api/staff/cars/${id}`;
+};
+
+export const getCarStaff = async (
+  id: number,
+  options?: RequestInit,
+): Promise<Car> => {
+  return customFetch<Car>(getGetCarStaffUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetCarStaffQueryKey = (id: number) => {
+  return [`/api/staff/cars/${id}`] as const;
+};
+
+export const getGetCarStaffQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCarStaff>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getCarStaff>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetCarStaffQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCarStaff>>> = ({
+    signal,
+  }) => getCarStaff(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCarStaff>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetCarStaffQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCarStaff>>
+>;
+export type GetCarStaffQueryError = ErrorType<unknown>;
+
+export function useGetCarStaff<
+  TData = Awaited<ReturnType<typeof getCarStaff>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getCarStaff>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetCarStaffQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
 
 export const getListLeadsUrl = (params?: ListLeadsParams) => {
   const normalizedParams = new URLSearchParams();

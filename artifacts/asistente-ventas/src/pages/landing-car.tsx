@@ -18,7 +18,6 @@ import {
   Timer,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
-import { MarketPriceCard } from "@/components/market-price-card";
 import { WhatsappWidget } from "@/components/whatsapp-widget";
 import { CustomerChat } from "@/components/customer-chat";
 import { formatPrice } from "@/lib/format";
@@ -80,9 +79,8 @@ export default function LandingCarPage() {
     return <div className="min-h-screen bg-[#f5f7fa] flex items-center justify-center text-stone-500 font-jakarta">Cargando ficha…</div>;
   }
 
-  const original = parseOriginal(car.notes);
-  const discount = original ? Math.round(((original - car.price) / original) * 100) : null;
-  const others = (allCars ?? []).filter((c) => c.id !== car.id && c.status !== "sold").slice(0, 4);
+  const discount: number | null = null;
+  const others = (allCars ?? []).filter((c) => c.id !== car.id).slice(0, 4);
   const isLockedByOther = car.status === "locked" && !stored;
 
   const onSubmit = (e: React.FormEvent) => {
@@ -141,9 +139,6 @@ export default function LandingCarPage() {
                     -{discount}% outlet
                   </span>
                 )}
-                <span className="absolute top-4 right-4 bg-black/45 backdrop-blur text-white text-xs font-medium px-3 py-1.5 rounded-full inline-flex items-center gap-1.5">
-                  <Eye className="h-3.5 w-3.5" /> {car.viewersNow} viendo ahora
-                </span>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -153,16 +148,10 @@ export default function LandingCarPage() {
                 <SpecCard icon={Settings2} label="Cambio" value={car.transmission} />
               </div>
 
-              <MarketPriceCard
-                ourPrice={car.price}
-                marketMin={car.marketPriceMin}
-                marketMax={car.marketPriceMax}
-              />
-
               <section className="bg-white rounded-2xl p-7 shadow-sm">
                 <h2 className="text-xl font-extrabold mb-3">Sobre este coche</h2>
                 <p className="text-sm text-stone-600 leading-relaxed">
-                  {car.notes ?? `${car.make} ${car.model} en perfecto estado, mantenimiento al día y revisión multipunto pasada en nuestro taller. Listo para entregar con garantía mecánica de 14 días.`}
+                  {`${car.make} ${car.model} en perfecto estado, mantenimiento al día y revisión multipunto pasada en nuestro taller. Listo para entregar con garantía mecánica de 14 días.`}
                 </p>
                 <div className="mt-5 grid sm:grid-cols-2 gap-3 text-sm">
                   <Bullet>Revisión multipunto y limpieza profesional</Bullet>
@@ -213,9 +202,6 @@ export default function LandingCarPage() {
 
                   <div className="mt-5 flex items-baseline gap-3">
                     <div className="text-4xl font-black tabular-nums">{formatPrice(car.price)}</div>
-                    {original && (
-                      <div className="text-base text-stone-400 line-through tabular-nums">{formatPrice(original)}</div>
-                    )}
                   </div>
                   <div className="mt-1 text-xs text-[#27AE60] font-bold inline-flex items-center gap-1.5">
                     <CheckCircle2 className="h-3.5 w-3.5" /> Bloqueo gratuito · Sin pagar nada
@@ -224,8 +210,8 @@ export default function LandingCarPage() {
                   <div className="mt-4 inline-flex items-center gap-1.5 text-sm text-[#E74C3C] font-bold">
                     <Clock className="h-4 w-4" />
                     {car.status === "locked"
-                      ? `Reservada · vuelve al outlet en ${timeUntilLabel(car.lockedUntil ?? car.availableUntil)}`
-                      : `Quedan ${timeUntilLabel(car.availableUntil)} de outlet`}
+                      ? "Reservada temporalmente"
+                      : "Disponible esta semana"}
                   </div>
 
                   {stored ? (
@@ -400,10 +386,4 @@ function timeUntilLabel(iso: string): string {
   const h = Math.floor(ms / 3600_000);
   if (h >= 24) return `${Math.floor(h / 24)} días`;
   return `${h}h`;
-}
-
-function parseOriginal(notes: string | null | undefined): number | null {
-  if (!notes) return null;
-  const m = notes.match(/Precio original\s+(\d+)€/i);
-  return m ? Number(m[1]) : null;
 }

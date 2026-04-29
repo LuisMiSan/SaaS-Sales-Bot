@@ -2,13 +2,13 @@ import { useState } from "react";
 import { Link, useRoute } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  useGetCar,
+  useGetCarStaff,
   useListLeads,
   useReleaseCar,
   useMarkCarSold,
   useUpdateCar,
-  getGetCarQueryKey,
-  getListCarsQueryKey,
+  getGetCarStaffQueryKey,
+  getListCarsStaffQueryKey,
   getListLeadsQueryKey,
 } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
@@ -27,7 +27,7 @@ export default function CarDetailPage() {
   const id = params ? Number(params.id) : 0;
   const qc = useQueryClient();
 
-  const { data: car } = useGetCar(id, { query: { enabled: !!id, queryKey: getGetCarQueryKey(id) } });
+  const { data: car } = useGetCarStaff(id, { query: { enabled: !!id, queryKey: getGetCarStaffQueryKey(id) } });
   const { data: leads } = useListLeads();
 
   const release = useReleaseCar();
@@ -35,8 +35,8 @@ export default function CarDetailPage() {
   const update = useUpdateCar();
 
   const invalidate = () => {
-    qc.invalidateQueries({ queryKey: getGetCarQueryKey(id) });
-    qc.invalidateQueries({ queryKey: getListCarsQueryKey() });
+    qc.invalidateQueries({ queryKey: getGetCarStaffQueryKey(id) });
+    qc.invalidateQueries({ queryKey: getListCarsStaffQueryKey() });
     qc.invalidateQueries({ queryKey: getListLeadsQueryKey() });
   };
 

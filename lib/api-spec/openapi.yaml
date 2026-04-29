@@ -60,7 +60,7 @@ paths:
         - in: query
           name: status
           required: false
-          schema: { type: string, enum: [open, locking, locked, released, sold] }
+          schema: { type: string, enum: [open, locking, locked] }
       responses:
         "200":
           description: OK
@@ -68,7 +68,7 @@ paths:
             application/json:
               schema:
                 type: array
-                items: { $ref: "#/components/schemas/Car" }
+                items: { $ref: "#/components/schemas/PublicCar" }
     post:
       operationId: createCar
       tags: [cars]
@@ -98,7 +98,7 @@ paths:
           description: OK
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Car" }
+              schema: { $ref: "#/components/schemas/PublicCar" }
     patch:
       operationId: updateCar
       tags: [cars]
@@ -159,6 +159,40 @@ paths:
   /cars/{id}/sell:
     post:
       operationId: markCarSold
+      tags: [cars]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Car" }
+
+  /staff/cars:
+    get:
+      operationId: listCarsStaff
+      tags: [cars]
+      parameters:
+        - in: query
+          name: status
+          required: false
+          schema: { type: string, enum: [open, locking, locked, released, sold] }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Car" }
+
+  /staff/cars/{id}:
+    get:
+      operationId: getCarStaff
       tags: [cars]
       parameters:
         - in: path
@@ -327,6 +361,24 @@ components:
       properties:
         status: { type: string }
       required: [status]
+
+    PublicCar:
+      type: object
+      properties:
+        id: { type: integer }
+        make: { type: string }
+        model: { type: string }
+        year: { type: integer }
+        price: { type: number }
+        priceLabel: { type: string }
+        status: { type: string, enum: [open, locking, locked] }
+        imageUrl: { type: ["string", "null"] }
+        km: { type: integer }
+        fuel: { type: string }
+        transmission: { type: string }
+        location: { type: string }
+        publishedAt: { type: string, format: date-time }
+      required: [id, make, model, year, price, priceLabel, status, km, fuel, transmission, location, publishedAt]
 
     Car:
       type: object

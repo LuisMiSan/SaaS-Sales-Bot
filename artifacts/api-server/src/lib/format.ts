@@ -44,6 +44,24 @@ export function serializeCar(car: DbCar) {
   };
 }
 
+export function serializePublicCar(car: DbCar) {
+  return {
+    id: car.id,
+    make: car.make,
+    model: car.model,
+    year: car.year,
+    price: Number(car.price),
+    priceLabel: priceLabel(Number(car.price)),
+    status: car.status,
+    imageUrl: car.imageUrl,
+    km: car.km,
+    fuel: car.fuel,
+    transmission: car.transmission,
+    location: car.location,
+    publishedAt: car.publishedAt.toISOString(),
+  };
+}
+
 export function serializeLead(lead: DbLead, lastMessage?: DbMessage | null) {
   return {
     id: lead.id,

@@ -3,6 +3,7 @@ import { eq, desc, and } from "drizzle-orm";
 import { db, carsTable, leadsTable, activityTable, messagesTable } from "@workspace/db";
 import {
   ListCarsQueryParams,
+  ListCarsStaffQueryParams,
   CreateCarBody,
   GetCarParams,
   UpdateCarParams,
@@ -12,7 +13,7 @@ import {
   ReleaseCarParams,
   MarkCarSoldParams,
 } from "@workspace/api-zod";
-import { serializeCar, windowHoursForAttractiveness } from "../lib/format";
+import { serializeCar, serializePublicCar, windowHoursForAttractiveness } from "../lib/format";
 import { parseCarLine, fetchCarPage, isUrl, normalizeMarketRange } from "../lib/import-ai";
 import { logger } from "../lib/logger";
 import { requireStaffAuth } from "../middleware/auth";
@@ -124,6 +125,8 @@ router.post("/cars/bulk-import", requireStaffAuth, async (req, res): Promise<voi
   res.status(201).json(result);
 });
 
+const PUBLIC_ALLOWED_STATUSES = new Set(["open", "locking", "locked"]);
+
 router.get("/cars", async (req, res): Promise<void> => {
   const parsed = ListCarsQueryParams.safeParse(req.query);
   if (!parsed.success) {
@@ -131,11 +134,47 @@ router.get("/cars", async (req, res): Promise<void> => {
     return;
   }
 
+  const requestedStatus = parsed.data.status;
+  if (requestedStatus && !PUBLIC_ALLOWED_STATUSES.has(requestedStatus)) {
+    res.status(403).json({ error: "Forbidden" });
+    return;
+  }
+
+  const rows = requestedStatus
+    ? await db.select().from(carsTable).where(eq(carsTable.status, requestedStatus)).orderBy(desc(carsTable.publishedAt))
+    : await db
+        .select()
+        .from(carsTable)
+        .where(eq(carsTable.status, "open"))
+        .orderBy(desc(carsTable.publishedAt));
+
+  res.json(rows.map(serializePublicCar));
+});
+
+router.get("/staff/cars", requireStaffAuth, async (req, res): Promise<void> => {
+  const parsed = ListCarsStaffQueryParams.safeParse(req.query);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
   const rows = parsed.data.status
     ? await db.select().from(carsTable).where(eq(carsTable.status, parsed.data.status)).orderBy(desc(carsTable.publishedAt))
     : await db.select().from(carsTable).orderBy(desc(carsTable.publishedAt));
-
   res.json(rows.map(serializeCar));
+});
+
+router.get("/staff/cars/:id", requireStaffAuth, async (req, res): Promise<void> => {
+  const id = Number(req.params.id);
+  if (!id) {
+    res.status(400).json({ error: "Invalid id" });
+    return;
+  }
+  const [car] = await db.select().from(carsTable).where(eq(carsTable.id, id));
+  if (!car) {
+    res.status(404).json({ error: "Car not found" });
+    return;
+  }
+  res.json(serializeCar(car));
 });
 
 router.post("/cars", requireStaffAuth, async (req, res): Promise<void> => {
@@ -185,7 +224,11 @@ router.get("/cars/:id", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Car not found" });
     return;
   }
-  res.json(serializeCar(car));
+  if (!PUBLIC_ALLOWED_STATUSES.has(car.status)) {
+    res.status(404).json({ error: "Car not found" });
+    return;
+  }
+  res.json(serializePublicCar(car));
 });
 
 router.patch("/cars/:id", requireStaffAuth, async (req, res): Promise<void> => {
