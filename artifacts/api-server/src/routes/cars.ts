@@ -19,12 +19,48 @@ import { requireStaffAuth } from "../middleware/auth";
 
 const router: IRouter = Router();
 
+const BULK_IMPORT_WINDOW_MS = 60 * 60 * 1000;
+const BULK_IMPORT_PER_USER_LIMIT = 5;
+const BULK_IMPORT_GLOBAL_LIMIT = 20;
+const bulkImportTimestamps = new Map<string, number[]>();
+let globalBulkImportTimestamps: number[] = [];
+
+function checkBulkImportRateLimit(userId: string): { allowed: boolean; retryAfterSecs: number } {
+  const now = Date.now();
+  const cutoff = now - BULK_IMPORT_WINDOW_MS;
+
+  globalBulkImportTimestamps = globalBulkImportTimestamps.filter((t) => t > cutoff);
+  if (globalBulkImportTimestamps.length >= BULK_IMPORT_GLOBAL_LIMIT) {
+    const oldest = globalBulkImportTimestamps[0];
+    return { allowed: false, retryAfterSecs: Math.ceil((oldest + BULK_IMPORT_WINDOW_MS - now) / 1000) };
+  }
+
+  const userTs = (bulkImportTimestamps.get(userId) ?? []).filter((t) => t > cutoff);
+  if (userTs.length >= BULK_IMPORT_PER_USER_LIMIT) {
+    const oldest = userTs[0];
+    return { allowed: false, retryAfterSecs: Math.ceil((oldest + BULK_IMPORT_WINDOW_MS - now) / 1000) };
+  }
+
+  userTs.push(now);
+  bulkImportTimestamps.set(userId, userTs);
+  globalBulkImportTimestamps.push(now);
+  return { allowed: true, retryAfterSecs: 0 };
+}
+
 interface BulkImportResult {
   created: ReturnType<typeof serializeCar>[];
   failed: Array<{ line: string; error: string }>;
 }
 
 router.post("/cars/bulk-import", requireStaffAuth, async (req, res): Promise<void> => {
+  const authHeader = req.headers["authorization"] ?? "";
+  const userId = authHeader.startsWith("Bearer ") ? authHeader.slice(7, 47) : "unknown";
+  const rateCheck = checkBulkImportRateLimit(userId);
+  if (!rateCheck.allowed) {
+    res.setHeader("Retry-After", String(rateCheck.retryAfterSecs));
+    res.status(429).json({ error: "Demasiadas importaciones. Inténtalo más tarde." });
+    return;
+  }
   const text = typeof req.body?.text === "string" ? req.body.text : "";
   if (!text.trim()) {
     res.status(400).json({ error: "text is required" });

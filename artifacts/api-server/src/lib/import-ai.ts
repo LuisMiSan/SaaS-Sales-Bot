@@ -1,7 +1,186 @@
+import dns from "node:dns";
+import http from "node:http";
+import https from "node:https";
+import net from "node:net";
 import { openai } from "@workspace/integrations-openai-ai-server";
 
 export function isUrl(text: string): boolean {
   return /^https?:\/\/\S+$/i.test(text.trim());
+}
+
+const FETCH_TIMEOUT_MS = 10_000;
+const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
+const MAX_REDIRECTS = 5;
+
+const PRIVATE_IP_RES: RegExp[] = [
+  /^127\./,
+  /^10\./,
+  /^172\.(1[6-9]|2\d|3[01])\./,
+  /^192\.168\./,
+  /^169\.254\./,
+  /^100\.6[4-9]\./,
+  /^100\.[7-9]\d\./,
+  /^100\.1[01]\d\./,
+  /^100\.12[0-7]\./,
+  /^0\.0\.0\.0$/,
+  /^::1$/,
+  /^::$/,
+  /^fc[\da-f]{2}:/i,
+  /^fd[\da-f]{2}:/i,
+  /^fe80:/i,
+  /^::ffff:(?:127\.|10\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)/i,
+];
+
+function isPrivateIp(ip: string): boolean {
+  return PRIVATE_IP_RES.some((re) => re.test(ip));
+}
+
+function assertSafeHostname(hostname: string): void {
+  if (
+    hostname === "localhost" ||
+    hostname.endsWith(".local") ||
+    hostname.endsWith(".internal") ||
+    hostname.endsWith(".localhost") ||
+    hostname === "metadata.google.internal"
+  ) {
+    throw new Error("Destino de URL no permitido");
+  }
+
+  if (net.isIP(hostname)) {
+    if (isPrivateIp(hostname)) {
+      throw new Error("Destino de URL no permitido");
+    }
+  }
+}
+
+function assertSafeUrlSync(rawUrl: string): URL {
+  let parsed: URL;
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    throw new Error("URL inválida");
+  }
+
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("Solo se permiten URLs http/https");
+  }
+
+  assertSafeHostname(parsed.hostname);
+  return parsed;
+}
+
+function safeLookup(
+  hostname: string,
+  options: dns.LookupOneOptions,
+  callback: (err: NodeJS.ErrnoException | null, address: string, family: number) => void,
+): void {
+  dns.lookup(hostname, { ...options, all: false }, (err, address, family) => {
+    if (err) {
+      callback(err, address, family);
+      return;
+    }
+    if (isPrivateIp(address)) {
+      callback(
+        Object.assign(new Error("Destino de URL no permitido"), { code: "ENOTALLOWED" }) as NodeJS.ErrnoException,
+        address,
+        family,
+      );
+      return;
+    }
+    callback(null, address, family);
+  });
+}
+
+const safeHttpAgent = new http.Agent({ lookup: safeLookup as unknown as typeof dns.lookup });
+const safeHttpsAgent = new https.Agent({ lookup: safeLookup as unknown as typeof dns.lookup });
+
+interface RawResponse {
+  status: number;
+  headers: http.IncomingHttpHeaders;
+  readBody(maxBytes: number, signal: AbortSignal): Promise<string>;
+}
+
+function httpGetRaw(parsed: URL, signal: AbortSignal): Promise<RawResponse> {
+  return new Promise((resolve, reject) => {
+    if (signal.aborted) {
+      reject(new Error("Timeout al descargar URL"));
+      return;
+    }
+
+    const isHttps = parsed.protocol === "https:";
+    const mod = isHttps ? https : http;
+    const agent = isHttps ? safeHttpsAgent : safeHttpAgent;
+
+    const req = mod.request({
+      hostname: parsed.hostname,
+      port: parsed.port || undefined,
+      path: (parsed.pathname || "/") + parsed.search,
+      method: "GET",
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; AsistenteVentasBot/1.0; +https://replit.com)",
+        Accept: "text/html,application/xhtml+xml",
+        "Accept-Language": "es-ES,es;q=0.9",
+      },
+      agent,
+    });
+
+    function abortReq() {
+      req.destroy(new Error("Timeout al descargar URL"));
+    }
+    signal.addEventListener("abort", abortReq, { once: true });
+
+    req.on("error", (err) => {
+      signal.removeEventListener("abort", abortReq);
+      reject(err);
+    });
+
+    req.on("response", (res) => {
+      signal.removeEventListener("abort", abortReq);
+      resolve({
+        status: res.statusCode ?? 0,
+        headers: res.headers,
+        readBody(maxBytes: number, sig: AbortSignal): Promise<string> {
+          return new Promise((resolveBody, rejectBody) => {
+            const cl = Number(res.headers["content-length"] ?? NaN);
+            if (Number.isFinite(cl) && cl > maxBytes) {
+              res.destroy();
+              rejectBody(new Error("Respuesta demasiado grande"));
+              return;
+            }
+
+            const chunks: Buffer[] = [];
+            let total = 0;
+
+            function abortBody() {
+              res.destroy(new Error("Timeout al descargar URL"));
+            }
+            sig.addEventListener("abort", abortBody, { once: true });
+
+            res.on("data", (chunk: Buffer) => {
+              total += chunk.byteLength;
+              if (total > maxBytes) {
+                res.destroy(new Error("Respuesta demasiado grande"));
+                return;
+              }
+              chunks.push(chunk);
+            });
+
+            res.on("end", () => {
+              sig.removeEventListener("abort", abortBody);
+              resolveBody(Buffer.concat(chunks).toString("utf8"));
+            });
+
+            res.on("error", (err) => {
+              sig.removeEventListener("abort", abortBody);
+              rejectBody(err);
+            });
+          });
+        },
+      });
+    });
+
+    req.end();
+  });
 }
 
 const META_RE = /<meta\b[^>]*>/gi;
@@ -41,29 +220,49 @@ function stripHtml(html: string): string {
 }
 
 export async function fetchCarPage(url: string): Promise<string> {
-  const res = await fetch(url, {
-    redirect: "follow",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (compatible; AsistenteVentasBot/1.0; +https://replit.com)",
-      Accept: "text/html,application/xhtml+xml",
-      "Accept-Language": "es-ES,es;q=0.9",
-    },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status} al descargar ${url}`);
-  const html = await res.text();
-  const title = (html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] ?? "").trim();
-  const ogTitle = pickMeta(html, ["og:title", "twitter:title"]);
-  const ogDesc = pickMeta(html, ["og:description", "twitter:description", "description"]);
-  const text = stripHtml(html).slice(0, 5000);
-  return [
-    `URL: ${url}`,
-    title && `TÍTULO: ${title}`,
-    ogTitle && ogTitle !== title && `OG_TITLE: ${ogTitle}`,
-    ogDesc && `DESCRIPCIÓN: ${ogDesc}`,
-    `CONTENIDO:\n${text}`,
-  ]
-    .filter(Boolean)
-    .join("\n");
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+  try {
+    let currentParsed = assertSafeUrlSync(url);
+
+    for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+      const raw = await httpGetRaw(currentParsed, controller.signal);
+
+      if (raw.status >= 300 && raw.status < 400) {
+        if (hop === MAX_REDIRECTS) throw new Error("Demasiadas redirecciones");
+        const locationHeader = raw.headers["location"];
+        const location = Array.isArray(locationHeader) ? locationHeader[0] : locationHeader;
+        if (!location) throw new Error("Redirect sin cabecera Location");
+        const nextUrl = new URL(location, currentParsed.href).href;
+        currentParsed = assertSafeUrlSync(nextUrl);
+        continue;
+      }
+
+      if (raw.status < 200 || raw.status >= 300) {
+        throw new Error(`HTTP ${raw.status} al descargar ${url}`);
+      }
+
+      const html = await raw.readBody(MAX_RESPONSE_BYTES, controller.signal);
+      const title = (html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] ?? "").trim();
+      const ogTitle = pickMeta(html, ["og:title", "twitter:title"]);
+      const ogDesc = pickMeta(html, ["og:description", "twitter:description", "description"]);
+      const text = stripHtml(html).slice(0, 5000);
+      return [
+        `URL: ${url}`,
+        title && `TÍTULO: ${title}`,
+        ogTitle && ogTitle !== title && `OG_TITLE: ${ogTitle}`,
+        ogDesc && `DESCRIPCIÓN: ${ogDesc}`,
+        `CONTENIDO:\n${text}`,
+      ]
+        .filter(Boolean)
+        .join("\n");
+    }
+
+    throw new Error("Demasiadas redirecciones");
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export interface ParsedCar {
