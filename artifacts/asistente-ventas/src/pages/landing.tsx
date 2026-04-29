@@ -9,7 +9,6 @@ import {
   Eye,
   MessageSquare,
   CheckCircle2,
-  LayoutDashboard,
   Car as CarIcon,
   Menu,
   X,
@@ -115,9 +114,6 @@ export default function LandingPage() {
             <a href="#proceso" className="hover:text-[#EE7B22]">Cómo funciona</a>
             <a href="#sobre-nosotros" className="hover:text-[#EE7B22]">Sobre nosotros</a>
             <a href="#contacto" className="hover:text-[#EE7B22]">Contacto</a>
-            <Link href="/" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-stone-900 text-white normal-case tracking-normal text-[11px]">
-              <LayoutDashboard className="h-3.5 w-3.5" /> Panel comercial
-            </Link>
           </nav>
           <button
             type="button"
@@ -134,9 +130,6 @@ export default function LandingPage() {
               <a href="#catalogo" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 rounded-md hover:bg-stone-100">Ver coches</a>
               <a href="#proceso" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 rounded-md hover:bg-stone-100">Cómo funciona</a>
               <a href="#sobre-nosotros" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 rounded-md hover:bg-stone-100">Sobre nosotros</a>
-              <Link href="/" onClick={() => setMenuOpen(false)} className="mt-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-md bg-stone-900 text-white text-sm">
-                <LayoutDashboard className="h-4 w-4" /> Panel comercial
-              </Link>
             </nav>
           </div>
         )}

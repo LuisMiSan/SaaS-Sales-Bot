@@ -1,11 +1,12 @@
 import { Router, type IRouter } from "express";
+import { requireStaffAuth } from "../middleware/auth";
 import { sql, desc } from "drizzle-orm";
 import { db, carsTable, leadsTable, activityTable } from "@workspace/db";
 import { serializeActivity } from "../lib/format";
 
 const router: IRouter = Router();
 
-router.get("/dashboard/summary", async (_req, res): Promise<void> => {
+router.get("/dashboard/summary", requireStaffAuth, async (_req, res): Promise<void> => {
   const cars = await db.select().from(carsTable);
   const leads = await db.select().from(leadsTable);
 
@@ -48,7 +49,7 @@ router.get("/dashboard/summary", async (_req, res): Promise<void> => {
   });
 });
 
-router.get("/dashboard/activity", async (_req, res): Promise<void> => {
+router.get("/dashboard/activity", requireStaffAuth, async (_req, res): Promise<void> => {
   const rows = await db.select().from(activityTable).orderBy(desc(activityTable.at)).limit(40);
   res.json(rows.map(serializeActivity));
 });

@@ -1,5 +1,7 @@
+import { useState, useEffect } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { setAuthTokenGetter } from "@workspace/api-client-react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout";
@@ -12,6 +14,8 @@ import PipelinePage from "@/pages/pipeline";
 import SettingsPage from "@/pages/settings";
 import LandingPage from "@/pages/landing";
 import LandingCarPage from "@/pages/landing-car";
+import StaffLogin from "@/pages/staff-login";
+import { getStoredToken, isAuthenticated } from "@/lib/staff-auth";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,17 +23,18 @@ const queryClient = new QueryClient({
   },
 });
 
-function Router() {
-  const [location] = useLocation();
-  const isPublic = location.startsWith("/tienda");
+setAuthTokenGetter(() => getStoredToken());
 
-  if (isPublic) {
-    return (
-      <Switch>
-        <Route path="/tienda" component={LandingPage} />
-        <Route path="/tienda/coche/:id" component={LandingCarPage} />
-      </Switch>
-    );
+function CockpitRouter() {
+  const [authed, setAuthed] = useState(() => isAuthenticated());
+
+  function handleLogin() {
+    setAuthed(true);
+    void queryClient.invalidateQueries();
+  }
+
+  if (!authed) {
+    return <StaffLogin onLogin={handleLogin} />;
   }
 
   return (
@@ -48,7 +53,27 @@ function Router() {
   );
 }
 
+function Router() {
+  const [location] = useLocation();
+  const isPublic = location.startsWith("/tienda");
+
+  if (isPublic) {
+    return (
+      <Switch>
+        <Route path="/tienda" component={LandingPage} />
+        <Route path="/tienda/coche/:id" component={LandingCarPage} />
+      </Switch>
+    );
+  }
+
+  return <CockpitRouter />;
+}
+
 function App() {
+  useEffect(() => {
+    setAuthTokenGetter(() => getStoredToken());
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

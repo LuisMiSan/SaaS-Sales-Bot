@@ -1,4 +1,5 @@
 import { Router, type IRouter } from "express";
+import { requireStaffAuth } from "../middleware/auth";
 import { eq, desc, sql } from "drizzle-orm";
 import { db, leadsTable, carsTable, messagesTable, activityTable } from "@workspace/db";
 import { logger } from "../lib/logger";
@@ -80,7 +81,7 @@ router.post("/whatsapp/webhook", async (req, res): Promise<void> => {
   }
 });
 
-router.get("/whatsapp/status", (_req, res): void => {
+router.get("/whatsapp/status", requireStaffAuth, (_req, res): void => {
   res.json({
     enabled: whatsappConfig.enabled,
     mode: whatsappConfig.enabled ? "live" : "sandbox",
@@ -89,7 +90,7 @@ router.get("/whatsapp/status", (_req, res): void => {
   });
 });
 
-router.post("/whatsapp/sandbox/inbound", async (req, res): Promise<void> => {
+router.post("/whatsapp/sandbox/inbound", requireStaffAuth, async (req, res): Promise<void> => {
   const body = req.body as { phone?: string; name?: string; text?: string };
   if (!body?.phone || !body?.text) {
     res.status(400).json({ error: "phone and text required" });

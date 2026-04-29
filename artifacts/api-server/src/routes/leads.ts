@@ -1,4 +1,5 @@
 import { Router, type IRouter } from "express";
+import { requireStaffAuth } from "../middleware/auth";
 import { eq, desc, sql } from "drizzle-orm";
 import { db, leadsTable, carsTable, messagesTable, activityTable } from "@workspace/db";
 import {
@@ -30,7 +31,7 @@ async function getLastMessage(leadId: number) {
   return msg ?? null;
 }
 
-router.get("/leads", async (req, res): Promise<void> => {
+router.get("/leads", requireStaffAuth, async (req, res): Promise<void> => {
   const parsed = ListLeadsQueryParams.safeParse(req.query);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -50,7 +51,7 @@ router.get("/leads", async (req, res): Promise<void> => {
   res.json(out);
 });
 
-router.post("/leads", async (req, res): Promise<void> => {
+router.post("/leads", requireStaffAuth, async (req, res): Promise<void> => {
   const parsed = CreateLeadBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -203,7 +204,7 @@ async function respondAsAgent(leadId: number): Promise<void> {
   }
 }
 
-router.get("/leads/:id", async (req, res): Promise<void> => {
+router.get("/leads/:id", requireStaffAuth, async (req, res): Promise<void> => {
   const params = GetLeadParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -225,7 +226,7 @@ router.get("/leads/:id", async (req, res): Promise<void> => {
   });
 });
 
-router.patch("/leads/:id", async (req, res): Promise<void> => {
+router.patch("/leads/:id", requireStaffAuth, async (req, res): Promise<void> => {
   const params = UpdateLeadParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -246,7 +247,7 @@ router.patch("/leads/:id", async (req, res): Promise<void> => {
   res.json({ ...serializeLead(lead, last), car: serializeCar(car) });
 });
 
-router.get("/leads/:id/messages", async (req, res): Promise<void> => {
+router.get("/leads/:id/messages", requireStaffAuth, async (req, res): Promise<void> => {
   const params = ListLeadMessagesParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -256,7 +257,7 @@ router.get("/leads/:id/messages", async (req, res): Promise<void> => {
   res.json(messages.map(serializeMessage));
 });
 
-router.post("/leads/:id/messages", async (req, res): Promise<void> => {
+router.post("/leads/:id/messages", requireStaffAuth, async (req, res): Promise<void> => {
   const params = SendLeadMessageParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -292,7 +293,7 @@ router.post("/leads/:id/messages", async (req, res): Promise<void> => {
   res.status(201).json(serializeMessage(msg));
 });
 
-router.post("/leads/:id/incoming", async (req, res): Promise<void> => {
+router.post("/leads/:id/incoming", requireStaffAuth, async (req, res): Promise<void> => {
   const params = SimulateIncomingMessageParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -316,7 +317,7 @@ router.post("/leads/:id/incoming", async (req, res): Promise<void> => {
   res.status(201).json(serializeMessage(msg));
 });
 
-router.post("/leads/:id/draft", async (req, res): Promise<void> => {
+router.post("/leads/:id/draft", requireStaffAuth, async (req, res): Promise<void> => {
   const params = DraftLeadReplyParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });

@@ -15,6 +15,7 @@ import {
 import { serializeCar, windowHoursForAttractiveness } from "../lib/format";
 import { parseCarLine, fetchCarPage, isUrl, normalizeMarketRange } from "../lib/import-ai";
 import { logger } from "../lib/logger";
+import { requireStaffAuth } from "../middleware/auth";
 
 const router: IRouter = Router();
 
@@ -23,7 +24,7 @@ interface BulkImportResult {
   failed: Array<{ line: string; error: string }>;
 }
 
-router.post("/cars/bulk-import", async (req, res): Promise<void> => {
+router.post("/cars/bulk-import", requireStaffAuth, async (req, res): Promise<void> => {
   const text = typeof req.body?.text === "string" ? req.body.text : "";
   if (!text.trim()) {
     res.status(400).json({ error: "text is required" });
@@ -101,7 +102,7 @@ router.get("/cars", async (req, res): Promise<void> => {
   res.json(rows.map(serializeCar));
 });
 
-router.post("/cars", async (req, res): Promise<void> => {
+router.post("/cars", requireStaffAuth, async (req, res): Promise<void> => {
   const parsed = CreateCarBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -151,7 +152,7 @@ router.get("/cars/:id", async (req, res): Promise<void> => {
   res.json(serializeCar(car));
 });
 
-router.patch("/cars/:id", async (req, res): Promise<void> => {
+router.patch("/cars/:id", requireStaffAuth, async (req, res): Promise<void> => {
   const params = UpdateCarParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -176,7 +177,7 @@ router.patch("/cars/:id", async (req, res): Promise<void> => {
   res.json(serializeCar(car));
 });
 
-router.post("/cars/:id/lock", async (req, res): Promise<void> => {
+router.post("/cars/:id/lock", requireStaffAuth, async (req, res): Promise<void> => {
   const params = LockCarParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -214,7 +215,7 @@ router.post("/cars/:id/lock", async (req, res): Promise<void> => {
   res.json(serializeCar(car));
 });
 
-router.post("/cars/:id/release", async (req, res): Promise<void> => {
+router.post("/cars/:id/release", requireStaffAuth, async (req, res): Promise<void> => {
   const params = ReleaseCarParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -246,7 +247,7 @@ router.post("/cars/:id/release", async (req, res): Promise<void> => {
   res.json(serializeCar(car));
 });
 
-router.post("/cars/:id/sell", async (req, res): Promise<void> => {
+router.post("/cars/:id/sell", requireStaffAuth, async (req, res): Promise<void> => {
   const params = MarkCarSoldParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
