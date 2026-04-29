@@ -9,7 +9,7 @@ export function isUrl(text: string): boolean {
 }
 
 const FETCH_TIMEOUT_MS = 20_000;
-const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
+const MAX_RESPONSE_BYTES = 512 * 1024; // 512 KB is plenty to extract car data
 const MAX_REDIRECTS = 5;
 
 const PRIVATE_IP_RES: RegExp[] = [
@@ -138,15 +138,9 @@ function httpGetRaw(parsed: URL, signal: AbortSignal): Promise<RawResponse> {
         headers: res.headers,
         readBody(maxBytes: number, sig: AbortSignal): Promise<string> {
           return new Promise((resolveBody, rejectBody) => {
-            const cl = Number(res.headers["content-length"] ?? NaN);
-            if (Number.isFinite(cl) && cl > maxBytes) {
-              res.destroy();
-              rejectBody(new Error("Respuesta demasiado grande"));
-              return;
-            }
-
             const chunks: Buffer[] = [];
             let total = 0;
+            let truncated = false;
 
             function abortBody() {
               res.destroy(new Error("Timeout al descargar URL"));
@@ -154,11 +148,15 @@ function httpGetRaw(parsed: URL, signal: AbortSignal): Promise<RawResponse> {
             sig.addEventListener("abort", abortBody, { once: true });
 
             res.on("data", (chunk: Buffer) => {
-              total += chunk.byteLength;
-              if (total > maxBytes) {
-                res.destroy(new Error("Respuesta demasiado grande"));
+              if (truncated) return;
+              const remaining = maxBytes - total;
+              if (chunk.byteLength >= remaining) {
+                chunks.push(chunk.subarray(0, remaining));
+                truncated = true;
+                res.destroy(); // stop reading, we have enough
                 return;
               }
+              total += chunk.byteLength;
               chunks.push(chunk);
             });
 
@@ -169,7 +167,12 @@ function httpGetRaw(parsed: URL, signal: AbortSignal): Promise<RawResponse> {
 
             res.on("error", (err) => {
               sig.removeEventListener("abort", abortBody);
-              rejectBody(err);
+              // A destroyed stream emits an error — treat truncation as success
+              if (truncated) {
+                resolveBody(Buffer.concat(chunks).toString("utf8"));
+              } else {
+                rejectBody(err);
+              }
             });
           });
         },
