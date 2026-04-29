@@ -128,8 +128,12 @@ export function BulkImportDialog() {
                 </div>
                 {result.failed.map((f, i) => (
                   <div key={i} className="rounded border border-amber-500/30 bg-amber-500/5 p-3 space-y-1">
-                    <div className="text-[11px] font-mono text-foreground/80">{f.line}</div>
-                    <div className="text-[11px] text-amber-500">{f.error}</div>
+                    <div className="text-[11px] font-mono text-foreground/60 truncate" title={f.line}>
+                      <span className="text-muted-foreground mr-1">Línea:</span>{f.line}
+                    </div>
+                    <div className="text-[11px] text-amber-500">
+                      <span className="font-semibold">Error:</span> {f.error}
+                    </div>
                   </div>
                 ))}
               </div>
