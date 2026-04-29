@@ -71,12 +71,20 @@ function assertSafeUrlSync(rawUrl: string): URL {
 
 function safeLookup(
   hostname: string,
-  options: dns.LookupOneOptions,
+  _options: unknown,
   callback: (err: NodeJS.ErrnoException | null, address: string, family: number) => void,
 ): void {
-  dns.lookup(hostname, { ...options, all: false }, (err, address, family) => {
+  dns.lookup(hostname, { family: 0 }, (err, address, family) => {
     if (err) {
-      callback(err, address, family);
+      callback(err, "", 4);
+      return;
+    }
+    if (!address) {
+      callback(
+        Object.assign(new Error("No se pudo resolver el hostname"), { code: "ENOTFOUND" }) as NodeJS.ErrnoException,
+        "",
+        4,
+      );
       return;
     }
     if (isPrivateIp(address)) {
