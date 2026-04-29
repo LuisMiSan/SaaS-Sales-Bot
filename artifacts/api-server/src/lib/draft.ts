@@ -100,7 +100,7 @@ Redacta ahora el mensaje de WhatsApp.`;
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-5.2",
+      model: "gpt-4.1",
       max_completion_tokens: 800,
       messages: [
         { role: "system", content: systemPrompt },

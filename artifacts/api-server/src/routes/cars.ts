@@ -318,6 +318,7 @@ router.post("/cars/:id/release", requireStaffAuth, async (req, res): Promise<voi
     })
     .where(eq(carsTable.id, params.data.id))
     .returning();
+  await db.update(leadsTable).set({ stage: "released" }).where(and(eq(leadsTable.carId, car.id), eq(leadsTable.stage, "locked")));
   await db.insert(activityTable).values({
     kind: "release",
     text: `${car.make} ${car.model} liberado y vuelve al escaparate`,

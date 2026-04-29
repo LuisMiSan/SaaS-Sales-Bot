@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 
 const ACTIVE_COLUMNS: { stage: LeadStage; label: string; color: string; bar: string }[] = [
   { stage: LeadStage.new, label: "Nuevo", color: "bg-sky-100 text-sky-800 border-sky-300", bar: "bg-sky-500" },
-  { stage: LeadStage.awaiting_deposit, label: "Esperando señal", color: "bg-amber-100 text-amber-800 border-amber-300", bar: "bg-amber-500" },
   { stage: LeadStage.locked, label: "Bloqueado", color: "bg-rose-100 text-rose-800 border-rose-300", bar: "bg-rose-500" },
   { stage: LeadStage.doubting, label: "Con dudas", color: "bg-violet-100 text-violet-800 border-violet-300", bar: "bg-violet-500" },
 ];
@@ -24,7 +23,6 @@ const CLOSED_COLUMNS: { stage: LeadStage; label: string; dot: string }[] = [
 
 const ALL_STAGES: { value: LeadStage; label: string }[] = [
   { value: LeadStage.new, label: "Nuevo" },
-  { value: LeadStage.awaiting_deposit, label: "Esperando señal" },
   { value: LeadStage.locked, label: "Bloqueado" },
   { value: LeadStage.doubting, label: "Con dudas" },
   { value: LeadStage.released, label: "Liberado" },

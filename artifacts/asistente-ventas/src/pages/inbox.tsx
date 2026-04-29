@@ -60,7 +60,6 @@ function pickAutoIntent(args: {
   if (!hasMessages) return "first_response";
   if (depositPaid || stage === "locked" || carStatus === "locked") return "confirm_lock";
   if (stage === "released" || carStatus === "released") return "post_release";
-  if (stage === "awaiting_deposit") return "ask_deposit";
 
   if (/(bizum|transfer|paypal|pago|paga|ingres|cuenta|iban)/.test(text)) return "confirm_lock";
   if (/(reserv|bloque|deposit|señal|me lo quedo|lo cojo|lo quiero)/.test(text)) return "ask_deposit";
@@ -74,7 +73,6 @@ function pickAutoIntent(args: {
 const STAGE_FILTERS = [
   { value: undefined, label: "Todas" },
   { value: "new" as const, label: "Nuevas" },
-  { value: "awaiting_deposit" as const, label: "Esperando depósito" },
   { value: "locked" as const, label: "Bloqueadas" },
   { value: "doubting" as const, label: "Dudas" },
   { value: "released" as const, label: "Liberadas" },

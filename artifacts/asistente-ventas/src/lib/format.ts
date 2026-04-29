@@ -46,7 +46,6 @@ export function statusLabel(s: string): string {
 export function stageLabel(s: string): string {
   switch (s) {
     case "new": return "Nuevo";
-    case "awaiting_deposit": return "Esperando depósito";
     case "locked": return "Bloqueado";
     case "doubting": return "Duda";
     case "released": return "Liberado";
