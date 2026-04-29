@@ -85,8 +85,11 @@ router.post("/cars/bulk-import", requireStaffAuth, async (req, res): Promise<voi
 
   for (const line of lines) {
     try {
+      req.log.info({ line: line.slice(0, 120), isUrl: isUrl(line) }, "bulk-import processing line");
       const payload = isUrl(line) ? await fetchCarPage(line.trim()) : line;
+      req.log.info({ payloadLen: payload.length, isUrl: isUrl(line) }, "bulk-import page fetched, calling AI");
       const parsed = await parseCarLine(payload);
+      req.log.info({ make: parsed.make, model: parsed.model }, "bulk-import AI parsed ok");
       const hours = windowHoursForAttractiveness(parsed.attractiveness);
       const now = new Date();
       const [car] = await db

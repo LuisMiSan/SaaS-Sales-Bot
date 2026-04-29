@@ -153,7 +153,9 @@ function httpGetRaw(parsed: URL, signal: AbortSignal): Promise<RawResponse> {
               if (chunk.byteLength >= remaining) {
                 chunks.push(chunk.subarray(0, remaining));
                 truncated = true;
-                res.destroy(); // stop reading, we have enough
+                sig.removeEventListener("abort", abortBody);
+                res.destroy(); // stop downloading, we have enough
+                resolveBody(Buffer.concat(chunks).toString("utf8")); // resolve right away
                 return;
               }
               total += chunk.byteLength;
@@ -167,12 +169,8 @@ function httpGetRaw(parsed: URL, signal: AbortSignal): Promise<RawResponse> {
 
             res.on("error", (err) => {
               sig.removeEventListener("abort", abortBody);
-              // A destroyed stream emits an error — treat truncation as success
-              if (truncated) {
-                resolveBody(Buffer.concat(chunks).toString("utf8"));
-              } else {
-                rejectBody(err);
-              }
+              if (truncated) return; // already resolved above
+              rejectBody(err);
             });
           });
         },
@@ -331,14 +329,17 @@ REGLAS:
 Devuelve SOLO el JSON. Nada más.`;
 
 export async function parseCarLine(line: string): Promise<ParsedCar> {
-  const response = await openai.chat.completions.create({
-    model: "gpt-4.1",
-    response_format: { type: "json_object" },
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: `Coche a procesar:\n${line}` },
-    ],
-  });
+  const response = await openai.chat.completions.create(
+    {
+      model: "gpt-4.1",
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: `Coche a procesar:\n${line.slice(0, 12000)}` },
+      ],
+    },
+    { timeout: 45_000 },
+  );
   const raw = response.choices[0]?.message?.content?.trim() ?? "";
   let data: Partial<ParsedCar>;
   try {
