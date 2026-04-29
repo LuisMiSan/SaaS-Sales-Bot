@@ -51,7 +51,7 @@ router.get("/leads", requireStaffAuth, async (req, res): Promise<void> => {
   res.json(out);
 });
 
-router.post("/leads", requireStaffAuth, async (req, res): Promise<void> => {
+router.post("/leads", async (req, res): Promise<void> => {
   const parsed = CreateLeadBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
