@@ -69,38 +69,24 @@ function assertSafeUrlSync(rawUrl: string): URL {
   return parsed;
 }
 
-function safeLookup(
-  hostname: string,
-  _options: unknown,
-  callback: (err: NodeJS.ErrnoException | null, address: string, family: number) => void,
-): void {
-  dns.lookup(hostname, { family: 0 }, (err, address, family) => {
-    if (err) {
-      callback(err, "", 4);
-      return;
-    }
-    if (!address) {
-      callback(
-        Object.assign(new Error("No se pudo resolver el hostname"), { code: "ENOTFOUND" }) as NodeJS.ErrnoException,
-        "",
-        4,
-      );
-      return;
-    }
-    if (isPrivateIp(address)) {
-      callback(
-        Object.assign(new Error("Destino de URL no permitido"), { code: "ENOTALLOWED" }) as NodeJS.ErrnoException,
-        address,
-        family,
-      );
-      return;
-    }
-    callback(null, address, family);
-  });
+async function assertSafeHostnameAsync(hostname: string): Promise<void> {
+  // Skip DNS lookup for literal IPs — already checked synchronously
+  if (net.isIP(hostname)) return;
+
+  let address: string;
+  try {
+    const result = await dns.promises.lookup(hostname, { family: 0 });
+    address = result.address;
+  } catch {
+    throw new Error(`No se pudo resolver el dominio: ${hostname}`);
+  }
+
+  if (!address) throw new Error(`No se pudo resolver el dominio: ${hostname}`);
+  if (isPrivateIp(address)) throw new Error("Destino de URL no permitido");
 }
 
-const safeHttpAgent = new http.Agent({ lookup: safeLookup as unknown as typeof dns.lookup });
-const safeHttpsAgent = new https.Agent({ lookup: safeLookup as unknown as typeof dns.lookup });
+const defaultHttpAgent = new http.Agent({ keepAlive: false });
+const defaultHttpsAgent = new https.Agent({ keepAlive: false });
 
 interface RawResponse {
   status: number;
@@ -117,7 +103,7 @@ function httpGetRaw(parsed: URL, signal: AbortSignal): Promise<RawResponse> {
 
     const isHttps = parsed.protocol === "https:";
     const mod = isHttps ? https : http;
-    const agent = isHttps ? safeHttpsAgent : safeHttpAgent;
+    const agent = isHttps ? defaultHttpsAgent : defaultHttpAgent;
 
     const req = mod.request({
       hostname: parsed.hostname,
@@ -238,6 +224,9 @@ export async function fetchCarPage(url: string): Promise<string> {
     let currentParsed = assertSafeUrlSync(url);
 
     for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+      // Validate DNS before each request (covers redirects to private IPs too)
+      await assertSafeHostnameAsync(currentParsed.hostname);
+
       const raw = await httpGetRaw(currentParsed, controller.signal);
 
       if (raw.status >= 300 && raw.status < 400) {
