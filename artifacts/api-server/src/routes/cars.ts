@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, inArray } from "drizzle-orm";
 import { db, carsTable, leadsTable, activityTable, messagesTable } from "@workspace/db";
 import {
   ListCarsQueryParams,
@@ -132,7 +132,8 @@ router.post("/cars/bulk-import", requireStaffAuth, async (req, res): Promise<voi
   res.status(201).json(result);
 });
 
-const PUBLIC_ALLOWED_STATUSES = new Set(["open", "locking", "locked"]);
+const PUBLIC_ALLOWED_STATUSES = new Set(["open", "locking", "locked", "released"]);
+const PUBLIC_DEFAULT_STATUSES = ["open", "released"] as const;
 
 router.get("/cars", async (req, res): Promise<void> => {
   const parsed = ListCarsQueryParams.safeParse(req.query);
@@ -152,7 +153,7 @@ router.get("/cars", async (req, res): Promise<void> => {
     : await db
         .select()
         .from(carsTable)
-        .where(eq(carsTable.status, "open"))
+        .where(inArray(carsTable.status, [...PUBLIC_DEFAULT_STATUSES]))
         .orderBy(desc(carsTable.publishedAt));
 
   res.json(rows.map(serializePublicCar));
