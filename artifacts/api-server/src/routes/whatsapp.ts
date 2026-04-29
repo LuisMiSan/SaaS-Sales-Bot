@@ -3,7 +3,7 @@ import { requireStaffAuth } from "../middleware/auth";
 import { eq, desc, sql } from "drizzle-orm";
 import { db, leadsTable, carsTable, messagesTable, activityTable } from "@workspace/db";
 import { logger } from "../lib/logger";
-import { whatsappConfig, parseIncomingWebhook, normalizePhone } from "../lib/whatsapp";
+import { whatsappConfig, parseIncomingWebhook, normalizePhone, verifyWebhookSignature } from "../lib/whatsapp";
 
 const router: IRouter = Router();
 
@@ -41,7 +41,19 @@ async function findOrCreateLeadByPhone(phone: string, fallbackName: string): Pro
   return { leadId: lead.id, created: true };
 }
 
-async function ingestIncoming(args: { fromPhone: string; profileName: string | null; text: string }): Promise<{ leadId: number; created: boolean }> {
+async function ingestIncoming(args: { fromPhone: string; profileName: string | null; text: string; waMessageId?: string }): Promise<{ leadId: number; created: boolean; duplicate: boolean }> {
+  if (args.waMessageId) {
+    const [existing] = await db
+      .select({ leadId: messagesTable.leadId })
+      .from(messagesTable)
+      .where(eq(messagesTable.waMessageId, args.waMessageId))
+      .limit(1);
+    if (existing) {
+      logger.info({ waMessageId: args.waMessageId }, "WhatsApp webhook duplicate message skipped");
+      return { leadId: existing.leadId, created: false, duplicate: true };
+    }
+  }
+
   const name = args.profileName?.trim() || `Cliente ${args.fromPhone.slice(-4)}`;
   const { leadId, created } = await findOrCreateLeadByPhone(args.fromPhone, name);
   await db.insert(messagesTable).values({
@@ -49,12 +61,13 @@ async function ingestIncoming(args: { fromPhone: string; profileName: string | n
     direction: "incoming",
     content: args.text || "(mensaje vacío)",
     aiGenerated: false,
+    waMessageId: args.waMessageId ?? null,
   });
   await db
     .update(leadsTable)
     .set({ unreadCount: sql`${leadsTable.unreadCount} + 1`, updatedAt: sql`now()` })
     .where(eq(leadsTable.id, leadId));
-  return { leadId, created };
+  return { leadId, created, duplicate: false };
 }
 
 router.get("/whatsapp/webhook", (req, res): void => {
@@ -70,11 +83,21 @@ router.get("/whatsapp/webhook", (req, res): void => {
 });
 
 router.post("/whatsapp/webhook", async (req, res): Promise<void> => {
+  const signatureHeader = req.headers["x-hub-signature-256"];
+  const rawBody = req.rawBody;
+
+  if (!rawBody || typeof signatureHeader !== "string" || !verifyWebhookSignature(rawBody, signatureHeader)) {
+    logger.warn({ ip: req.ip }, "WhatsApp webhook rejected: invalid or missing X-Hub-Signature-256");
+    res.sendStatus(401);
+    return;
+  }
+
   res.sendStatus(200);
+
   try {
     const incomings = parseIncomingWebhook(req.body);
     for (const inc of incomings) {
-      await ingestIncoming({ fromPhone: inc.fromPhone, profileName: inc.profileName, text: inc.text });
+      await ingestIncoming({ fromPhone: inc.fromPhone, profileName: inc.profileName, text: inc.text, waMessageId: inc.waMessageId });
     }
   } catch (err) {
     logger.error({ err }, "WhatsApp webhook processing failed");
@@ -90,22 +113,24 @@ router.get("/whatsapp/status", requireStaffAuth, (_req, res): void => {
   });
 });
 
-router.post("/whatsapp/sandbox/inbound", requireStaffAuth, async (req, res): Promise<void> => {
-  const body = req.body as { phone?: string; name?: string; text?: string };
-  if (!body?.phone || !body?.text) {
-    res.status(400).json({ error: "phone and text required" });
-    return;
-  }
-  try {
-    const result = await ingestIncoming({
-      fromPhone: body.phone,
-      profileName: body.name ?? null,
-      text: body.text,
-    });
-    res.status(201).json(result);
-  } catch (err) {
-    res.status(500).json({ error: (err as Error).message });
-  }
-});
+if (process.env["NODE_ENV"] !== "production") {
+  router.post("/whatsapp/sandbox/inbound", requireStaffAuth, async (req, res): Promise<void> => {
+    const body = req.body as { phone?: string; name?: string; text?: string };
+    if (!body?.phone || !body?.text) {
+      res.status(400).json({ error: "phone and text required" });
+      return;
+    }
+    try {
+      const result = await ingestIncoming({
+        fromPhone: body.phone,
+        profileName: body.name ?? null,
+        text: body.text,
+      });
+      res.status(201).json(result);
+    } catch (err) {
+      res.status(500).json({ error: (err as Error).message });
+    }
+  });
+}
 
 export default router;

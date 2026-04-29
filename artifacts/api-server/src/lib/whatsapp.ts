@@ -1,15 +1,39 @@
+import { createHmac, timingSafeEqual } from "crypto";
 import { logger } from "./logger";
 
 const WHATSAPP_TOKEN = process.env["WHATSAPP_TOKEN"];
 const WHATSAPP_PHONE_NUMBER_ID = process.env["WHATSAPP_PHONE_NUMBER_ID"];
 const WHATSAPP_VERIFY_TOKEN = process.env["WHATSAPP_VERIFY_TOKEN"] ?? "asistente-ventas-verify";
+const WHATSAPP_APP_SECRET = process.env["WHATSAPP_APP_SECRET"];
 const GRAPH_VERSION = process.env["WHATSAPP_GRAPH_VERSION"] ?? "v21.0";
 
 export const whatsappConfig = {
   enabled: Boolean(WHATSAPP_TOKEN && WHATSAPP_PHONE_NUMBER_ID),
   verifyToken: WHATSAPP_VERIFY_TOKEN,
   phoneNumberId: WHATSAPP_PHONE_NUMBER_ID ?? null,
+  appSecretConfigured: Boolean(WHATSAPP_APP_SECRET),
 };
+
+/**
+ * Verify the X-Hub-Signature-256 header sent by Meta on every webhook POST.
+ * Returns true only when the signature matches. Always returns false if
+ * WHATSAPP_APP_SECRET is not configured.
+ */
+export function verifyWebhookSignature(rawBody: Buffer, signatureHeader: string): boolean {
+  if (!WHATSAPP_APP_SECRET) {
+    logger.warn("WHATSAPP_APP_SECRET is not set — rejecting all webhook POST requests");
+    return false;
+  }
+  const prefix = "sha256=";
+  if (!signatureHeader.startsWith(prefix)) return false;
+  const receivedHex = signatureHeader.slice(prefix.length);
+  const expected = createHmac("sha256", WHATSAPP_APP_SECRET).update(rawBody).digest("hex");
+  try {
+    return timingSafeEqual(Buffer.from(receivedHex, "hex"), Buffer.from(expected, "hex"));
+  } catch {
+    return false;
+  }
+}
 
 export function normalizePhone(input: string): string {
   return input.replace(/[^\d]/g, "");

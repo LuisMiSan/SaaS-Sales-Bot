@@ -64,7 +64,13 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json());
+app.use(
+  express.json({
+    verify(_req, _res, buf) {
+      (_req as import("express").Request).rawBody = buf;
+    },
+  }),
+);
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);

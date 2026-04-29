@@ -53,6 +53,7 @@ export const messagesTable = pgTable("messages", {
   content: text("content").notNull(),
   aiGenerated: boolean("ai_generated").notNull().default(false),
   intent: text("intent"),
+  waMessageId: text("wa_message_id").unique(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
