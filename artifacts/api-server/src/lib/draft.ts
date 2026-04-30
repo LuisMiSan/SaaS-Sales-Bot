@@ -16,6 +16,8 @@ export const DEFAULT_INTENT_GUIDES: Record<string, string> = {
     "Han pasado las 2h y el cliente no ha cerrado. La unidad ha sido liberada. Avisar con naturalidad, generar un FOMO sutil mencionando que sigue disponible si encaja, sin sonar desesperado. NO usar esta guía si el cliente acaba de pedir que le bloquees el coche.",
   confirm_relock:
     "El cliente quiere que le vuelvas a bloquear la unidad después de que el bloqueo anterior expiró. Confirma de forma natural que le vuelves a bloquear ahora mismo o que lo gestionas enseguida. Recuérdale que sigue siendo gratuito y sin compromiso, 2h desde ahora. Tono cercano y resolutivo, sin recrearte en que el anterior bloqueo expiró.",
+  nudge_closing:
+    "La unidad está bloqueada y el cliente lleva un rato sin dar señales. Momento clave: pregunta de forma natural si tiene alguna duda pendiente sobre el coche o si quiere que le pongas en contacto con un comercial para cerrar la compra antes de que expire la ventana de 2h. Sin presión, pero con urgencia real. Un solo mensaje corto.",
   custom:
     "Responder al cliente siguiendo las instrucciones específicas que se indican.",
 };
@@ -29,8 +31,10 @@ REGLAS DEL SISTEMA:
 - Si no compra en 2h, el coche vuelve a "Ventana abierta" como "Liberado recientemente".
 - PROHIBIDO mencionar cualquier pago para reservar (ni señal, ni Bizum, ni transferencia previa, ni ningún tipo de cantidad para asegurar la unidad). El bloqueo es siempre gratis.
 - Si el cliente pregunta "¿hay que pagar algo para reservar?", responder claramente que no, que el bloqueo es gratuito.
+- Si el cliente pregunta por financiación, confirmar que sí se puede financiar y que el comercial le explicará las condiciones en detalle.
 - Sin presión agresiva. La urgencia viene de tiempo + disponibilidad real, nunca de marketing barato.
 - Tono: profesional, cercano, directo. Como un comercial bueno de toda la vida, no como un call-center.
+- Usa los datos de la ficha del coche para responder preguntas técnicas. NUNCA inventes datos que no estén en la ficha.
 
 REGLAS DE FORMATO:
 - WhatsApp real: frases cortas, saltos de línea naturales.
@@ -57,6 +61,31 @@ function carLabel(car: DbCar): string {
   return `${car.make} ${car.model} ${car.year} (${eurFormatter.format(Number(car.price))})`;
 }
 
+function carSpecsBlock(car: DbCar): string {
+  const lines: string[] = [
+    `Marca y modelo: ${car.make} ${car.model} ${car.year}`,
+    `Precio: ${eurFormatter.format(Number(car.price))}`,
+  ];
+  if (car.km != null) lines.push(`Kilómetros: ${Number(car.km).toLocaleString("es-ES")} km`);
+  if (car.fuel) lines.push(`Combustible: ${car.fuel}`);
+  if (car.transmission) lines.push(`Cambio: ${car.transmission}`);
+  if (car.horsepower != null) lines.push(`Potencia: ${car.horsepower} CV`);
+  if (car.doors != null) lines.push(`Puertas: ${car.doors}`);
+  if (car.seats != null) lines.push(`Plazas: ${car.seats}`);
+  if (car.color) lines.push(`Color: ${car.color}`);
+  if (car.bodyType) lines.push(`Carrocería: ${car.bodyType}`);
+  if (car.engineCc != null) lines.push(`Cilindrada: ${car.engineCc} cc`);
+  const consumptions: string[] = [];
+  if (car.consumptionUrban != null) consumptions.push(`urbano ${car.consumptionUrban} L/100km`);
+  if (car.consumptionHighway != null) consumptions.push(`carretera ${car.consumptionHighway} L/100km`);
+  if (car.consumptionMixed != null) consumptions.push(`mixto ${car.consumptionMixed} L/100km`);
+  if (consumptions.length > 0) lines.push(`Consumo: ${consumptions.join(", ")}`);
+  if (car.co2 != null) lines.push(`Emisiones CO2: ${car.co2} g/km`);
+  if (car.location) lines.push(`Ubicación: ${car.location}`);
+  if (car.description) lines.push(`Descripción: ${car.description}`);
+  return lines.map((l) => `  - ${l}`).join("\n");
+}
+
 export async function generateDraft(args: {
   intent: string;
   instructions?: string | null;
@@ -74,7 +103,6 @@ export async function generateDraft(args: {
   }
 
   const guide = intentGuides[intent] ?? intentGuides.custom;
-  const carLine = carLabel(car);
 
   const transcript = history
     .slice(-12)
@@ -88,9 +116,11 @@ export async function generateDraft(args: {
   const userPrompt = `CONTEXTO DEL LEAD:
 - Cliente: ${lead.name}
 - Teléfono: ${lead.phone}
-- Coche de interés: ${carLine}
 - Estado del coche: ${car.status}
 - Estado del lead: ${lead.stage}
+
+FICHA TÉCNICA DEL COCHE:
+${carSpecsBlock(car)}
 
 CONVERSACIÓN HASTA AHORA:
 ${transcript || "(aún no hay mensajes)"}
@@ -141,6 +171,8 @@ function fallbackDraft(intent: string, lead: DbLead, car: DbCar): string {
       return `Sin problema, ${name}.\nSolo ten en cuenta que si otro cliente la bloquea antes, deja de estar disponible.\nSi quieres asegurarla, aún estás a tiempo y no te cuesta nada.`;
     case "confirm_relock":
       return `Ahora mismo te la vuelvo a bloquear, ${name}.\nSon otras 2h sin coste, sin compromiso.\nDime si prefieres pasarte por el concesionario o lo cerramos por aquí.`;
+    case "nudge_closing":
+      return `${name}, ¿todo bien por ahí?\nSi tienes alguna duda sobre el coche, dímela.\nY si quieres que te ponga en contacto con uno de nuestros comerciales para cerrar la compra, solo dímelo.`;
     case "post_release":
       return `La unidad ha sido liberada nuevamente.\nSi sigue encajando contigo, aún puedes acceder si no se bloquea otra vez.`;
     default:

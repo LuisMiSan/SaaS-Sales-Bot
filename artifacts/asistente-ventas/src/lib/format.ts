@@ -67,6 +67,7 @@ export function intentLabel(intent: string): string {
     case "ask_deposit": return "Pedir depósito";
     case "confirm_lock": return "Confirmar bloqueo";
     case "confirm_relock": return "Re-bloquear";
+    case "nudge_closing": return "Nudge cierre";
     case "handle_doubt": return "Cliente duda";
     case "post_release": return "Post liberación";
     case "custom": return "Personalizado";

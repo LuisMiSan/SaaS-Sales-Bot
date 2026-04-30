@@ -44,6 +44,7 @@ const INTENTS = [
   { value: "ask_deposit", label: "Pedir cierre" },
   { value: "confirm_lock", label: "Confirmar bloqueo" },
   { value: "confirm_relock", label: "Re-bloquear" },
+  { value: "nudge_closing", label: "Nudge cierre" },
   { value: "handle_doubt", label: "Cliente duda" },
   { value: "post_release", label: "Post liberación" },
 ] as const;
