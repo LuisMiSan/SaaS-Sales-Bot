@@ -247,7 +247,7 @@ paths:
           description: Created
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/LeadWithCar" }
+              schema: { $ref: "#/components/schemas/PublicLeadCreated" }
 
   /leads/{id}:
     get:
@@ -537,6 +537,15 @@ components:
           properties:
             car: { $ref: "#/components/schemas/Car" }
           required: [car]
+
+    PublicLeadCreated:
+      allOf:
+        - $ref: "#/components/schemas/Lead"
+        - type: object
+          properties:
+            publicToken: { type: string }
+            car: { $ref: "#/components/schemas/PublicCar" }
+          required: [publicToken, car]
 
     LeadDetail:
       allOf:

@@ -6,6 +6,12 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// Trust Replit's reverse proxy so req.ip reflects the real client address
+// from the rightmost non-trusted entry in X-Forwarded-For rather than the
+// proxy's own socket IP. An attacker cannot spoof this because the Replit
+// proxy appends the real client IP; only that appended value is trusted.
+app.set("trust proxy", 1);
+
 app.use(
   pinoHttp({
     logger,

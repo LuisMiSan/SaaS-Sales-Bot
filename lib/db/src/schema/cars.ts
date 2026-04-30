@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, timestamp, boolean, doublePrecision, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, timestamp, boolean, doublePrecision, jsonb, primaryKey } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 export const carsTable = pgTable("cars", {
@@ -55,6 +55,7 @@ export const leadsTable = pgTable("leads", {
   unreadCount: integer("unread_count").notNull().default(0),
   avatarColor: text("avatar_color").notNull().default("#7c3aed"),
   publicToken: text("public_token").notNull().default(sql`gen_random_uuid()`),
+  clientIp: text("client_ip"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
@@ -69,6 +70,7 @@ export const messagesTable = pgTable("messages", {
   aiGenerated: boolean("ai_generated").notNull().default(false),
   intent: text("intent"),
   waMessageId: text("wa_message_id").unique(),
+  clientIp: text("client_ip"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -92,3 +94,17 @@ export const settingsTable = pgTable("settings", {
 });
 
 export type Setting = typeof settingsTable.$inferSelect;
+
+// Atomic fixed-window rate limit buckets.
+// key = "<scope>:<ip>", windowStart = floor(now, windowMs).
+export const rateLimitWindowsTable = pgTable(
+  "rate_limit_windows",
+  {
+    key: text("key").notNull(),
+    windowStart: timestamp("window_start", { withTimezone: true }).notNull(),
+    count: integer("count").notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.key, t.windowStart] })],
+);
+
+export type RateLimitWindow = typeof rateLimitWindowsTable.$inferSelect;

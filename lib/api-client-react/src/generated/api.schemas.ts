@@ -282,6 +282,11 @@ export type LeadWithCar = Lead & {
   car: Car;
 };
 
+export type PublicLeadCreated = Lead & {
+  publicToken: string;
+  car: PublicCar;
+};
+
 export type MessageDirection =
   (typeof MessageDirection)[keyof typeof MessageDirection];
 

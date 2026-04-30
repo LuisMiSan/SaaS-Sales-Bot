@@ -16,7 +16,7 @@ import {
   SimulateIncomingMessageParams,
   SimulateIncomingMessageBody,
 } from "@workspace/api-zod";
-import { serializeLead, serializeCar, serializeMessage } from "../lib/format";
+import { serializeLead, serializeCar, serializePublicCar, serializeMessage } from "../lib/format";
 import { generateDraft } from "../lib/draft";
 import { pickAutoIntent } from "../lib/auto-intent";
 import { sendWhatsAppText } from "../lib/whatsapp";
@@ -80,10 +80,20 @@ router.post("/leads", async (req, res): Promise<void> => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
+
+  // Use req.ip which Express derives from the trusted proxy chain (trust proxy: 1
+  // is set in app.ts), so the value cannot be spoofed via a forged header.
+  const clientIp = req.ip ?? "unknown";
+  const rateLimited = await isIpLeadRateLimited(clientIp);
+  if (rateLimited) {
+    res.status(429).json({ error: "Too many requests. Please try again later." });
+    return;
+  }
+
   const color = AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)];
   const [lead] = await db
     .insert(leadsTable)
-    .values({ ...parsed.data, avatarColor: color })
+    .values({ ...parsed.data, avatarColor: color, clientIp })
     .returning();
   const [car] = await db.select().from(carsTable).where(eq(carsTable.id, lead.carId));
   await db.insert(activityTable).values({
@@ -101,7 +111,7 @@ router.post("/leads", async (req, res): Promise<void> => {
       aiGenerated: true,
     })
     .returning();
-  res.status(201).json({ ...serializeLead(lead, welcome), publicToken: lead.publicToken, car: serializeCar(car) });
+  res.status(201).json({ ...serializeLead(lead, welcome), publicToken: lead.publicToken, car: serializePublicCar(car) });
 });
 
 router.get("/leads/:id/thread", async (req, res): Promise<void> => {
@@ -145,10 +155,18 @@ router.post("/leads/:id/thread", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Conversation not found" });
     return;
   }
+  const clientIp = req.ip ?? "unknown";
+
+  // Per-lead fast check, then cross-lead per-IP DB check to prevent bypass via multiple leads.
   if (isPublicMessageRateLimited(lead.id)) {
     res.status(429).json({ error: "Too many messages. Please wait before sending again." });
     return;
   }
+  if (await isIpThreadRateLimited(clientIp)) {
+    res.status(429).json({ error: "Too many messages. Please wait before sending again." });
+    return;
+  }
+
   const [msg] = await db
     .insert(messagesTable)
     .values({
@@ -156,18 +174,59 @@ router.post("/leads/:id/thread", async (req, res): Promise<void> => {
       direction: "incoming",
       content: body.data.content,
       aiGenerated: false,
+      clientIp,
     })
     .returning();
   await db.update(leadsTable).set({ unreadCount: sql`${leadsTable.unreadCount} + 1`, updatedAt: sql`now()` }).where(eq(leadsTable.id, lead.id));
 
-  // Fire-and-forget: AI agent responds automatically to the customer.
-  // The customer chat polls every 5s and will pick up the reply.
+  // Fire-and-forget: AI agent responds automatically; chat polls every 5s.
   void respondAsAgent(lead.id).catch((err) => {
     logger.error({ err, leadId: lead.id }, "Auto-respond failed");
   });
 
   res.status(201).json(serializeMessage(msg));
 });
+
+// Atomically increments a fixed-window counter and returns true if the limit is exceeded.
+// Uses ON CONFLICT DO UPDATE so the increment and read are a single atomic DB operation,
+// preventing race conditions under parallel requests.
+const RATE_LIMIT_WINDOW_MS = 10 * 60_000; // 10 minutes
+
+async function incrementAndCheck(scope: string, ip: string, limit: number): Promise<boolean> {
+  if (ip === "unknown") return false;
+  const windowStart = new Date(Math.floor(Date.now() / RATE_LIMIT_WINDOW_MS) * RATE_LIMIT_WINDOW_MS);
+  const key = `${scope}:${ip}`;
+  const result = await db.execute<{ count: number }>(
+    sql`INSERT INTO rate_limit_windows (key, window_start, count)
+        VALUES (${key}, ${windowStart}, 1)
+        ON CONFLICT (key, window_start)
+        DO UPDATE SET count = rate_limit_windows.count + 1
+        RETURNING count`,
+  );
+  const count = result.rows[0]?.count ?? 1;
+  return count > limit;
+}
+
+// Per-IP lead creation: max 10 per IP per 10-min window.
+async function isIpLeadRateLimited(ip: string): Promise<boolean> {
+  return incrementAndCheck("lead_create", ip, 10);
+}
+
+// Per-IP public thread messages: max 20 per IP per 10-min window across all leads.
+async function isIpThreadRateLimited(ip: string): Promise<boolean> {
+  return incrementAndCheck("thread_msg", ip, 20);
+}
+
+// Periodically delete expired rate_limit_windows rows to prevent unbounded growth.
+setInterval(
+  () => {
+    const cutoff = new Date(Date.now() - RATE_LIMIT_WINDOW_MS * 2);
+    db.execute(sql`DELETE FROM rate_limit_windows WHERE window_start < ${cutoff}`).catch((err) => {
+      logger.warn({ err }, "rate_limit_windows cleanup failed");
+    });
+  },
+  15 * 60_000, // every 15 minutes
+).unref();
 
 // Per-lead rate limiter for the public chat endpoint.
 // Allows at most 5 messages per lead per 60 seconds.

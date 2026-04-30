@@ -33,6 +33,7 @@ import type {
   LockCarBody,
   Message,
   PublicCar,
+  PublicLeadCreated,
   SendMessageBody,
   SimulateIncomingBody,
   UpdateCarBody,
@@ -1165,8 +1166,8 @@ export const getCreateLeadUrl = () => {
 export const createLead = async (
   createLeadBody: CreateLeadBody,
   options?: RequestInit,
-): Promise<LeadWithCar> => {
-  return customFetch<LeadWithCar>(getCreateLeadUrl(), {
+): Promise<PublicLeadCreated> => {
+  return customFetch<PublicLeadCreated>(getCreateLeadUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },

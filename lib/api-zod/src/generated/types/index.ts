@@ -34,6 +34,7 @@ export * from "./message";
 export * from "./messageDirection";
 export * from "./publicCar";
 export * from "./publicCarStatus";
+export * from "./publicLeadCreated";
 export * from "./sendMessageBody";
 export * from "./simulateIncomingBody";
 export * from "./stageCount";
