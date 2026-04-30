@@ -69,9 +69,22 @@ function assertSafeUrlSync(rawUrl: string): URL {
   return parsed;
 }
 
-async function assertSafeHostnameAsync(hostname: string): Promise<void> {
-  // Skip DNS lookup for literal IPs — already checked synchronously
-  if (net.isIP(hostname)) return;
+/**
+ * Resolves the hostname once, validates it is not a private IP, and returns
+ * the resolved IP address so the caller can pin the outbound connection to
+ * that address.  This prevents DNS-rebinding: a subsequent OS-level lookup
+ * performed by Node's http/https stack could return a different (private) IP
+ * if the attacker's DNS TTL has expired between the validation and the
+ * connect() call.
+ *
+ * For literal IPs the function validates the IP directly and returns it as-is.
+ */
+async function resolveAndValidateHostname(hostname: string): Promise<string> {
+  // Literal IP — validate and return as-is, no DNS query needed
+  if (net.isIP(hostname)) {
+    if (isPrivateIp(hostname)) throw new Error("Destino de URL no permitido");
+    return hostname;
+  }
 
   let address: string;
   try {
@@ -83,6 +96,8 @@ async function assertSafeHostnameAsync(hostname: string): Promise<void> {
 
   if (!address) throw new Error(`No se pudo resolver el dominio: ${hostname}`);
   if (isPrivateIp(address)) throw new Error("Destino de URL no permitido");
+
+  return address;
 }
 
 const defaultHttpAgent = new http.Agent({ keepAlive: false });
@@ -94,7 +109,17 @@ interface RawResponse {
   readBody(maxBytes: number, signal: AbortSignal): Promise<string>;
 }
 
-function httpGetRaw(parsed: URL, signal: AbortSignal): Promise<RawResponse> {
+/**
+ * Low-level HTTP GET.
+ *
+ * @param parsed   - The validated URL (provides path, protocol, original hostname).
+ * @param pinnedIp - The IP address that was returned by the DNS validation step.
+ *                   We connect to this IP directly so that no second OS-level DNS
+ *                   resolution occurs — this defeats DNS-rebinding attacks.
+ *                   The original hostname is still sent in the Host header and as
+ *                   the TLS SNI so that the server can identify the virtual host.
+ */
+function httpGetRaw(parsed: URL, pinnedIp: string, signal: AbortSignal): Promise<RawResponse> {
   return new Promise((resolve, reject) => {
     if (signal.aborted) {
       reject(new Error("Timeout al descargar URL"));
@@ -106,11 +131,20 @@ function httpGetRaw(parsed: URL, signal: AbortSignal): Promise<RawResponse> {
     const agent = isHttps ? defaultHttpsAgent : defaultHttpAgent;
 
     const req = mod.request({
-      hostname: parsed.hostname,
-      port: parsed.port || undefined,
+      // Connect to the pinned IP, not the hostname, to prevent a second DNS
+      // resolution that an attacker could manipulate (DNS rebinding).
+      // Node's http/https stack accepts a bare IPv6 address (without brackets)
+      // as the `hostname` option and handles the socket addressing internally.
+      hostname: pinnedIp,
+      port: parsed.port || (isHttps ? 443 : 80),
       path: (parsed.pathname || "/") + parsed.search,
       method: "GET",
+      // Preserve the original hostname in the Host header (required by HTTP/1.1)
+      // and as the TLS servername (SNI) so virtual hosting and TLS certs work.
+      // parsed.host already contains the correctly bracketed IPv6 address and
+      // any explicit port, so we use it directly instead of reconstructing.
       headers: {
+        Host: parsed.host,
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
         "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
@@ -118,6 +152,9 @@ function httpGetRaw(parsed: URL, signal: AbortSignal): Promise<RawResponse> {
         "Cache-Control": "no-cache",
         Pragma: "no-cache",
       },
+      // For HTTPS: set servername (SNI) to the original hostname, not the IP,
+      // so the server presents the correct TLS certificate.
+      ...(isHttps ? { servername: parsed.hostname } : {}),
       agent,
     });
 
@@ -287,10 +324,14 @@ export async function fetchCarPage(url: string): Promise<FetchedPage> {
     let currentParsed = assertSafeUrlSync(url);
 
     for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-      // Validate DNS before each request (covers redirects to private IPs too)
-      await assertSafeHostnameAsync(currentParsed.hostname);
+      // Resolve the hostname once, validate it is not a private IP, and pin
+      // the returned IP for the outbound connection.  This single atomic
+      // lookup-then-connect pattern eliminates the DNS-rebinding window that
+      // existed when the validation lookup and the connection lookup were
+      // separate operations.
+      const pinnedIp = await resolveAndValidateHostname(currentParsed.hostname);
 
-      const raw = await httpGetRaw(currentParsed, controller.signal);
+      const raw = await httpGetRaw(currentParsed, pinnedIp, controller.signal);
 
       if (raw.status >= 300 && raw.status < 400) {
         if (hop === MAX_REDIRECTS) throw new Error("Demasiadas redirecciones");
