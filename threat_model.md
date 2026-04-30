@@ -27,7 +27,7 @@ Production assumptions for future scans: `NODE_ENV=production`; TLS is handled b
 
 - **Production entry points:** `artifacts/api-server/src/app.ts`, `artifacts/api-server/src/routes/*.ts`, `artifacts/asistente-ventas/src/App.tsx`, public pages under `artifacts/asistente-ventas/src/pages/landing*.tsx`.
 - **Highest-risk areas:** `src/routes/leads.ts`, `src/routes/cars.ts`, `src/routes/whatsapp.ts`, `src/routes/settings.ts`, `src/lib/import-ai.ts`, `src/lib/draft.ts`.
-- **Public surfaces:** `/tienda`, `/tienda/coche/:id`, `GET/POST /api/leads/:id/thread`, `GET /api/cars`, `GET /api/cars/:id`, WhatsApp webhook endpoints. Product docs mention public lead creation, but current server code gates `POST /api/leads` behind staff auth.
+- **Public surfaces:** `/tienda`, `/tienda/coche/:id`, `POST /api/leads`, `GET/POST /api/leads/:id/thread`, `GET /api/cars`, `GET /api/cars/:id`, WhatsApp webhook endpoints.
 - **Internal surfaces that must be protected:** dashboard, inbox, pipeline, inventory, settings pages; `/api/dashboard/*`, `/api/leads*` except public thread endpoints, mutating `/api/cars*`, `/api/settings`, `/api/whatsapp/status`, `/api/whatsapp/sandbox/inbound`.
 - **Usually dev-only / out of scope:** `artifacts/mockup-sandbox`, `.agents`, attached assets, local skills, generated scanner noise outside production paths.
 
@@ -47,8 +47,8 @@ The API stores and serves PII, sales conversations, internal inventory metadata,
 
 ### Denial of Service
 
-Publicly reachable polling and chat endpoints, webhook ingestion, and AI-backed drafting can consume database, network, and model resources. The production system must bound request sizes, transcript growth, iteration counts, and traffic rates so public users or token holders cannot exhaust AI/network budgets or force unbounded auto-reply work.
+Publicly reachable lead creation, polling, and chat endpoints, webhook ingestion, and AI-backed drafting can consume database, network, and model resources. The production system must bound request sizes, transcript growth, iteration counts, and traffic rates so public users or token holders cannot mint unlimited fresh chat tokens, exhaust AI/network budgets, or force unbounded auto-reply work.
 
 ### Elevation of Privilege
 
-The most important guarantee is that public users must never gain access to the internal sales cockpit or its backing APIs. All admin and staff actions must be enforced server-side. User-controlled URLs must never let an attacker pivot the backend into internal services, and shared serializers must not accidentally expose internal-only fields on public catalog endpoints.
+The most important guarantee is that public users must never gain access to the internal sales cockpit or its backing APIs. All admin and staff actions must be enforced server-side. User-controlled URLs must never let an attacker pivot the backend into internal services, and public lead/chat flows must not reuse internal serializers or other back-office response shapes that reveal staff-only vehicle metadata.
