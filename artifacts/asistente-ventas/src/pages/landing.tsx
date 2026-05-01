@@ -99,7 +99,7 @@ export default function LandingPage() {
       {/* HEADER */}
       <header className="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between gap-3">
-          <Link href="/tienda" className="text-base sm:text-xl font-extrabold tracking-tight whitespace-nowrap">
+          <Link href="/" className="text-base sm:text-xl font-extrabold tracking-tight whitespace-nowrap">
             Pujamos<span className="text-[#EE7B22]">tu</span>coche.es
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-stone-600">
@@ -212,7 +212,7 @@ export default function LandingPage() {
             {cars.map((car, idx) => {
               const isLocked = car.status === "locked";
               return (
-                <Link key={car.id} href={`/tienda/coche/${car.id}`}>
+                <Link key={car.id} href={`/coche/${car.id}`}>
                   <article
                     className={cn(
                       "bg-white border rounded-xl overflow-hidden h-full flex flex-col transition-all",

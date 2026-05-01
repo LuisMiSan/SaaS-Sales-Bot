@@ -64,7 +64,7 @@ function LeadCard({ lead }: { lead: LeadWithCar }) {
           </div>
         </div>
         <Link
-          href={`/inbox/${lead.id}`}
+          href={`/staff/inbox/${lead.id}`}
           className="shrink-0 h-7 w-7 rounded-md flex items-center justify-center text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
           title="Abrir conversación"
         >
@@ -199,7 +199,7 @@ export default function PipelinePage() {
                     {colLeads.slice(0, 4).map((l) => (
                       <Link
                         key={l.id}
-                        href={`/inbox/${l.id}`}
+                        href={`/staff/inbox/${l.id}`}
                         title={l.name}
                         className="h-6 w-6 rounded-full border-2 border-card flex items-center justify-center text-white text-[9px] font-bold hover:z-10 transition-transform hover:scale-110"
                         style={{ backgroundColor: l.avatarColor }}

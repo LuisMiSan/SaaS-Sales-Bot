@@ -27,11 +27,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
   }, [mobileOpen]);
 
   const navItems = [
-    { href: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
-    { href: "/pipeline", label: "Pipeline", icon: Kanban },
-    { href: "/inbox", label: "Buzón", icon: MessageSquare },
-    { href: "/inventory", label: "Inventario", icon: Car },
-    { href: "/settings", label: "Configuración", icon: Settings2 },
+    { href: "/staff", label: "Dashboard", icon: LayoutDashboard, exact: true },
+    { href: "/staff/pipeline", label: "Pipeline", icon: Kanban },
+    { href: "/staff/inbox", label: "Buzón", icon: MessageSquare },
+    { href: "/staff/inventory", label: "Inventario", icon: Car },
+    { href: "/staff/settings", label: "Configuración", icon: Settings2 },
   ];
 
   const navContent = (

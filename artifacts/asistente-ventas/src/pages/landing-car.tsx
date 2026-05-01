@@ -168,11 +168,11 @@ export default function LandingCarPage() {
       {/* HEADER */}
       <header className="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between gap-3">
-          <Link href="/tienda" className="text-base sm:text-xl font-extrabold tracking-tight whitespace-nowrap min-w-0 truncate">
+          <Link href="/" className="text-base sm:text-xl font-extrabold tracking-tight whitespace-nowrap min-w-0 truncate">
             Pujamos<span className="text-[#EE7B22]">tu</span>coche.es
           </Link>
           <Link
-            href="/tienda"
+            href="/"
             className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-stone-600 hover:text-[#EE7B22] whitespace-nowrap shrink-0"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
@@ -185,7 +185,7 @@ export default function LandingCarPage() {
       <main className="pt-24 pb-20 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <nav className="text-xs text-stone-500 mb-5">
-            <Link href="/tienda" className="hover:text-[#EE7B22]">Outlet</Link>
+            <Link href="/" className="hover:text-[#EE7B22]">Outlet</Link>
             <span className="mx-2">/</span>
             <span>{car.make}</span>
             <span className="mx-2">/</span>
@@ -396,7 +396,7 @@ export default function LandingCarPage() {
                       <p className="text-xs text-stone-600">
                         Esta unidad está bloqueada 2h. Si no se cierra la compra, vuelve al outlet automáticamente.
                       </p>
-                      <Link href="/tienda" className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-[#C4621A] hover:underline">
+                      <Link href="/" className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-[#C4621A] hover:underline">
                         Ver otros coches →
                       </Link>
                     </div>
@@ -459,13 +459,13 @@ export default function LandingCarPage() {
                 <h2 className="text-2xl font-extrabold tracking-tight">
                   Otros coches del <em className="not-italic text-[#EE7B22]">outlet</em>
                 </h2>
-                <Link href="/tienda" className="text-xs font-bold uppercase tracking-widest text-[#C4621A] hover:underline">
+                <Link href="/" className="text-xs font-bold uppercase tracking-widest text-[#C4621A] hover:underline">
                   Ver todos →
                 </Link>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {others.map((o) => (
-                  <Link key={o.id} href={`/tienda/coche/${o.id}`}>
+                  <Link key={o.id} href={`/coche/${o.id}`}>
                     <article className="bg-white border border-stone-200 rounded-xl overflow-hidden hover:shadow-lg hover:border-[#EE7B22] hover:-translate-y-1 transition-all">
                       <CarThumb make={o.make} model={o.model} imageUrl={o.imageUrl} photos={o.photos} className="h-32 w-full" />
                       <div className="p-3">

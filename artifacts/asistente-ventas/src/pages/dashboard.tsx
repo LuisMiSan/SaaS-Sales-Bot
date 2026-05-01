@@ -53,7 +53,7 @@ export default function DashboardPage() {
             <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Dashboard</h1>
             <p className="text-sm text-muted-foreground mt-1">Estado del escaparate, leads activos y tiempo de respuesta.</p>
           </div>
-          <Link href="/inbox" className="self-start sm:self-auto inline-flex items-center gap-2 px-3 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90">
+          <Link href="/staff/inbox" className="self-start sm:self-auto inline-flex items-center gap-2 px-3 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90">
             Abrir buzón
           </Link>
         </header>

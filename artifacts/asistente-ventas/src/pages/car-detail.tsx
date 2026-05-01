@@ -349,7 +349,7 @@ export default function CarDetailPage() {
   return (
     <div className="flex-1 overflow-y-auto scrollbar-thin">
       <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-5 md:space-y-6">
-        <Link href="/inventory" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+        <Link href="/staff/inventory" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Volver al inventario
         </Link>
 

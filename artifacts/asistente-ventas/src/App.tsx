@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation, Redirect } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { setAuthTokenGetter } from "@workspace/api-client-react";
 import { Toaster } from "@/components/ui/toaster";
@@ -40,13 +40,13 @@ function CockpitRouter() {
   return (
     <Layout>
       <Switch>
-        <Route path="/" component={DashboardPage} />
-        <Route path="/pipeline" component={PipelinePage} />
-        <Route path="/inbox" component={InboxPage} />
-        <Route path="/inbox/:id" component={InboxPage} />
-        <Route path="/inventory" component={InventoryPage} />
-        <Route path="/cars/:id" component={CarDetailPage} />
-        <Route path="/settings" component={SettingsPage} />
+        <Route path="/staff" component={DashboardPage} />
+        <Route path="/staff/pipeline" component={PipelinePage} />
+        <Route path="/staff/inbox" component={InboxPage} />
+        <Route path="/staff/inbox/:id" component={InboxPage} />
+        <Route path="/staff/inventory" component={InventoryPage} />
+        <Route path="/staff/cars/:id" component={CarDetailPage} />
+        <Route path="/staff/settings" component={SettingsPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
@@ -55,18 +55,21 @@ function CockpitRouter() {
 
 function Router() {
   const [location] = useLocation();
-  const isPublic = location.startsWith("/tienda");
+  const isStaff = location.startsWith("/staff");
 
-  if (isPublic) {
-    return (
-      <Switch>
-        <Route path="/tienda" component={LandingPage} />
-        <Route path="/tienda/coche/:id" component={LandingCarPage} />
-      </Switch>
-    );
+  if (isStaff) {
+    return <CockpitRouter />;
   }
 
-  return <CockpitRouter />;
+  return (
+    <Switch>
+      <Route path="/" component={LandingPage} />
+      <Route path="/coche/:id" component={LandingCarPage} />
+      <Route path="/tienda" component={LandingPage} />
+      <Route path="/tienda/coche/:id" component={LandingCarPage} />
+      <Route component={NotFound} />
+    </Switch>
+  );
 }
 
 function App() {
