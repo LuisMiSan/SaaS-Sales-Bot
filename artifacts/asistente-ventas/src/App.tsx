@@ -14,8 +14,12 @@ import PipelinePage from "@/pages/pipeline";
 import SettingsPage from "@/pages/settings";
 import LandingPage from "@/pages/landing";
 import LandingCarPage from "@/pages/landing-car";
+import PrivacyPage from "@/pages/legal-privacy";
+import CookiesPage from "@/pages/legal-cookies";
+import TermsPage from "@/pages/legal-terms";
 import StaffLogin from "@/pages/staff-login";
 import { getStoredToken, isAuthenticated } from "@/lib/staff-auth";
+import { CookieConsent } from "@/components/cookie-consent";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -65,6 +69,9 @@ function Router() {
     <Switch>
       <Route path="/" component={LandingPage} />
       <Route path="/coche/:id" component={LandingCarPage} />
+      <Route path="/privacidad" component={PrivacyPage} />
+      <Route path="/cookies" component={CookiesPage} />
+      <Route path="/terminos" component={TermsPage} />
       <Route path="/tienda" component={LandingPage} />
       <Route path="/tienda/coche/:id" component={LandingCarPage} />
       <Route component={NotFound} />
@@ -82,6 +89,7 @@ function App() {
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
           <Router />
+          <CookieConsent />
         </WouterRouter>
         <Toaster />
       </TooltipProvider>

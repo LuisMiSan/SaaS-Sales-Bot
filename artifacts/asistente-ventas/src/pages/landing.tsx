@@ -24,29 +24,38 @@ import { cn } from "@/lib/utils";
 
 const MAX_CARS_SHOWN = 15;
 
-function endOfWeek(): Date {
-  const d = new Date();
-  const day = d.getDay();
-  const sat = (6 - day + 7) % 7;
-  const out = new Date(d);
-  out.setDate(d.getDate() + (sat || 7));
-  out.setHours(23, 59, 0, 0);
-  return out;
-}
+const FOMO_DURATION_MS = 120 * 60 * 1000;
 
-function useWeekCountdown() {
-  const [now, setNow] = useState(Date.now());
+function useFomoTimer() {
+  const [remaining, setRemaining] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem("fomo_start");
+      const start = stored ? Number(stored) : Date.now();
+      if (!stored) sessionStorage.setItem("fomo_start", String(Date.now()));
+      return Math.max(0, FOMO_DURATION_MS - (Date.now() - start));
+    } catch {
+      return FOMO_DURATION_MS;
+    }
+  });
+
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
+    const id = setInterval(() => {
+      try {
+        const stored = sessionStorage.getItem("fomo_start");
+        const start = stored ? Number(stored) : Date.now();
+        setRemaining(Math.max(0, FOMO_DURATION_MS - (Date.now() - start)));
+      } catch {
+        setRemaining((r) => Math.max(0, r - 1000));
+      }
+    }, 1000);
     return () => clearInterval(id);
   }, []);
-  const ms = endOfWeek().getTime() - now;
-  const total = Math.max(0, Math.floor(ms / 1000));
-  const d = Math.floor(total / 86400);
-  const h = Math.floor((total % 86400) / 3600);
+
+  const total = Math.floor(remaining / 1000);
+  const h = Math.floor(total / 3600);
   const m = Math.floor((total % 3600) / 60);
   const s = total % 60;
-  return { d, h, m, s };
+  return { h, m, s, expired: remaining === 0 };
 }
 
 export default function LandingPage() {
@@ -88,7 +97,7 @@ export default function LandingPage() {
     }
   };
 
-  const { d, h, m, s } = useWeekCountdown();
+  const fomo = useFomoTimer();
 
   useEffect(() => {
     document.documentElement.classList.remove("dark");
@@ -151,13 +160,23 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* COUNTDOWN GLOBAL */}
+        {/* FOMO TIMER — personal 120-min window */}
         <div className="bg-[#E74C3C] text-white text-center py-3.5 px-6 font-bold text-sm">
-          <Clock className="inline h-4 w-4 mr-1.5 -mt-0.5" />
-          Oferta termina sábado 23:59 —
-          <span className="font-mono font-black ml-2 tabular-nums">
-            {d}d {String(h).padStart(2, "0")}h {String(m).padStart(2, "0")}m {String(s).padStart(2, "0")}s
-          </span>
+          {fomo.expired ? (
+            <>
+              <Clock className="inline h-4 w-4 mr-1.5 -mt-0.5" />
+              Tu ventana ha expirado — vuelve y descubre nuevas unidades esta semana
+            </>
+          ) : (
+            <>
+              <Clock className="inline h-4 w-4 mr-1.5 -mt-0.5" />
+              Tu ventana de oportunidad se cierra en{" "}
+              <span className="font-mono font-black ml-1 tabular-nums">
+                {String(fomo.h).padStart(2, "0")}:{String(fomo.m).padStart(2, "0")}:{String(fomo.s).padStart(2, "0")}
+              </span>
+              {" "}— Bloquea ya sin pagar nada
+            </>
+          )}
         </div>
       </section>
 
@@ -312,25 +331,23 @@ export default function LandingPage() {
       </section>
 
       {/* MARCAS */}
-      <section className="py-14 px-6" style={{ background: "#eef2f7" }}>
-        <h2 className="text-center text-3xl font-extrabold tracking-tight">
+      <section className="py-14" style={{ background: "#eef2f7" }}>
+        <h2 className="text-center text-3xl font-extrabold tracking-tight px-6">
           Marcas <em className="not-italic text-[#EE7B22]">disponibles</em>
         </h2>
-        <p className="text-center text-sm text-stone-500 mt-1">Las mejores marcas del mercado pasan por el escaparate</p>
-        <div className="mt-10 max-w-7xl mx-auto bg-white rounded-xl overflow-hidden">
-          <div className="flex items-center gap-16 py-10 px-8 overflow-hidden">
-            <div className="flex items-center gap-16 animate-[scroll_30s_linear_infinite] shrink-0">
-              {[...BRANDS, ...BRANDS].map((b, i) => (
-                <div key={i} className="shrink-0 h-12 flex items-center justify-center min-w-[90px] text-stone-400 hover:text-stone-700 transition-colors" title={b.name}>
-                  <img
-                    src={`https://cdn.simpleicons.org/${b.slug}/9CA3AF`}
-                    alt={b.name}
-                    className="h-9 w-auto opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
-                    loading="lazy"
-                  />
-                </div>
-              ))}
-            </div>
+        <p className="text-center text-sm text-stone-500 mt-1 px-6">Las mejores marcas del mercado pasan por el escaparate</p>
+        <div className="mt-10 bg-white py-10 overflow-hidden w-full">
+          <div className="flex items-center gap-16 w-max animate-[scroll_35s_linear_infinite]">
+            {[...BRANDS, ...BRANDS, ...BRANDS].map((b, i) => (
+              <div key={i} className="shrink-0 h-12 flex items-center justify-center min-w-[90px]" title={b.name}>
+                <img
+                  src={`https://cdn.simpleicons.org/${b.slug}/9CA3AF`}
+                  alt={b.name}
+                  className="h-9 w-auto opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
+                  loading="lazy"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -422,6 +439,13 @@ export default function LandingPage() {
             Pujamos<span className="text-[#EE7B22]">tu</span>coche.es
           </div>
           <p>Concesionario de coches de ocasión · Madrid · <a className="text-[#EE7B22] hover:underline" href="mailto:pujamostucoche@gmail.com">pujamostucoche@gmail.com</a></p>
+          <div className="flex items-center justify-center gap-4 text-xs text-white/40 flex-wrap">
+            <Link href="/privacidad" className="hover:text-white/70 transition-colors">Política de Privacidad</Link>
+            <span>·</span>
+            <Link href="/cookies" className="hover:text-white/70 transition-colors">Política de Cookies</Link>
+            <span>·</span>
+            <Link href="/terminos" className="hover:text-white/70 transition-colors">Aviso Legal y Términos</Link>
+          </div>
           <p className="text-white/40 text-xs">© {new Date().getFullYear()} Pujamostucoche. Todos los derechos reservados.</p>
         </div>
       </footer>
@@ -432,7 +456,7 @@ export default function LandingPage() {
       />
 
       <style>{`
-        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-33.333%); } }
         .font-jakarta { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
       `}</style>
     </div>
