@@ -104,7 +104,7 @@ export default function InboxPage() {
   const [stage, setStage] = useState<string | undefined>(undefined);
   const [search, setSearch] = useState("");
 
-  const { data: leads } = useListLeads(stage ? { stage: stage as never } : undefined);
+  const { data: leads } = useListLeads(stage ? { stage: stage as never } : undefined, { query: { queryKey: getListLeadsQueryKey(stage ? { stage: stage as never } : undefined), refetchInterval: 30_000 } });
 
   const filtered = (leads ?? []).filter((l) =>
     !search || l.name.toLowerCase().includes(search.toLowerCase()) || l.phone.includes(search),
@@ -239,7 +239,7 @@ function EmptyConversation() {
 
 function Conversation({ leadId, onClose }: { leadId: number; onClose: () => void }) {
   const qc = useQueryClient();
-  const { data: lead } = useGetLead(leadId, { query: { enabled: !!leadId, queryKey: getGetLeadQueryKey(leadId) } });
+  const { data: lead } = useGetLead(leadId, { query: { enabled: !!leadId, queryKey: getGetLeadQueryKey(leadId), refetchInterval: 15_000 } });
   const send = useSendLeadMessage();
   const draft = useDraftLeadReply();
   const incoming = useSimulateIncomingMessage();

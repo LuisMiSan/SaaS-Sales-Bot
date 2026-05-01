@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { useListLeads, useUpdateLead } from "@workspace/api-client-react";
+import { useListLeads, useUpdateLead, getListLeadsQueryKey } from "@workspace/api-client-react";
 import { LeadStage, LeadWithCar } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatRelative, formatPrice, stageLabel } from "@/lib/format";
@@ -126,7 +126,7 @@ function LeadCard({ lead }: { lead: LeadWithCar }) {
 /* ─── Pipeline page ─────────────────────────────────────── */
 
 export default function PipelinePage() {
-  const { data: leads = [], isLoading } = useListLeads();
+  const { data: leads = [], isLoading } = useListLeads(undefined, { query: { queryKey: getListLeadsQueryKey(), refetchInterval: 30_000 } });
 
   const byStage = (stage: LeadStage) => leads.filter((l) => l.stage === stage);
 
