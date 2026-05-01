@@ -99,7 +99,7 @@ function LeadCard({ lead }: { lead: LeadWithCar }) {
             type="button"
             onClick={() => setOpen((v) => !v)}
             disabled={isPending}
-            className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded-md bg-secondary hover:bg-accent transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded-md bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
           >
             Mover <ChevronDown className="h-3 w-3" />
           </button>

@@ -142,21 +142,21 @@
   body { @apply bg-background text-foreground antialiased; font-feature-settings: "ss01", "cv11"; }
 }
 
-/* Status colors */
+/* Status colors — readable on both light (default) and dark card backgrounds */
 @layer utilities {
-  .status-open    { @apply bg-emerald-500/15 text-emerald-300 border border-emerald-500/30; }
-  .status-locking { @apply bg-amber-500/15 text-amber-300 border border-amber-500/30; }
-  .status-locked  { @apply bg-rose-500/15 text-rose-300 border border-rose-500/30; }
-  .status-released{ @apply bg-sky-500/15 text-sky-300 border border-sky-500/30; }
-  .status-sold    { @apply bg-zinc-500/15 text-zinc-300 border border-zinc-500/30; }
+  .status-open    { @apply bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30; }
+  .status-locking { @apply bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30; }
+  .status-locked  { @apply bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30; }
+  .status-released{ @apply bg-sky-100 text-sky-700 border border-sky-200 dark:bg-sky-500/20 dark:text-sky-300 dark:border-sky-500/30; }
+  .status-sold    { @apply bg-zinc-100 text-zinc-600 border border-zinc-200 dark:bg-zinc-500/20 dark:text-zinc-300 dark:border-zinc-500/30; }
 
-  .stage-new            { @apply bg-sky-500/15 text-sky-300 border border-sky-500/30; }
-  .stage-awaiting_deposit { @apply bg-amber-500/15 text-amber-300 border border-amber-500/30; }
-  .stage-locked         { @apply bg-rose-500/15 text-rose-300 border border-rose-500/30; }
-  .stage-doubting       { @apply bg-violet-500/15 text-violet-300 border border-violet-500/30; }
-  .stage-released       { @apply bg-sky-500/15 text-sky-300 border border-sky-500/30; }
-  .stage-won            { @apply bg-emerald-500/15 text-emerald-300 border border-emerald-500/30; }
-  .stage-lost           { @apply bg-zinc-500/15 text-zinc-400 border border-zinc-500/30; }
+  .stage-new            { @apply bg-sky-100 text-sky-700 border border-sky-200 dark:bg-sky-500/20 dark:text-sky-300 dark:border-sky-500/30; }
+  .stage-awaiting_deposit { @apply bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30; }
+  .stage-locked         { @apply bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30; }
+  .stage-doubting       { @apply bg-violet-100 text-violet-700 border border-violet-200 dark:bg-violet-500/20 dark:text-violet-300 dark:border-violet-500/30; }
+  .stage-released       { @apply bg-sky-100 text-sky-700 border border-sky-200 dark:bg-sky-500/20 dark:text-sky-300 dark:border-sky-500/30; }
+  .stage-won            { @apply bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30; }
+  .stage-lost           { @apply bg-zinc-100 text-zinc-500 border border-zinc-200 dark:bg-zinc-500/20 dark:text-zinc-400 dark:border-zinc-500/30; }
 }
 
 .bg-grid {
