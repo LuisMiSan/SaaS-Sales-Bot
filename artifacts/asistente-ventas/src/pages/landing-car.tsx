@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useRoute } from "wouter";
+import { Link, useParams } from "wouter";
 import { useGetCar, useCreateLead, useListCars, getGetCarQueryKey } from "@workspace/api-client-react";
 import type { PublicCar } from "@workspace/api-client-react";
 import {
@@ -31,7 +31,7 @@ import {
 import { CarThumb } from "@/components/car-thumb";
 import { WhatsappWidget } from "@/components/whatsapp-widget";
 import { CustomerChat } from "@/components/customer-chat";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, sanitizePhotoUrl } from "@/lib/format";
 
 type StoredLead = { leadId: number; publicToken: string; name: string; phone: string };
 
@@ -66,7 +66,7 @@ function saveStoredLead(carId: number, value: StoredLead) {
 }
 
 function Gallery({ car }: { car: PublicCar }) {
-  const photos = car.photos?.length ? car.photos : car.imageUrl ? [car.imageUrl] : [];
+  const photos = (car.photos?.length ? car.photos : car.imageUrl ? [car.imageUrl] : []).map(sanitizePhotoUrl);
   const [idx, setIdx] = useState(0);
 
   if (photos.length === 0) {
@@ -117,8 +117,8 @@ function Gallery({ car }: { car: PublicCar }) {
 }
 
 export default function LandingCarPage() {
-  const [, params] = useRoute("/tienda/coche/:id");
-  const id = params ? Number(params.id) : 0;
+  const params = useParams<{ id: string }>();
+  const id = params.id ? Number(params.id) : 0;
   const { data: car } = useGetCar(id, { query: { enabled: !!id, queryKey: getGetCarQueryKey(id) } });
   const { data: allCars } = useListCars();
   const create = useCreateLead();

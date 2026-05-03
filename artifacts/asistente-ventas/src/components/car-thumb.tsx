@@ -1,6 +1,8 @@
 import { Car as CarIcon } from "lucide-react";
+import { sanitizePhotoUrl } from "@/lib/format";
 
 function resolveImage(url: string): string {
+  url = sanitizePhotoUrl(url);
   if (/^(?:https?:)?\/\//i.test(url) || url.startsWith("data:")) return url;
   const base = import.meta.env.BASE_URL || "/";
   const trimmed = url.startsWith("/") ? url.slice(1) : url;

@@ -266,8 +266,15 @@ function extractPhotos(html: string, baseUrl: string): string[] {
     src = src.trim();
     if (!src || src.startsWith("data:")) return;
     try {
-      const abs = new URL(src, baseUrl).href;
+      let abs = new URL(src, baseUrl).href;
       if (!abs.startsWith("http")) return;
+      // Unwrap Next.js /_next/image proxy URLs — they block cross-origin requests.
+      // Extract the real image URL from the `url` query param.
+      const parsed = new URL(abs);
+      if (parsed.pathname === "/_next/image") {
+        const inner = parsed.searchParams.get("url");
+        if (inner) abs = inner.startsWith("http") ? inner : new URL(inner, abs).href;
+      }
       if (seen.has(abs)) return;
       seen.add(abs);
       photos.push(abs);

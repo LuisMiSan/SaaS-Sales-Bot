@@ -78,3 +78,19 @@ export function intentLabel(intent: string): string {
 export function initials(name: string) {
   return name.split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase();
 }
+
+/**
+ * Unwrap Next.js /_next/image proxy URLs so images load cross-origin.
+ * e.g. https://site.com/_next/image?url=https%3A%2F%2Fcdn.com%2Fphoto.jpg&w=3840&q=75
+ *   → https://cdn.com/photo.jpg
+ */
+export function sanitizePhotoUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    if (parsed.pathname === "/_next/image") {
+      const inner = parsed.searchParams.get("url");
+      if (inner) return inner.startsWith("http") ? inner : new URL(inner, url).href;
+    }
+  } catch { /* return original */ }
+  return url;
+}
