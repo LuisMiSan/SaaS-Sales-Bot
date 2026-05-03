@@ -5,6 +5,7 @@ import leadsRouter from "./leads";
 import dashboardRouter from "./dashboard";
 import whatsappRouter from "./whatsapp";
 import settingsRouter from "./settings";
+import adminRouter from "./admin";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(leadsRouter);
 router.use(dashboardRouter);
 router.use(whatsappRouter);
 router.use(settingsRouter);
+router.use(adminRouter);
 
 export default router;
