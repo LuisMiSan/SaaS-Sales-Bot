@@ -137,6 +137,15 @@ export default function LandingCarPage() {
     if (id) setStored(loadStoredLead(id));
   }, [id]);
 
+  // Clear stored lead if the car is no longer locked — the conversation cycle is over.
+  useEffect(() => {
+    if (!car || !stored) return;
+    if (car.status !== "locked") {
+      try { window.localStorage.removeItem(`pujamostucoche.lead.${car.id}`); } catch { /* noop */ }
+      setStored(null);
+    }
+  }, [car?.status, car?.id]);
+
   if (!car) {
     return <div className="min-h-screen bg-[#f5f7fa] flex items-center justify-center text-stone-500 font-jakarta">Cargando ficha…</div>;
   }
