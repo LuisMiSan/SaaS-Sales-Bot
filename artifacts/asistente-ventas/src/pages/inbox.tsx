@@ -97,7 +97,7 @@ const STAGE_FILTERS = [
 ];
 
 export default function InboxPage() {
-  const [, params] = useRoute("/inbox/:id");
+  const [, params] = useRoute("/staff/inbox/:id");
   const selectedId = params ? Number(params.id) : null;
   const [, navigate] = useLocation();
 
@@ -155,7 +155,7 @@ export default function InboxPage() {
             const isSelected = lead.id === selectedId;
             const target = lead.car.status === "locked" ? lead.car.lockedUntil : null;
             return (
-              <Link key={lead.id} href={`/inbox/${lead.id}`}>
+              <Link key={lead.id} href={`/staff/inbox/${lead.id}`}>
                 <div
                   className={cn(
                     "px-4 py-3 border-b border-border/60 cursor-pointer transition-colors",
@@ -348,7 +348,7 @@ function Conversation({ leadId, onClose }: { leadId: number; onClose: () => void
       {/* Pinned car card — compact */}
       <div className="px-3 sm:px-5 pt-3">
         <Link
-          href={`/cars/${car.id}`}
+          href={`/staff/cars/${car.id}`}
           className="flex items-center gap-3 px-3 py-2 rounded-md bg-secondary/40 border border-border hover:bg-secondary/70 transition-colors"
         >
           <CarThumb make={car.make} model={car.model} imageUrl={car.imageUrl} className="h-10 w-14 rounded shrink-0" />
