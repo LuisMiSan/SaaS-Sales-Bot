@@ -21,7 +21,7 @@ import {
   Star,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
-import { WhatsappWidget, buildWhatsappUrl } from "@/components/whatsapp-widget";
+import { WhatsappWidget, buildWhatsappUrl, useWhatsappNumber } from "@/components/whatsapp-widget";
 import { BodyTypePicker, BrandPicker, inferBodyType } from "@/components/car-pickers";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -67,6 +67,7 @@ export default function LandingPage() {
   const [bodyFilter, setBodyFilter] = useState<string | undefined>(undefined);
   const [brandFilter, setBrandFilter] = useState<string | undefined>(undefined);
   const [menuOpen, setMenuOpen] = useState(false);
+  const waNumber = useWhatsappNumber();
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -158,9 +159,21 @@ export default function LandingPage() {
             <p className="mt-5 text-lg text-white/70">
               Miércoles a sábado. Bloqueas la unidad 2 horas sin pagar nada. Ningún precio sube. Lo que pierdes es la oportunidad.
             </p>
-            <a href="#catalogo" className="mt-8 inline-flex items-center gap-2 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold px-7 py-3.5 rounded-md transition-colors">
-              Ver ofertas Flash <ArrowRight className="h-4 w-4" />
-            </a>
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a href="#catalogo" className="inline-flex items-center gap-2 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold px-7 py-3.5 rounded-md transition-colors">
+                Ver ofertas Flash <ArrowRight className="h-4 w-4" />
+              </a>
+              {buildWhatsappUrl(waNumber, "Hola, me gustaría recibir información sobre vuestro outlet de coches de oportunidad.") && (
+                <a
+                  href={buildWhatsappUrl(waNumber, "Hola, me gustaría recibir información sobre vuestro outlet de coches de oportunidad.") ?? "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1FBA57] text-white font-extrabold px-7 py-3.5 rounded-md transition-colors"
+                >
+                  <MessageSquare className="h-4 w-4" /> Habla con nosotros
+                </a>
+              )}
+            </div>
           </div>
         </div>
 
@@ -353,16 +366,8 @@ export default function LandingPage() {
             icon={MessageSquare}
             title="Habla por WhatsApp"
             desc="Te respondemos en minutos"
-            href={
-              buildWhatsappUrl(
-                "Hola, vengo del outlet de Pujamostucoche.es y me gustaría que me ayudéis a encontrar coche.",
-              ) ?? "#proceso"
-            }
-            external={Boolean(
-              buildWhatsappUrl(
-                "Hola, vengo del outlet de Pujamostucoche.es y me gustaría que me ayudéis a encontrar coche.",
-              ),
-            )}
+            href={buildWhatsappUrl(waNumber, "Hola, vengo del outlet de Pujamostucoche.es y me gustaría que me ayudéis a encontrar coche.") ?? "#proceso"}
+            external={Boolean(buildWhatsappUrl(waNumber, "Hola, vengo del outlet de Pujamostucoche.es y me gustaría que me ayudéis a encontrar coche."))}
           />
           <QuickAction icon={CreditCard} title="Financiación" desc="Planes a tu medida" href="#sobre-nosotros" />
         </div>
@@ -503,7 +508,7 @@ export default function LandingPage() {
             </a>
 
             <a
-              href={buildWhatsappUrl("Hola, vengo de Pujamostucoche.es y me gustaría más información.") ?? "#"}
+              href={buildWhatsappUrl(waNumber, "Hola, vengo de Pujamostucoche.es y me gustaría más información.") ?? "#"}
               target="_blank"
               rel="noopener noreferrer"
               className="group bg-stone-50 hover:bg-[#0A3D6E] hover:text-white border border-stone-200 rounded-2xl p-8 text-center transition-colors"

@@ -1,15 +1,23 @@
 import { MessageCircle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
-const RAW_NUMBER = import.meta.env.VITE_WHATSAPP_PUBLIC_NUMBER as string | undefined;
+const BASE = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "");
 
-export function getWhatsappNumber(): string | null {
-  if (!RAW_NUMBER) return null;
-  const cleaned = RAW_NUMBER.replace(/[^\d]/g, "");
-  return cleaned.length >= 9 ? cleaned : null;
+export function useWhatsappNumber(): string | null {
+  const { data } = useQuery<string | null>({
+    queryKey: ["public-config"],
+    queryFn: async () => {
+      const r = await fetch(`${BASE}/api/config`);
+      if (!r.ok) return null;
+      const d = (await r.json()) as { whatsappNumber?: string | null };
+      return d.whatsappNumber ?? null;
+    },
+    staleTime: 5 * 60_000,
+  });
+  return data ?? null;
 }
 
-export function buildWhatsappUrl(message: string): string | null {
-  const number = getWhatsappNumber();
+export function buildWhatsappUrl(number: string | null | undefined, message: string): string | null {
   if (!number) return null;
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
@@ -20,7 +28,8 @@ interface WhatsappWidgetProps {
 }
 
 export function WhatsappWidget({ message, label = "Chatea por WhatsApp" }: WhatsappWidgetProps) {
-  const href = buildWhatsappUrl(message);
+  const number = useWhatsappNumber();
+  const href = buildWhatsappUrl(number, message);
   if (!href) return null;
 
   return (

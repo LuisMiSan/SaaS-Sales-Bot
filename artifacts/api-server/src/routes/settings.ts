@@ -6,6 +6,14 @@ import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
 
+router.get("/config", async (req, res): Promise<void> => {
+  const rows = await db.select().from(settingsTable).where(eq(settingsTable.key, "whatsapp_number"));
+  const raw = rows[0]?.value ?? "";
+  const cleaned = raw.replace(/[^\d]/g, "");
+  const whatsappNumber = cleaned.length >= 9 ? cleaned : null;
+  res.json({ whatsappNumber });
+});
+
 router.get("/settings", requireStaffAuth, async (req, res): Promise<void> => {
   const rows = await db.select().from(settingsTable);
   const obj: Record<string, string> = {};

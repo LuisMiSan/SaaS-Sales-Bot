@@ -29,7 +29,7 @@ import {
   PlayCircle,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
-import { WhatsappWidget } from "@/components/whatsapp-widget";
+import { WhatsappWidget, buildWhatsappUrl, useWhatsappNumber } from "@/components/whatsapp-widget";
 import { CustomerChat } from "@/components/customer-chat";
 import { formatPrice, sanitizePhotoUrl } from "@/lib/format";
 
@@ -122,6 +122,7 @@ export default function LandingCarPage() {
   const { data: car } = useGetCar(id, { query: { enabled: !!id, queryKey: getGetCarQueryKey(id) } });
   const { data: allCars } = useListCars();
   const create = useCreateLead();
+  const waNumber = useWhatsappNumber();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -446,6 +447,19 @@ export default function LandingCarPage() {
                         <ShieldCheck className="h-3.5 w-3.5 text-[#27AE60]" /> Sin pagos · Cancelas cuando quieras
                       </div>
                     </form>
+                  )}
+                  {!stored && buildWhatsappUrl(waNumber, `Hola, me interesa el ${car.make} ${car.model} ${car.year} que vi en vuestro outlet. ¿Podéis darme información?`) && (
+                    <div className="mt-4 pt-4 border-t border-stone-100 text-center">
+                      <p className="text-xs text-stone-400 mb-2.5">¿Prefieres hablar directamente?</p>
+                      <a
+                        href={buildWhatsappUrl(waNumber, `Hola, me interesa el ${car.make} ${car.model} ${car.year} que vi en vuestro outlet. ¿Podéis darme información?`) ?? "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex w-full items-center justify-center gap-2 py-3 rounded-lg bg-[#25D366] hover:bg-[#1FBA57] text-white font-extrabold text-sm transition-colors"
+                      >
+                        <MessageSquare className="h-4 w-4" /> Preguntar por WhatsApp
+                      </a>
+                    </div>
                   )}
                 </div>
 
