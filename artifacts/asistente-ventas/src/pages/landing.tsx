@@ -15,6 +15,10 @@ import {
   Mail,
   MapPin,
   Phone,
+  ShieldCheck,
+  Award,
+  Users,
+  Star,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
 import { WhatsappWidget, buildWhatsappUrl } from "@/components/whatsapp-widget";
@@ -407,11 +411,68 @@ export default function LandingPage() {
             <Step n={3} icon={CheckCircle2} title="Cierras la compra" body="Tienes 2h para cerrar (visita, financiación o transferencia). Si no cierras, vuelve al escaparate como liberada." />
           </div>
 
-          <div id="sobre-nosotros" className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-white/10 pt-12">
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-white/10 pt-12">
             <Stat n="14 días" l="Garantía mecánica" />
             <Stat n="+1.200" l="Coches vendidos" />
             <Stat n="4,8/5" l="Reseñas Google" />
             <Stat n="0€" l="Comisiones ocultas" />
+          </div>
+        </div>
+      </section>
+
+      {/* SOBRE NOSOTROS */}
+      <section id="sobre-nosotros" className="bg-[#f5f7fa] py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <div className="inline-block px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-[#EE7B22] border border-[#EE7B22]/40 bg-[#EE7B22]/15 mb-4">
+              Sobre nosotros
+            </div>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-[#0A3D6E] tracking-tight">
+              Un concesionario <em className="not-italic text-[#EE7B22]">diferente</em>
+            </h2>
+            <p className="mt-4 text-stone-600 max-w-2xl mx-auto text-lg leading-relaxed">
+              {/* COPY PROVISIONAL — sustituir cuando tengáis los textos reales */}
+              Nacimos para acabar con la sensación de que comprar un coche de ocasión es complicado y poco transparente. Cada semana seleccionamos unidades de alta rotación, las ponemos a precio de outlet y os damos 2 horas para decidir sin presión.
+            </p>
+          </div>
+
+          {/* VALORES */}
+          <div className="grid md:grid-cols-3 gap-6 mb-16">
+            <ValueCard
+              icon={ShieldCheck}
+              title="Transparencia total"
+              body="Precio fijo, sin sorpresas ni cargos ocultos. Lo que ves en pantalla es lo que pagas."
+            />
+            <ValueCard
+              icon={Award}
+              title="Selección rigurosa"
+              body="Cada vehículo pasa por nuestra revisión antes de entrar al escaparate. Solo coches que nosotros mismos compraríamos."
+            />
+            <ValueCard
+              icon={Users}
+              title="Trato personal"
+              body="Un comercial real te atiende por WhatsApp. Sin bots, sin centralitas, sin esperas interminables."
+            />
+          </div>
+
+          {/* BLOQUE MISIÓN — fondo navy */}
+          <div
+            className="rounded-2xl px-8 py-12 md:px-14 md:py-14 text-white flex flex-col md:flex-row items-center gap-8"
+            style={{ background: "linear-gradient(135deg,#0E4F8E 0%,#0A3D6E 100%)" }}
+          >
+            <div className="flex-shrink-0 h-16 w-16 rounded-full bg-[#EE7B22]/20 flex items-center justify-center text-[#EE7B22]">
+              <Star className="h-8 w-8" />
+            </div>
+            <div>
+              <p className="text-xl md:text-2xl font-extrabold leading-snug">
+                {/* COPY PROVISIONAL */}
+                "Queremos que el día que compres tu coche recuerdes que fue fácil, justo y sin estrés."
+              </p>
+              <p className="mt-3 text-white/60 text-sm">
+                {/* NOMBRE / CARGO PROVISIONAL */}
+                Equipo Pujamostucoche · Madrid
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -552,6 +613,18 @@ function Step({ n, icon: Icon, title, body }: { n: number; icon: React.ElementTy
       </div>
       <h3 className="mt-4 text-xl font-extrabold">{title}</h3>
       <p className="mt-2 text-sm text-white/60 leading-relaxed">{body}</p>
+    </div>
+  );
+}
+
+function ValueCard({ icon: Icon, title, body }: { icon: React.ElementType; title: string; body: string }) {
+  return (
+    <div className="bg-white border border-stone-200 rounded-2xl p-8 flex flex-col gap-4 hover:shadow-lg hover:-translate-y-1 transition-all">
+      <div className="h-12 w-12 rounded-xl bg-[#EE7B22]/10 text-[#EE7B22] flex items-center justify-center">
+        <Icon className="h-6 w-6" />
+      </div>
+      <h3 className="text-lg font-extrabold text-[#0A3D6E]">{title}</h3>
+      <p className="text-sm text-stone-500 leading-relaxed">{body}</p>
     </div>
   );
 }
