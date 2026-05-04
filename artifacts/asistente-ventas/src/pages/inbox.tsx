@@ -212,7 +212,7 @@ export default function InboxPage() {
         )}
       >
         {selectedId ? (
-          <Conversation key={selectedId} leadId={selectedId} onClose={() => navigate("/inbox")} />
+          <Conversation key={selectedId} leadId={selectedId} onClose={() => navigate("/staff/inbox")} />
         ) : (
           <EmptyConversation />
         )}

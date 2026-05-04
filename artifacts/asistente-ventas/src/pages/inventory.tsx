@@ -59,7 +59,7 @@ export default function InventoryPage() {
             const target = car.status === "locked" ? car.lockedUntil : car.availableUntil;
             const variant = car.status === "locked" ? "lock" : "open";
             return (
-              <Link key={car.id} href={`/cars/${car.id}`}>
+              <Link key={car.id} href={`/staff/cars/${car.id}`}>
                 <Card className="overflow-hidden bg-card border-border hover:border-primary/40 transition-colors cursor-pointer group">
                   <div className="relative">
                     <CarThumb make={car.make} model={car.model} imageUrl={car.imageUrl} photos={car.photos} className="h-40 w-full" />

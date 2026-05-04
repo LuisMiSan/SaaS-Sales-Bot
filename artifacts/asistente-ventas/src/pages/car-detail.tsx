@@ -316,7 +316,7 @@ function SpecRow({ label, value }: { label: string; value: string | null | undef
 }
 
 export default function CarDetailPage() {
-  const [, params] = useRoute("/cars/:id");
+  const [, params] = useRoute("/staff/cars/:id");
   const id = params ? Number(params.id) : 0;
   const qc = useQueryClient();
   const [, navigate] = useLocation();
@@ -432,7 +432,7 @@ export default function CarDetailPage() {
                             {
                               onSuccess: () => {
                                 qc.invalidateQueries({ queryKey: getListCarsStaffQueryKey() });
-                                navigate("/inventory");
+                                navigate("/staff/inventory");
                               },
                             },
                           );
@@ -530,7 +530,7 @@ export default function CarDetailPage() {
           </div>
           <div className="grid md:grid-cols-2 gap-3">
             {carLeads.map((l) => (
-              <Link key={l.id} href={`/inbox/${l.id}`}>
+              <Link key={l.id} href={`/staff/inbox/${l.id}`}>
                 <Card className="p-4 bg-card border-border hover:border-primary/40 cursor-pointer">
                   <div className="flex items-start justify-between gap-2">
                     <div>
