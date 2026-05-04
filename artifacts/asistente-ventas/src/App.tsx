@@ -12,6 +12,7 @@ import InventoryPage from "@/pages/inventory";
 import CarDetailPage from "@/pages/car-detail";
 import PipelinePage from "@/pages/pipeline";
 import SettingsPage from "@/pages/settings";
+import ManualesPage from "@/pages/manuales";
 import LandingPage from "@/pages/landing";
 import LandingCarPage from "@/pages/landing-car";
 import PrivacyPage from "@/pages/legal-privacy";
@@ -51,6 +52,7 @@ function CockpitRouter() {
         <Route path="/staff/inventory" component={InventoryPage} />
         <Route path="/staff/cars/:id" component={CarDetailPage} />
         <Route path="/staff/settings" component={SettingsPage} />
+        <Route path="/staff/manuales" component={ManualesPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
