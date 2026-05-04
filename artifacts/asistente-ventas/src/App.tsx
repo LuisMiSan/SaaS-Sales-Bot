@@ -24,7 +24,12 @@ import { CookieConsent } from "@/components/cookie-consent";
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { staleTime: 5_000, refetchOnWindowFocus: false },
+    queries: {
+      staleTime: 30_000,
+      refetchOnWindowFocus: false,
+      retry: 4,
+      retryDelay: (attempt) => Math.min(1_000 * 2 ** attempt, 15_000),
+    },
   },
 });
 

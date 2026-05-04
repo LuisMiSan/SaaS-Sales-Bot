@@ -59,7 +59,7 @@ function useFomoTimer() {
 }
 
 export default function LandingPage() {
-  const { data: allCars } = useListCars();
+  const { data: allCars, isLoading: carsLoading, isError: carsError, refetch: refetchCars } = useListCars();
   const [bodyFilter, setBodyFilter] = useState<string | undefined>(undefined);
   const [brandFilter, setBrandFilter] = useState<string | undefined>(undefined);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -211,7 +211,41 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {cars.length === 0 ? (
+          {carsLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="bg-white border border-stone-200 rounded-xl overflow-hidden animate-pulse">
+                  <div className="h-44 bg-stone-200" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-3 w-16 bg-stone-200 rounded" />
+                    <div className="h-4 w-28 bg-stone-200 rounded" />
+                    <div className="flex gap-1.5 mt-2">
+                      <div className="h-5 w-10 bg-stone-100 rounded" />
+                      <div className="h-5 w-14 bg-stone-100 rounded" />
+                      <div className="h-5 w-16 bg-stone-100 rounded" />
+                    </div>
+                    <div className="h-7 w-24 bg-stone-200 rounded mt-2" />
+                    <div className="h-9 w-full bg-stone-100 rounded-lg mt-3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : carsError ? (
+            <div className="border-2 border-dashed border-stone-200 rounded-xl py-14 px-6 text-center">
+              <CarIcon className="h-10 w-10 mx-auto text-stone-300" />
+              <p className="mt-3 text-sm font-semibold text-stone-700">
+                No se han podido cargar los coches en este momento.
+              </p>
+              <p className="text-xs text-stone-500 mt-1">Comprueba tu conexión o inténtalo de nuevo.</p>
+              <button
+                type="button"
+                onClick={() => void refetchCars()}
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#EE7B22] hover:bg-[#C4621A] text-white text-xs font-extrabold transition-colors"
+              >
+                Volver a intentarlo
+              </button>
+            </div>
+          ) : cars.length === 0 ? (
             <div className="border-2 border-dashed border-stone-200 rounded-xl py-12 px-6 text-center">
               <CarIcon className="h-10 w-10 mx-auto text-stone-300" />
               <p className="mt-3 text-sm font-semibold text-stone-700">
