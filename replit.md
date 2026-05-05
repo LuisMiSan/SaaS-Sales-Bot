@@ -7,13 +7,10 @@ Cockpit comercial para concesionario de coches de ocasión. El equipo gestiona d
 - Es **gratuita y sin compromiso**: no se pide señal, fianza, depósito, transferencia ni Bizum para reservar. La columna `cars.depositCents` se mantiene en BD como referencia interna pero NO aparece en la web pública (`/tienda`, `/tienda/coche/:id`) ni en los prompts de la IA (`artifacts/api-server/src/lib/draft.ts`).
 - En el cockpit (dashboard, inbox, car-detail) sí se sigue mostrando para uso interno del comercial.
 
-## Web pública "Pujamostucoche.es" (`/tienda` y `/tienda/coche/:id`)
-- Orden de secciones del landing: Hero+Countdown → Outlet de la semana (selectores de carrocería + marca arriba, después catálogo de hasta 15 coches) → Quick actions → Marcas → Cómo funciona (3 pasos, 2h) → Sobre nosotros → Footer.
-- Selectores horizontales `BodyTypePicker` y `BrandPicker` (`src/components/car-pickers.tsx`): scroll snap + flechas (md+), tarjetas con `aria-pressed` para toggle. Carrocería se infiere por regex del make+model (`inferBodyType`, sin campo en BD). Marca filtra por `car.make` case-insensitive. Filtros se componen con la atractividad existente. Estado vacío con CTA "Quitar todos los filtros" si la combinación no devuelve coches.
-  - Carrocerías: 8 fotografías PNG en `public/body-types/` (480 px de ancho, ~170 KB cada una, coches azul oscuro sobre fondo gris claro de estudio). Ruta construida con `import.meta.env.BASE_URL`.
-  - Marcas en el picker (10, mid-low only): Seat, Volkswagen, Renault, Peugeot, Citroën, Ford, Toyota, Hyundai, Kia, Dacia. **No** se exponen Audi/BMW/Mercedes en la web pública (es un outlet). La marquesina inferior `BRANDS` en `landing.tsx` mantiene la misma política y añade Opel/Fiat.
-- Per-car: caja "Cómo funciona el bloqueo" rediseñada en 3 columnas horizontales (`LockStep`): Bloquéalo gratis · Te escribimos por WhatsApp · Tienes 2h para cerrar.
-- Widget WhatsApp flotante (`src/components/whatsapp-widget.tsx`): fijo abajo a la derecha. Lee `VITE_WHATSAPP_PUBLIC_NUMBER` (var de entorno expuesta a Vite) y se oculta si está vacío o inválido. Mensaje genérico en `/tienda`, mensaje pre-rellenado por coche en `/tienda/coche/:id`.
+## Web pública "Pujamostucoche.es" (`/` y `/coche/:id`)
+- Orden de secciones del landing (rediseño oscuro mayo 2026): Hero oscuro → ¿Sabes lo que...? → Comparativa Nosotros vs. Ellos → Ejemplo real con primer coche disponible → Modo IKEA → Misión → Cómo funciona (3 pasos) → Catálogo coches en sección oscura (hasta 15 unidades) → Footer CTA → Footer legal.
+- Paleta: fondo muy oscuro `#070711`, acento naranja `#EE7B22`, tarjetas de coches sobre `#0E1A2E`.
+- Widget WhatsApp (`src/components/whatsapp-widget.tsx`): lee el número de BD vía `/api/config` (hook `useWhatsappNumber`). Número configurable en panel staff → Ajustes sin redesplegar. Número actual: `34604928624`. Botones inline en hero + ficha de coche (`landing-car.tsx`).
 
 ## Stack
 - Monorepo pnpm (`pnpm-workspace`).

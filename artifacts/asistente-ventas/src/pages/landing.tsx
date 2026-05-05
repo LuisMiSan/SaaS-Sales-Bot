@@ -2,456 +2,321 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { useListCars } from "@workspace/api-client-react";
 import {
-  CreditCard,
-  Clock,
   ArrowRight,
   Lock,
-  Eye,
   MessageSquare,
   CheckCircle2,
   Car as CarIcon,
   Menu,
   X,
-  Mail,
-  MapPin,
-  Phone,
   ShieldCheck,
-  Award,
   Users,
   Star,
+  ChevronRight,
+  TrendingDown,
+  Search,
+  Award,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
 import { WhatsappWidget, buildWhatsappUrl, useWhatsappNumber } from "@/components/whatsapp-widget";
-import { BodyTypePicker, BrandPicker, inferBodyType } from "@/components/car-pickers";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const MAX_CARS_SHOWN = 15;
 
-const FOMO_DURATION_MS = 120 * 60 * 1000;
-
-function useFomoTimer() {
-  const [remaining, setRemaining] = useState(() => {
-    try {
-      const stored = sessionStorage.getItem("fomo_start");
-      const start = stored ? Number(stored) : Date.now();
-      if (!stored) sessionStorage.setItem("fomo_start", String(Date.now()));
-      return Math.max(0, FOMO_DURATION_MS - (Date.now() - start));
-    } catch {
-      return FOMO_DURATION_MS;
-    }
-  });
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      try {
-        const stored = sessionStorage.getItem("fomo_start");
-        const start = stored ? Number(stored) : Date.now();
-        setRemaining(Math.max(0, FOMO_DURATION_MS - (Date.now() - start)));
-      } catch {
-        setRemaining((r) => Math.max(0, r - 1000));
-      }
-    }, 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  const total = Math.floor(remaining / 1000);
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = total % 60;
-  return { h, m, s, expired: remaining === 0 };
-}
+const COMPARE_ROWS = [
+  ["Precio de compra", "Precio oficial (+15-25%)", "Precio mayorista real"],
+  ["Transparencia de costes", "Limitada", "Total, sin letra pequeña"],
+  ["Comisiones ocultas", "Frecuentes", "Nunca"],
+  ["Acceso a subastas privadas", "Sin acceso", "Acceso directo"],
+  ["Trámites de transferencia", "Coste extra", "Siempre incluidos"],
+  ["Presión de venta", "Habitual", "Ninguna"],
+  ["Revisión previa del vehículo", "No siempre", "Siempre"],
+];
 
 export default function LandingPage() {
   const { data: allCars, isLoading: carsLoading, isError: carsError, refetch: refetchCars } = useListCars();
-  const [bodyFilter, setBodyFilter] = useState<string | undefined>(undefined);
-  const [brandFilter, setBrandFilter] = useState<string | undefined>(undefined);
   const [menuOpen, setMenuOpen] = useState(false);
   const waNumber = useWhatsappNumber();
 
   useEffect(() => {
     if (!menuOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenuOpen(false);
-    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMenuOpen(false); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [menuOpen]);
-  const cars = useMemo(() => {
-    let open = allCars ?? [];
-    if (bodyFilter) open = open.filter((c) => inferBodyType(c.make, c.model) === bodyFilter);
-    if (brandFilter) open = open.filter((c) => c.make.toLowerCase() === brandFilter.toLowerCase());
-    return open.slice(0, MAX_CARS_SHOWN);
-  }, [allCars, bodyFilter, brandFilter]);
 
-  const onPickBody = (value: string | undefined) => {
-    setBodyFilter(value);
-    if (value && typeof window !== "undefined") {
-      requestAnimationFrame(() => {
-        document.getElementById("catalogo-grid")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
-  };
+  const cars = useMemo(() => (allCars ?? []).slice(0, MAX_CARS_SHOWN), [allCars]);
 
-  const onPickBrand = (value: string | undefined) => {
-    setBrandFilter(value);
-    if (value && typeof window !== "undefined") {
-      requestAnimationFrame(() => {
-        document.getElementById("catalogo-grid")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
-  };
+  const featuredCar = useMemo(
+    () => (allCars ?? []).find((c) => c.status === "open") ?? allCars?.[0],
+    [allCars],
+  );
 
-  const fomo = useFomoTimer();
+  useEffect(() => { document.documentElement.classList.remove("dark"); }, []);
 
-  useEffect(() => {
-    document.documentElement.classList.remove("dark");
-  }, []);
+  const waHeroUrl = buildWhatsappUrl(waNumber, "Hola, me gustaría consultar los coches disponibles hoy en Pujamostucoche.es.");
 
   return (
-    <div className="bg-[#f5f7fa] text-[#222] font-jakarta min-h-screen">
+    <div className="bg-white text-[#0A0A1A] font-jakarta min-h-screen">
+
       {/* HEADER */}
-      <header className="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
+      <header className="fixed top-0 inset-x-0 z-50 bg-[#070711]/95 backdrop-blur border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between gap-3">
-          <Link href="/" className="text-base sm:text-xl font-extrabold tracking-tight whitespace-nowrap">
+          <Link href="/" className="text-base sm:text-xl font-extrabold tracking-tight whitespace-nowrap text-white">
             Pujamos<span className="text-[#EE7B22]">tu</span>coche.es
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-stone-600">
-            <a href="#catalogo" className="hover:text-[#EE7B22]">Ver coches</a>
-            <a href="#proceso" className="hover:text-[#EE7B22]">Cómo funciona</a>
-            <a href="#sobre-nosotros" className="hover:text-[#EE7B22]">Sobre nosotros</a>
-            <a href="#contacto" className="hover:text-[#EE7B22]">Contacto</a>
+          <nav className="hidden md:flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-white/60">
+            <a href="#catalogo" className="hover:text-[#EE7B22] transition-colors">Ver coches</a>
+            <a href="#como-funciona" className="hover:text-[#EE7B22] transition-colors">Cómo funciona</a>
+            <a href="#nosotros" className="hover:text-[#EE7B22] transition-colors">Nosotros</a>
+            <a href="#catalogo" className="ml-2 px-4 py-2 rounded-md bg-[#EE7B22] hover:bg-[#C4621A] text-white transition-colors">
+              Ver coches
+            </a>
           </nav>
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
-            className="md:hidden h-9 w-9 -mr-1 inline-flex items-center justify-center rounded-md text-stone-700 hover:bg-stone-100"
+            className="md:hidden h-9 w-9 -mr-1 inline-flex items-center justify-center rounded-md text-white/70 hover:bg-white/10"
             aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
         {menuOpen && (
-          <div className="md:hidden border-t border-stone-200 bg-white">
-            <nav className="px-4 py-3 flex flex-col gap-1 text-sm font-semibold text-stone-700">
-              <a href="#catalogo" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 rounded-md hover:bg-stone-100">Ver coches</a>
-              <a href="#proceso" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 rounded-md hover:bg-stone-100">Cómo funciona</a>
-              <a href="#sobre-nosotros" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 rounded-md hover:bg-stone-100">Sobre nosotros</a>
+          <div className="md:hidden border-t border-white/10 bg-[#070711]">
+            <nav className="px-4 py-3 flex flex-col gap-1 text-sm font-semibold text-white/70">
+              <a href="#catalogo" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 rounded-md hover:bg-white/5 hover:text-white">Ver coches</a>
+              <a href="#como-funciona" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 rounded-md hover:bg-white/5 hover:text-white">Cómo funciona</a>
+              <a href="#nosotros" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 rounded-md hover:bg-white/5 hover:text-white">Nosotros</a>
             </nav>
           </div>
         )}
       </header>
 
       {/* HERO */}
-      <section className="pt-20">
-        <div
-          className="relative overflow-hidden text-center px-6 py-24 md:py-32"
-          style={{ background: "linear-gradient(135deg,#0E4F8E 0%,#15558A 100%)" }}
-        >
-          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 50%,rgba(212,165,116,0.18) 0%,transparent 70%)" }} />
-          <div className="relative max-w-3xl mx-auto">
-            <div className="inline-block px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-[#EE7B22] border border-[#EE7B22]/40 bg-[#EE7B22]/15 mb-5">
-              Ofertas Flash Outlet
+      <section className="pt-16 bg-[#070711] text-white">
+        <div className="relative overflow-hidden px-6 py-28 md:py-40 text-center">
+          <div
+            className="absolute inset-0 opacity-[0.025]"
+            style={{
+              backgroundImage: `repeating-linear-gradient(0deg,transparent,transparent 79px,rgba(255,255,255,1) 80px),repeating-linear-gradient(90deg,transparent,transparent 79px,rgba(255,255,255,1) 80px)`,
+            }}
+          />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: "radial-gradient(ellipse at 50% 60%,rgba(238,123,34,0.10) 0%,transparent 65%)" }}
+          />
+          <div className="relative max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-[#EE7B22] border border-[#EE7B22]/30 bg-[#EE7B22]/10 mb-7">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#EE7B22] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#EE7B22]" />
+              </span>
+              Coches disponibles ahora
             </div>
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-[1.05]">
-              Coches de <em className="not-italic text-[#EE7B22]">oportunidad</em><br /> cada semana
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.05]">
+              Deja de pagar el margen<br className="hidden sm:block" /> de los{" "}
+              <em className="not-italic text-[#EE7B22]">concesionarios.</em>
             </h1>
-            <p className="mt-5 text-lg text-white/70">
-              Miércoles a sábado. Bloqueas la unidad 2 horas sin pagar nada. Ningún precio sube. Lo que pierdes es la oportunidad.
+            <p className="mt-7 text-lg md:text-xl text-white/55 max-w-2xl mx-auto leading-relaxed">
+              Compramos directamente a mayoristas y subastas. Sin intermediarios.
+              Sin margen inflado. Solo el precio <strong className="text-white font-extrabold">justo</strong>.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <a href="#catalogo" className="inline-flex items-center gap-2 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold px-7 py-3.5 rounded-md transition-colors">
-                Ver ofertas Flash <ArrowRight className="h-4 w-4" />
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a
+                href="#catalogo"
+                className="inline-flex items-center gap-2 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold px-8 py-4 rounded-md transition-colors text-base"
+              >
+                Consultar coche disponible hoy <ArrowRight className="h-4 w-4" />
               </a>
-              {buildWhatsappUrl(waNumber, "Hola, me gustaría recibir información sobre vuestro outlet de coches de oportunidad.") && (
+              {waHeroUrl && (
                 <a
-                  href={buildWhatsappUrl(waNumber, "Hola, me gustaría recibir información sobre vuestro outlet de coches de oportunidad.") ?? "#"}
+                  href={waHeroUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1FBA57] text-white font-extrabold px-7 py-3.5 rounded-md transition-colors"
+                  className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/20 text-white font-extrabold px-8 py-4 rounded-md transition-colors text-base"
                 >
-                  <MessageSquare className="h-4 w-4" /> Habla con nosotros
+                  <MessageSquare className="h-4 w-4" /> Hablar por WhatsApp
                 </a>
               )}
             </div>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-5 text-xs font-semibold text-white/40">
+              <div className="flex items-center gap-1.5">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star key={i} className="h-3.5 w-3.5 fill-[#EE7B22] text-[#EE7B22]" />
+                ))}
+                <span className="ml-1 text-white/60">4,8 en Google</span>
+              </div>
+              <span className="text-white/20">·</span>
+              <span className="text-white/60">+1.200 coches vendidos</span>
+              <span className="text-white/20">·</span>
+              <span className="text-white/60">0 € comisiones ocultas</span>
+            </div>
           </div>
-        </div>
-
-        {/* FOMO TIMER — personal 120-min window */}
-        <div className="bg-[#E74C3C] text-white text-center py-3.5 px-6 font-bold text-sm">
-          {fomo.expired ? (
-            <>
-              <Clock className="inline h-4 w-4 mr-1.5 -mt-0.5" />
-              Tu ventana ha expirado — vuelve y descubre nuevas unidades esta semana
-            </>
-          ) : (
-            <>
-              <Clock className="inline h-4 w-4 mr-1.5 -mt-0.5" />
-              Tu ventana de oportunidad se cierra en{" "}
-              <span className="font-mono font-black ml-1 tabular-nums">
-                {String(fomo.h).padStart(2, "0")}:{String(fomo.m).padStart(2, "0")}:{String(fomo.s).padStart(2, "0")}
-              </span>
-              {" "}— Bloquea ya sin pagar nada
-            </>
-          )}
         </div>
       </section>
 
-      {/* CATÁLOGO — 15 coches (justo debajo del Hero) */}
-      <section id="catalogo" className="bg-white py-12 sm:py-16 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Selectores de búsqueda — carrocerías + marcas */}
-          <div className="space-y-8 mb-10 sm:mb-12">
-            <BodyTypePicker active={bodyFilter} onSelect={onPickBody} />
-            <BrandPicker active={brandFilter} onSelect={onPickBrand} />
+      {/* ¿SABES LO QUE...? */}
+      <section className="bg-white py-20 px-6">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-extrabold leading-tight">
+            ¿Sabes lo que ningún concesionario<br className="hidden sm:block" /> te dirá jamás?
+          </h2>
+          <div className="mt-6 space-y-4 text-stone-500 leading-relaxed text-lg">
+            <p>
+              El margen medio de un concesionario en un coche de ocasión es del{" "}
+              <strong className="text-[#0A0A1A]">15 al 25%</strong> sobre el precio real de mercado.
+              Eso significa que en un coche de 15.000 €, estás pagando entre{" "}
+              <strong className="text-[#0A0A1A]">2.250 € y 3.750 € de más</strong>, solo por el nombre en la fachada.
+            </p>
+            <p>
+              Nosotros accedemos directamente a subastas de flotas y mayoristas. Sin escaparates de lujo.
+              Sin vendedores a comisión. Sin ese margen.
+            </p>
           </div>
-
-          <div id="catalogo-grid" className="flex flex-col sm:flex-row sm:flex-wrap sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10 scroll-mt-24">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                Outlet de la <em className="not-italic text-[#EE7B22]">semana</em>
-              </h2>
-              <p className="text-sm text-stone-500 mt-1">
-                {bodyFilter || brandFilter
-                  ? `${cars.length} coches que coinciden con tu búsqueda.`
-                  : "15 coches con ventana de oportunidad. Pulsa \"Bloquear unidad\" y queda reservada 2h para ti, sin pagar nada."}
-              </p>
-              {(bodyFilter || brandFilter) && (
-                <button
-                  type="button"
-                  onClick={() => { setBodyFilter(undefined); setBrandFilter(undefined); }}
-                  className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#EE7B22] hover:underline"
-                >
-                  Quitar filtros y ver todos
-                </button>
-              )}
-            </div>
-          </div>
-
-          {carsLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} className="bg-white border border-stone-200 rounded-xl overflow-hidden animate-pulse">
-                  <div className="h-44 bg-stone-200" />
-                  <div className="p-4 space-y-2">
-                    <div className="h-3 w-16 bg-stone-200 rounded" />
-                    <div className="h-4 w-28 bg-stone-200 rounded" />
-                    <div className="flex gap-1.5 mt-2">
-                      <div className="h-5 w-10 bg-stone-100 rounded" />
-                      <div className="h-5 w-14 bg-stone-100 rounded" />
-                      <div className="h-5 w-16 bg-stone-100 rounded" />
-                    </div>
-                    <div className="h-7 w-24 bg-stone-200 rounded mt-2" />
-                    <div className="h-9 w-full bg-stone-100 rounded-lg mt-3" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : carsError ? (
-            <div className="border-2 border-dashed border-stone-200 rounded-xl py-14 px-6 text-center">
-              <CarIcon className="h-10 w-10 mx-auto text-stone-300" />
-              <p className="mt-3 text-sm font-semibold text-stone-700">
-                No se han podido cargar los coches en este momento.
-              </p>
-              <p className="text-xs text-stone-500 mt-1">Comprueba tu conexión o inténtalo de nuevo.</p>
-              <button
-                type="button"
-                onClick={() => void refetchCars()}
-                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#EE7B22] hover:bg-[#C4621A] text-white text-xs font-extrabold transition-colors"
-              >
-                Volver a intentarlo
-              </button>
-            </div>
-          ) : cars.length === 0 ? (
-            <div className="border-2 border-dashed border-stone-200 rounded-xl py-12 px-6 text-center">
-              <CarIcon className="h-10 w-10 mx-auto text-stone-300" />
-              <p className="mt-3 text-sm font-semibold text-stone-700">
-                Ningún coche del outlet coincide con esta búsqueda esta semana.
-              </p>
-              <p className="text-xs text-stone-500 mt-1">Prueba a cambiar de carrocería o marca, o quita los filtros.</p>
-              <button
-                type="button"
-                onClick={() => { setBodyFilter(undefined); setBrandFilter(undefined); }}
-                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#EE7B22] hover:bg-[#C4621A] text-white text-xs font-extrabold transition-colors"
-              >
-                Quitar todos los filtros
-              </button>
-            </div>
-          ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
-            {cars.map((car, idx) => {
-              const isLocked = car.status === "locked";
-              return (
-                <Link key={car.id} href={`/coche/${car.id}`}>
-                  <article
-                    className={cn(
-                      "bg-white border rounded-xl overflow-hidden h-full flex flex-col transition-all",
-                      isLocked
-                        ? "border-stone-200 opacity-90 cursor-pointer hover:shadow-md"
-                        : "border-stone-200 cursor-pointer hover:shadow-xl hover:border-[#EE7B22] hover:-translate-y-1",
-                    )}
-                  >
-                    <div className="relative">
-                      <CarThumb
-                        make={car.make}
-                        model={car.model}
-                        imageUrl={car.imageUrl}
-                        photos={car.photos}
-                        className={cn("h-44 w-full", isLocked && "grayscale")}
-                      />
-                      {isLocked ? (
-                        <span className="absolute top-3 left-3 bg-stone-900 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full inline-flex items-center gap-1">
-                          <Lock className="h-3 w-3" /> Reservado
-                        </span>
-                      ) : (
-                        <>
-                          {idx < 3 && (
-                            <span className="absolute top-3 left-3 bg-[#E74C3C] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
-                              Flash
-                            </span>
-                          )}
-                        </>
-                      )}
-                    </div>
-                    <div className="p-4 flex-1 flex flex-col">
-                      <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22]">{car.make}</div>
-                      <div className="text-base font-extrabold leading-tight mt-1 line-clamp-1">{car.model}</div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        <span className="bg-stone-100 text-stone-600 text-[11px] px-2 py-0.5 rounded">{car.year}</span>
-                        <span className="bg-stone-100 text-stone-600 text-[11px] px-2 py-0.5 rounded">{(car.km / 1000).toFixed(0)}k km</span>
-                        <span className="bg-stone-100 text-stone-600 text-[11px] px-2 py-0.5 rounded">{car.fuel}</span>
-                      </div>
-                      <div className="mt-3 flex items-baseline gap-2">
-                        <span className={cn("text-2xl font-black tabular-nums", isLocked && "text-stone-500")}>{formatPrice(car.price)}</span>
-                      </div>
-                      {isLocked ? (
-                        <div className="mt-2 inline-flex items-center gap-1.5 text-xs text-stone-600 font-bold">
-                          <Lock className="h-3.5 w-3.5" />
-                          Reservada temporalmente
-                        </div>
-                      ) : (
-                        <div className="mt-2 inline-flex items-center gap-1.5 text-xs text-[#E74C3C] font-bold">
-                          <Clock className="h-3.5 w-3.5" />
-                          Disponible esta semana
-                        </div>
-                      )}
-                      {isLocked ? (
-                        <button
-                          disabled
-                          className="mt-4 w-full py-2.5 rounded-lg bg-stone-200 text-stone-500 font-extrabold text-sm cursor-not-allowed"
-                        >
-                          Reservado por otro cliente
-                        </button>
-                      ) : (
-                        <button className="mt-4 w-full py-2.5 rounded-lg bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold text-sm transition-colors">
-                          Bloquear unidad
-                        </button>
-                      )}
-                    </div>
-                  </article>
-                </Link>
-              );
-            })}
-          </div>
-          )}
+          <a href="#catalogo" className="mt-8 inline-flex items-center gap-1.5 text-[#EE7B22] font-bold text-sm hover:underline">
+            <ChevronRight className="h-4 w-4" /> Ver coches disponibles hoy
+          </a>
         </div>
       </section>
 
-      {/* ATAJOS — recorridos típicos del comprador */}
-      <section className="bg-white py-14 px-6 border-t border-stone-200">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-5">
-          <QuickAction icon={CarIcon} title="Ver coches" desc="15 oportunidades esta semana" href="#catalogo" />
-          <QuickAction icon={Lock} title="Cómo funciona" desc="Bloqueo gratis 2h, sin compromiso" href="#proceso" />
-          <QuickAction
-            icon={MessageSquare}
-            title="Habla por WhatsApp"
-            desc="Te respondemos en minutos"
-            href={buildWhatsappUrl(waNumber, "Hola, vengo del outlet de Pujamostucoche.es y me gustaría que me ayudéis a encontrar coche.") ?? "#proceso"}
-            external={Boolean(buildWhatsappUrl(waNumber, "Hola, vengo del outlet de Pujamostucoche.es y me gustaría que me ayudéis a encontrar coche."))}
-          />
-          <QuickAction icon={CreditCard} title="Financiación" desc="Planes a tu medida" href="#sobre-nosotros" />
-        </div>
-      </section>
-
-      {/* MARCAS */}
-      <section className="py-14" style={{ background: "#eef2f7" }}>
-        <h2 className="text-center text-3xl font-extrabold tracking-tight px-6">
-          Marcas <em className="not-italic text-[#EE7B22]">disponibles</em>
-        </h2>
-        <p className="text-center text-sm text-stone-500 mt-1 px-6">Las mejores marcas del mercado pasan por el escaparate</p>
-        <div className="mt-10 bg-white py-10 overflow-hidden w-full">
-          <div className="flex items-center gap-16 w-max animate-[scroll_35s_linear_infinite]">
-            {[...BRANDS, ...BRANDS, ...BRANDS].map((b, i) => (
-              <div key={i} className="shrink-0 h-12 flex items-center justify-center min-w-[90px]" title={b.name}>
-                <img
-                  src={`https://cdn.simpleicons.org/${b.slug}/9CA3AF`}
-                  alt={b.name}
-                  className="h-9 w-auto opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
-                  loading="lazy"
-                />
+      {/* COMPARATIVA */}
+      <section className="bg-[#f5f7fa] py-20 px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-extrabold">
+              Nosotros vs. Ellos.{" "}
+              <em className="not-italic text-[#EE7B22]">Sin rodeos.</em>
+            </h2>
+          </div>
+          <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-200">
+            <div className="grid grid-cols-3 bg-[#070711] text-xs font-extrabold uppercase tracking-widest">
+              <div className="px-4 sm:px-6 py-4 text-white/30">Característica</div>
+              <div className="px-4 sm:px-6 py-4 text-center text-white/50">Concesionario</div>
+              <div className="px-4 sm:px-6 py-4 text-center text-[#EE7B22]">Pujamostucoche</div>
+            </div>
+            {COMPARE_ROWS.map(([feat, them, us], i) => (
+              <div key={i} className={cn("grid grid-cols-3 border-t border-stone-100", i % 2 === 1 && "bg-stone-50")}>
+                <div className="px-4 sm:px-6 py-3.5 text-xs sm:text-sm font-semibold text-stone-600">{feat}</div>
+                <div className="px-4 sm:px-6 py-3.5 text-center text-xs sm:text-sm text-stone-400">{them}</div>
+                <div className="px-4 sm:px-6 py-3.5 text-center text-xs sm:text-sm font-bold text-[#EE7B22]">{us}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* PROCESO — corresponde a Buzón + Dashboard */}
-      <section id="proceso" className="bg-[#0E4F8E] text-white py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14">
-            <div className="inline-block px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-[#EE7B22] border border-[#EE7B22]/40 bg-[#EE7B22]/15 mb-4">
-              Cómo funciona
+      {/* EJEMPLO REAL */}
+      {featuredCar && (
+        <section className="bg-white py-20 px-6">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-extrabold">
+                Un ejemplo real.{" "}
+                <em className="not-italic text-[#EE7B22]">Con números reales.</em>
+              </h2>
             </div>
-            <h2 className="text-4xl font-extrabold tracking-tight">
-              Una ventana de <em className="not-italic text-[#EE7B22]">2 horas</em>
-            </h2>
-            <p className="mt-3 text-white/60 max-w-xl mx-auto">
-              Aquí no sube el precio. Aquí pierdes la oportunidad. Bloqueas la unidad sin pagar nada, hablamos por WhatsApp y decides con calma.
+            <div className="bg-[#f5f7fa] border border-stone-200 rounded-2xl overflow-hidden">
+              <div className="flex flex-col sm:flex-row">
+                <div className="sm:w-56 shrink-0">
+                  <CarThumb
+                    make={featuredCar.make}
+                    model={featuredCar.model}
+                    imageUrl={featuredCar.imageUrl}
+                    photos={featuredCar.photos}
+                    className="h-52 sm:h-full w-full"
+                  />
+                </div>
+                <div className="flex-1 p-6 sm:p-8">
+                  <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22] mb-1">
+                    {featuredCar.make}
+                  </div>
+                  <div className="text-xl font-extrabold">
+                    {featuredCar.model} · {featuredCar.year}
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <span className="bg-stone-200 text-stone-600 text-xs px-2 py-0.5 rounded">
+                      {(featuredCar.km / 1000).toFixed(0)}k km
+                    </span>
+                    <span className="bg-stone-200 text-stone-600 text-xs px-2 py-0.5 rounded">{featuredCar.fuel}</span>
+                    <span className="bg-stone-200 text-stone-600 text-xs px-2 py-0.5 rounded">
+                      {featuredCar.transmission}
+                    </span>
+                  </div>
+                  <div className="mt-6 space-y-2.5 border-t border-stone-200 pt-5">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-stone-400">Precio estimado en concesionario</span>
+                      <span className="line-through text-stone-400 font-semibold">
+                        {formatPrice(Math.round(featuredCar.price * 1.20))}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-stone-700 font-bold text-sm">Nuestro precio</span>
+                      <span className="text-2xl font-black text-[#EE7B22]">{formatPrice(featuredCar.price)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm bg-green-50 border border-green-100 rounded-lg px-3 py-2 mt-1">
+                      <span className="text-green-700 font-bold">Ahorro estimado (20%)</span>
+                      <span className="text-green-700 font-extrabold">
+                        {formatPrice(Math.round(featuredCar.price * 0.20))}
+                      </span>
+                    </div>
+                  </div>
+                  <Link
+                    href={`/coche/${featuredCar.id}`}
+                    className="mt-5 w-full inline-flex items-center justify-center gap-2 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold py-3 rounded-lg transition-colors text-sm"
+                  >
+                    Consultar este {featuredCar.make} <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* MODO IKEA */}
+      <section className="bg-[#070711] text-white py-20 px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-[#EE7B22] border border-[#EE7B22]/30 bg-[#EE7B22]/10 mb-6">
+            Nuestra filosofía
+          </div>
+          <h2 className="text-3xl md:text-5xl font-extrabold leading-tight">
+            Modo <em className="not-italic text-[#EE7B22]">IKEA.</em>
+          </h2>
+          <div className="mt-6 space-y-4 text-lg text-white/55 leading-relaxed max-w-2xl">
+            <p>
+              IKEA vende muebles de calidad a precio de fábrica porque eliminó intermediarios.
+              Nosotros hacemos lo mismo con los coches: acceso directo a subastas de flotas
+              empresariales y mayoristas, sin el margen del escaparate de lujo.
             </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <Step n={1} icon={Lock} title="Bloqueas la unidad" body="Pulsas el botón y la unidad queda reservada solo para ti durante 2h. Sin pagar nada. Sin compromiso." />
-            <Step n={2} icon={MessageSquare} title="Hablamos por WhatsApp" body="Un comercial te escribe en minutos. Resolvéis dudas, planificáis prueba o entrega." />
-            <Step n={3} icon={CheckCircle2} title="Cierras la compra" body="Tienes 2h para cerrar (visita, financiación o transferencia). Si no cierras, vuelve al escaparate como liberada." />
-          </div>
-
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-white/10 pt-12">
-            <Stat n="14 días" l="Garantía mecánica" />
-            <Stat n="+1.200" l="Coches vendidos" />
-            <Stat n="4,8/5" l="Reseñas Google" />
-            <Stat n="0€" l="Comisiones ocultas" />
+            <p>
+              No tenemos instalaciones que pagar ni vendedores a comisión. Tenemos algo mejor:{" "}
+              <strong className="text-white">el precio real del mercado</strong>.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* SOBRE NOSOTROS */}
-      <section id="sobre-nosotros" className="bg-[#f5f7fa] py-20 px-6">
+      {/* MISIÓN */}
+      <section id="nosotros" className="bg-white py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <div className="inline-block px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-[#EE7B22] border border-[#EE7B22]/40 bg-[#EE7B22]/15 mb-4">
-              Sobre nosotros
-            </div>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-[#0A3D6E] tracking-tight">
-              Un concesionario <em className="not-italic text-[#EE7B22]">diferente</em>
+            <h2 className="text-3xl md:text-4xl font-extrabold">
+              Nuestra misión: que pagues{" "}
+              <em className="not-italic text-[#EE7B22]">solo lo justo.</em>
             </h2>
-            <p className="mt-4 text-stone-600 max-w-2xl mx-auto text-lg leading-relaxed">
-              {/* COPY PROVISIONAL — sustituir cuando tengáis los textos reales */}
-              Nacimos para acabar con la sensación de que comprar un coche de ocasión es complicado y poco transparente. Cada semana seleccionamos unidades de alta rotación, las ponemos a precio de outlet y os damos 2 horas para decidir sin presión.
-            </p>
           </div>
-
-          {/* VALORES */}
-          <div className="grid md:grid-cols-3 gap-6 mb-16">
+          <div className="grid md:grid-cols-3 gap-6">
             <ValueCard
               icon={ShieldCheck}
               title="Transparencia total"
-              body="Precio fijo, sin sorpresas ni cargos ocultos. Lo que ves en pantalla es lo que pagas."
+              body="Precio fijo, sin sorpresas ni cargos ocultos. Lo que ves en pantalla es lo que pagas, sin letra pequeña."
             />
             <ValueCard
-              icon={Award}
-              title="Selección rigurosa"
-              body="Cada vehículo pasa por nuestra revisión antes de entrar al escaparate. Solo coches que nosotros mismos compraríamos."
+              icon={TrendingDown}
+              title="Precios mayoristas"
+              body="Compramos directamente a subastas y flotas empresariales. Sin intermediarios, sin margen de concesionario."
             />
             <ValueCard
               icon={Users}
@@ -459,194 +324,255 @@ export default function LandingPage() {
               body="Un comercial real te atiende por WhatsApp. Sin bots, sin centralitas, sin esperas interminables."
             />
           </div>
+        </div>
+      </section>
 
-          {/* BLOQUE MISIÓN — fondo navy */}
-          <div
-            className="rounded-2xl px-8 py-12 md:px-14 md:py-14 text-white flex flex-col md:flex-row items-center gap-8"
-            style={{ background: "linear-gradient(135deg,#0E4F8E 0%,#0A3D6E 100%)" }}
-          >
-            <div className="flex-shrink-0 h-16 w-16 rounded-full bg-[#EE7B22]/20 flex items-center justify-center text-[#EE7B22]">
-              <Star className="h-8 w-8" />
-            </div>
-            <div>
-              <p className="text-xl md:text-2xl font-extrabold leading-snug">
-                {/* COPY PROVISIONAL */}
-                "Queremos que el día que compres tu coche recuerdes que fue fácil, justo y sin estrés."
-              </p>
-              <p className="mt-3 text-white/60 text-sm">
-                {/* NOMBRE / CARGO PROVISIONAL */}
-                Equipo Pujamostucoche · Madrid
-              </p>
-            </div>
+      {/* CÓMO FUNCIONA */}
+      <section id="como-funciona" className="bg-[#f5f7fa] py-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-extrabold">
+              Así de simple.{" "}
+              <em className="not-italic text-[#EE7B22]">Así de distinto.</em>
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            <StepCard
+              n={1}
+              icon={Search}
+              title="Nos dices qué buscas"
+              body="Elige entre los coches disponibles o escríbenos por WhatsApp con lo que necesitas. Respondemos en minutos."
+            />
+            <StepCard
+              n={2}
+              icon={Lock}
+              title="Bloqueas la unidad 2h gratis"
+              body="Reservas sin pagar nada. Tienes 2 horas para decidir con calma, sin presión de ningún tipo."
+            />
+            <StepCard
+              n={3}
+              icon={CheckCircle2}
+              title="Cierras a precio justo"
+              body="Sin sorpresas de última hora. El precio que ves es lo que pagas. Los trámites siempre incluidos."
+            />
           </div>
         </div>
       </section>
 
-      {/* CONTACTO */}
-      <section id="contacto" className="bg-white py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-[#EE7B22] font-bold uppercase tracking-widest text-sm mb-3">Contacto</p>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-[#0A3D6E]">
-              ¿Tienes <span className="text-[#EE7B22]">dudas</span>? Escríbenos.
-            </h2>
-            <p className="text-stone-600 mt-4 max-w-2xl mx-auto">
-              Te respondemos en menos de 24h. Sin compromiso, sin presión, solo respuestas claras.
-            </p>
+      {/* CATÁLOGO — coches reales */}
+      <section id="catalogo" className="bg-[#0E1A2E] py-20 px-4 sm:px-6 scroll-mt-16">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-widest text-[#EE7B22] mb-2">Inventario en directo</div>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">
+                Coches disponibles hoy —{" "}
+                <em className="not-italic text-[#EE7B22]">Precio mayorista verificado</em>
+              </h2>
+            </div>
+            {!carsLoading && (
+              <div className="text-white/40 text-sm shrink-0">{cars.length} unidades esta semana</div>
+            )}
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            <a
-              href="mailto:pujamostucoche@gmail.com"
-              className="group bg-stone-50 hover:bg-[#0A3D6E] hover:text-white border border-stone-200 rounded-2xl p-8 text-center transition-colors"
-            >
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#EE7B22]/10 group-hover:bg-[#EE7B22]/20 text-[#EE7B22] mb-4">
-                <Mail className="w-6 h-6" />
-              </div>
-              <div className="text-sm uppercase tracking-widest text-stone-500 group-hover:text-white/70 mb-2">Email</div>
-              <div className="font-bold text-[#0A3D6E] group-hover:text-white break-all">pujamostucoche@gmail.com</div>
-            </a>
-
-            <a
-              href={buildWhatsappUrl(waNumber, "Hola, vengo de Pujamostucoche.es y me gustaría más información.") ?? "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group bg-stone-50 hover:bg-[#0A3D6E] hover:text-white border border-stone-200 rounded-2xl p-8 text-center transition-colors"
-            >
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#EE7B22]/10 group-hover:bg-[#EE7B22]/20 text-[#EE7B22] mb-4">
-                <Phone className="w-6 h-6" />
-              </div>
-              <div className="text-sm uppercase tracking-widest text-stone-500 group-hover:text-white/70 mb-2">WhatsApp</div>
-              <div className="font-bold text-[#0A3D6E] group-hover:text-white">Habla con un comercial</div>
-            </a>
-
-            <div className="bg-stone-50 border border-stone-200 rounded-2xl p-8 text-center">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#EE7B22]/10 text-[#EE7B22] mb-4">
-                <MapPin className="w-6 h-6" />
-              </div>
-              <div className="text-sm uppercase tracking-widest text-stone-500 mb-2">Dirección</div>
-              <div className="font-bold text-[#0A3D6E]">Madrid · España</div>
-              <div className="text-sm text-stone-600 mt-1">Lun a Sáb · 10:00–20:00</div>
+          {carsLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="bg-white/5 border border-white/10 rounded-xl overflow-hidden animate-pulse">
+                  <div className="h-44 bg-white/10" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-3 w-16 bg-white/10 rounded" />
+                    <div className="h-4 w-28 bg-white/10 rounded" />
+                    <div className="h-7 w-24 bg-white/10 rounded mt-3" />
+                    <div className="h-9 w-full bg-white/5 rounded-lg mt-3" />
+                  </div>
+                </div>
+              ))}
             </div>
+          ) : carsError ? (
+            <div className="border-2 border-dashed border-white/10 rounded-xl py-14 px-6 text-center">
+              <CarIcon className="h-10 w-10 mx-auto text-white/20" />
+              <p className="mt-3 text-sm font-semibold text-white/60">No se han podido cargar los coches.</p>
+              <button
+                type="button"
+                onClick={() => void refetchCars()}
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#EE7B22] text-white text-xs font-extrabold"
+              >
+                Volver a intentarlo
+              </button>
+            </div>
+          ) : cars.length === 0 ? (
+            <div className="border-2 border-dashed border-white/10 rounded-xl py-14 px-6 text-center">
+              <CarIcon className="h-10 w-10 mx-auto text-white/20" />
+              <p className="mt-3 text-sm font-semibold text-white/60">
+                No hay coches disponibles en este momento. Vuelve pronto.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+              {cars.map((car) => {
+                const isLocked = car.status === "locked";
+                return (
+                  <Link key={car.id} href={`/coche/${car.id}`}>
+                    <article
+                      className={cn(
+                        "bg-[#162033] border rounded-xl overflow-hidden h-full flex flex-col transition-all",
+                        isLocked
+                          ? "border-white/5 opacity-70 cursor-pointer"
+                          : "border-white/10 cursor-pointer hover:border-[#EE7B22]/50 hover:shadow-2xl hover:-translate-y-1",
+                      )}
+                    >
+                      <div className="relative">
+                        <CarThumb
+                          make={car.make}
+                          model={car.model}
+                          imageUrl={car.imageUrl}
+                          photos={car.photos}
+                          className={cn("h-44 w-full", isLocked && "grayscale opacity-50")}
+                        />
+                        {isLocked ? (
+                          <span className="absolute top-3 left-3 bg-stone-900/90 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full inline-flex items-center gap-1">
+                            <Lock className="h-3 w-3" /> Reservado
+                          </span>
+                        ) : (
+                          <span className="absolute top-3 left-3 bg-[#EE7B22] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+                            Disponible
+                          </span>
+                        )}
+                      </div>
+                      <div className="p-4 flex-1 flex flex-col">
+                        <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22]">
+                          {car.make}
+                        </div>
+                        <div className="text-sm font-extrabold leading-tight mt-0.5 text-white line-clamp-1">
+                          {car.model}
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          <span className="bg-white/5 text-white/40 text-[11px] px-2 py-0.5 rounded">{car.year}</span>
+                          <span className="bg-white/5 text-white/40 text-[11px] px-2 py-0.5 rounded">
+                            {(car.km / 1000).toFixed(0)}k km
+                          </span>
+                          <span className="bg-white/5 text-white/40 text-[11px] px-2 py-0.5 rounded">{car.fuel}</span>
+                        </div>
+                        <div className="mt-3">
+                          <span className="text-2xl font-black tabular-nums text-white">
+                            {formatPrice(car.price)}
+                          </span>
+                        </div>
+                        {isLocked ? (
+                          <button
+                            disabled
+                            className="mt-4 w-full py-2.5 rounded-lg bg-white/5 text-white/25 font-extrabold text-sm cursor-not-allowed"
+                          >
+                            Reservado por otro cliente
+                          </button>
+                        ) : (
+                          <button className="mt-4 w-full py-2.5 rounded-lg bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold text-sm transition-colors">
+                            Ver este coche
+                          </button>
+                        )}
+                      </div>
+                    </article>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* FOOTER CTA */}
+      <section className="bg-[#070711] py-20 px-6 text-center text-white">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-extrabold leading-tight">
+            En este sector, la transparencia<br /> es una{" "}
+            <em className="not-italic text-[#EE7B22]">revolución.</em>
+          </h2>
+          <p className="mt-5 text-white/45 text-lg max-w-xl mx-auto">
+            Compramos directamente a mayoristas para que tú pagues el precio real. Sin margen de
+            escaparate, sin presión, sin sorpresas.
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a
+              href="#catalogo"
+              className="inline-flex items-center gap-2 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold px-8 py-4 rounded-md transition-colors"
+            >
+              Ver coches disponibles hoy <ArrowRight className="h-4 w-4" />
+            </a>
+            {waHeroUrl && (
+              <a
+                href={waHeroUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/20 text-white font-extrabold px-8 py-4 rounded-md transition-colors"
+              >
+                <MessageSquare className="h-4 w-4" /> Consultar por WhatsApp
+              </a>
+            )}
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-[#0A3D6E] text-white/60 py-10 px-6 text-center text-sm">
+      <footer className="bg-[#040408] text-white/25 py-10 px-6 text-center text-sm border-t border-white/5">
         <div className="max-w-5xl mx-auto space-y-3">
           <div className="text-white font-extrabold text-lg">
             Pujamos<span className="text-[#EE7B22]">tu</span>coche.es
           </div>
-          <p>Concesionario de coches de ocasión · Madrid · <a className="text-[#EE7B22] hover:underline" href="mailto:pujamostucoche@gmail.com">pujamostucoche@gmail.com</a></p>
-          <div className="flex items-center justify-center gap-4 text-xs text-white/40 flex-wrap">
-            <Link href="/privacidad" className="hover:text-white/70 transition-colors">Política de Privacidad</Link>
+          <p>
+            Concesionario de coches de ocasión · Madrid ·{" "}
+            <a className="text-[#EE7B22] hover:underline" href="mailto:pujamostucoche@gmail.com">
+              pujamostucoche@gmail.com
+            </a>
+          </p>
+          <div className="flex items-center justify-center gap-4 text-xs text-white/20 flex-wrap">
+            <Link href="/privacidad" className="hover:text-white/50 transition-colors">Política de Privacidad</Link>
             <span>·</span>
-            <Link href="/cookies" className="hover:text-white/70 transition-colors">Política de Cookies</Link>
+            <Link href="/cookies" className="hover:text-white/50 transition-colors">Política de Cookies</Link>
             <span>·</span>
-            <Link href="/terminos" className="hover:text-white/70 transition-colors">Aviso Legal y Términos</Link>
+            <Link href="/terminos" className="hover:text-white/50 transition-colors">Aviso Legal y Términos</Link>
           </div>
-          <p className="text-white/40 text-xs">© {new Date().getFullYear()} Pujamostucoche. Todos los derechos reservados.</p>
+          <p className="text-white/20 text-xs">© {new Date().getFullYear()} Pujamostucoche. Todos los derechos reservados.</p>
         </div>
       </footer>
 
       <WhatsappWidget
-        message="Hola, vengo del outlet de Pujamostucoche.es y me gustaría que me ayudéis a encontrar coche."
+        message="Hola, vengo de Pujamostucoche.es y me gustaría información sobre los coches disponibles."
         label="Habla con nosotros"
       />
 
       <style>{`
-        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-33.333%); } }
         .font-jakarta { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
       `}</style>
     </div>
   );
 }
 
-const BRANDS = [
-  { name: "Seat", slug: "seat" },
-  { name: "Volkswagen", slug: "volkswagen" },
-  { name: "Renault", slug: "renault" },
-  { name: "Peugeot", slug: "peugeot" },
-  { name: "Citroën", slug: "citroen" },
-  { name: "Ford", slug: "ford" },
-  { name: "Toyota", slug: "toyota" },
-  { name: "Hyundai", slug: "hyundai" },
-  { name: "Kia", slug: "kia" },
-  { name: "Dacia", slug: "dacia" },
-  { name: "Opel", slug: "opel" },
-  { name: "Fiat", slug: "fiat" },
-];
-
-function QuickAction({
-  icon: Icon,
-  title,
-  desc,
-  href,
-  external,
-}: {
-  icon: React.ElementType;
-  title: string;
-  desc: string;
-  href: string;
-  external?: boolean;
-}) {
-  const externalProps = external ? { target: "_blank" as const, rel: "noopener noreferrer" } : {};
-  return (
-    <a
-      href={href}
-      {...externalProps}
-      className="group block text-center p-6 rounded-xl border border-stone-200 bg-white hover:border-[#EE7B22] hover:shadow-lg hover:-translate-y-1 transition-all"
-    >
-      <div className="h-12 w-12 mx-auto rounded-full bg-[#EE7B22]/10 text-[#EE7B22] flex items-center justify-center mb-3 group-hover:bg-[#EE7B22] group-hover:text-white transition-colors">
-        <Icon className="h-6 w-6" />
-      </div>
-      <div className="font-extrabold text-stone-900">{title}</div>
-      <div className="text-xs text-stone-500 mt-1">{desc}</div>
-    </a>
-  );
-}
-
-function Step({ n, icon: Icon, title, body }: { n: number; icon: React.ElementType; title: string; body: string }) {
-  return (
-    <div className="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur">
-      <div className="flex items-center justify-between">
-        <div className="h-10 w-10 rounded-lg bg-[#EE7B22] text-stone-900 flex items-center justify-center">
-          <Icon className="h-5 w-5" />
-        </div>
-        <span className="text-xs font-bold text-[#EE7B22]/80 uppercase tracking-widest">Paso {n}</span>
-      </div>
-      <h3 className="mt-4 text-xl font-extrabold">{title}</h3>
-      <p className="mt-2 text-sm text-white/60 leading-relaxed">{body}</p>
-    </div>
-  );
-}
-
 function ValueCard({ icon: Icon, title, body }: { icon: React.ElementType; title: string; body: string }) {
   return (
-    <div className="bg-white border border-stone-200 rounded-2xl p-8 flex flex-col gap-4 hover:shadow-lg hover:-translate-y-1 transition-all">
+    <div className="bg-[#f5f7fa] border border-stone-200 rounded-2xl p-8 flex flex-col gap-4 hover:shadow-lg hover:-translate-y-1 transition-all">
       <div className="h-12 w-12 rounded-xl bg-[#EE7B22]/10 text-[#EE7B22] flex items-center justify-center">
         <Icon className="h-6 w-6" />
       </div>
-      <h3 className="text-lg font-extrabold text-[#0A3D6E]">{title}</h3>
+      <h3 className="text-lg font-extrabold">{title}</h3>
       <p className="text-sm text-stone-500 leading-relaxed">{body}</p>
     </div>
   );
 }
 
-function Stat({ n, l }: { n: string; l: string }) {
+function StepCard({ n, icon: Icon, title, body }: { n: number; icon: React.ElementType; title: string; body: string }) {
   return (
-    <div className="text-center">
-      <div className="text-3xl font-black text-[#EE7B22]">{n}</div>
-      <div className="text-xs uppercase tracking-widest text-white/50 mt-1">{l}</div>
+    <div className="flex flex-col gap-4 p-7 rounded-2xl bg-white border border-stone-200 hover:shadow-lg hover:-translate-y-1 transition-all">
+      <div className="flex items-center gap-3">
+        <div className="h-10 w-10 rounded-lg bg-[#EE7B22] text-white flex items-center justify-center font-black text-lg shrink-0">
+          {n}
+        </div>
+        <div className="h-10 w-10 rounded-lg bg-[#EE7B22]/10 text-[#EE7B22] flex items-center justify-center shrink-0">
+          <Icon className="h-5 w-5" />
+        </div>
+      </div>
+      <h3 className="text-lg font-extrabold">{title}</h3>
+      <p className="text-sm text-stone-500 leading-relaxed">{body}</p>
     </div>
   );
-}
-
-function timeUntilLabel(iso: string): string {
-  const ms = new Date(iso).getTime() - Date.now();
-  if (ms <= 0) return "0h";
-  const h = Math.floor(ms / 3600_000);
-  if (h >= 24) return `${Math.floor(h / 24)} días`;
-  return `${h}h`;
 }
