@@ -64,6 +64,22 @@ function CockpitRouter() {
   );
 }
 
+function usePageTitle(title: string) {
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+}
+
+function TitledLanding() {
+  usePageTitle("Pujamostucoche.es — Compra coches a precio mayorista");
+  return <LandingPage />;
+}
+
+function TitledLandingCar() {
+  usePageTitle("Pujamostucoche.es — Ficha del vehículo");
+  return <LandingCarPage />;
+}
+
 function Router() {
   const [location] = useLocation();
   const isStaff = location.startsWith("/staff");
@@ -74,13 +90,13 @@ function Router() {
 
   return (
     <Switch>
-      <Route path="/" component={LandingPage} />
-      <Route path="/coche/:id" component={LandingCarPage} />
+      <Route path="/" component={TitledLanding} />
+      <Route path="/coche/:id" component={TitledLandingCar} />
       <Route path="/privacidad" component={PrivacyPage} />
       <Route path="/cookies" component={CookiesPage} />
       <Route path="/terminos" component={TermsPage} />
-      <Route path="/tienda" component={LandingPage} />
-      <Route path="/tienda/coche/:id" component={LandingCarPage} />
+      <Route path="/tienda" component={TitledLanding} />
+      <Route path="/tienda/coche/:id" component={TitledLandingCar} />
       <Route component={NotFound} />
     </Switch>
   );
