@@ -46,7 +46,13 @@ export default function LandingPage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [menuOpen]);
 
-  const cars = useMemo(() => (allCars ?? []).slice(0, MAX_CARS_SHOWN), [allCars]);
+  const cars = useMemo(
+    () =>
+      (allCars ?? [])
+        .filter((c) => c.status === "open")
+        .slice(0, MAX_CARS_SHOWN),
+    [allCars],
+  );
 
   const featuredCar = useMemo(
     () => (allCars ?? []).find((c) => c.status === "open") ?? allCars?.[0],
