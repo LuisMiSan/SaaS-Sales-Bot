@@ -150,52 +150,5 @@ export async function seedIfEmpty(): Promise<void> {
   // Bump updated_at to reflect last message order
   await db.execute(sql`UPDATE leads SET updated_at = (SELECT MAX(created_at) FROM messages WHERE messages.lead_id = leads.id) WHERE EXISTS (SELECT 1 FROM messages WHERE messages.lead_id = leads.id)`);
 
-  await ensureFifteenCars();
-
   logger.info("Seed complete");
-}
-
-const EXTRA_CARS = [
-  { make: "Audi", model: "Q3 35 TFSI S line", year: 2021, price: 28900, attractiveness: "hot", km: 52000, fuel: "Gasolina", transmission: "Automático", location: "Madrid Norte", depositCents: 30000, originalPrice: 32500 },
-  { make: "BMW", model: "X1 sDrive18d", year: 2020, price: 25400, attractiveness: "normal", km: 71000, fuel: "Diésel", transmission: "Automático", location: "Madrid Sur", depositCents: 25000, originalPrice: 28900 },
-  { make: "Volkswagen", model: "Tiguan 2.0 TDI Advance", year: 2019, price: 21900, attractiveness: "normal", km: 96000, fuel: "Diésel", transmission: "Manual", location: "Móstoles", depositCents: 20000, originalPrice: 24900 },
-  { make: "Peugeot", model: "3008 1.5 BlueHDi GT Line", year: 2020, price: 19400, attractiveness: "hot", km: 64000, fuel: "Diésel", transmission: "Automático", location: "Getafe", depositCents: 20000, originalPrice: 22500 },
-  { make: "Hyundai", model: "Tucson 1.6 CRDi N Line", year: 2021, price: 22500, attractiveness: "hot", km: 38000, fuel: "Diésel", transmission: "Manual", location: "Alcalá de Henares", depositCents: 25000, originalPrice: 25900 },
-  { make: "Kia", model: "Sportage 1.6 T-GDi GT-Line", year: 2022, price: 26900, attractiveness: "hot", km: 28000, fuel: "Gasolina", transmission: "Automático", location: "Madrid Centro", depositCents: 30000, originalPrice: 30500 },
-  { make: "Ford", model: "Kuga 2.5 PHEV ST-Line", year: 2021, price: 24500, attractiveness: "normal", km: 49000, fuel: "Híbrido enchufable", transmission: "Automático", location: "Madrid Norte", depositCents: 25000, originalPrice: 28900 },
-  { make: "Citroën", model: "C5 Aircross 1.5 BlueHDi Shine", year: 2020, price: 18900, attractiveness: "hard", km: 88000, fuel: "Diésel", transmission: "Manual", location: "Leganés", depositCents: 20000, originalPrice: 22400 },
-];
-
-async function ensureFifteenCars(): Promise<void> {
-  const all = await db.select().from(carsTable);
-  if (all.length >= 15) return;
-
-  const have = new Set(all.map((c) => `${c.make.toLowerCase()}-${c.model.toLowerCase()}`));
-  const needed = 15 - all.length;
-  const toAdd = EXTRA_CARS.filter((c) => !have.has(`${c.make.toLowerCase()}-${c.model.toLowerCase()}`)).slice(0, needed);
-
-  const now = new Date();
-  for (let i = 0; i < toAdd.length; i++) {
-    const c = toAdd[i];
-    const wHours = c.attractiveness === "hot" ? 24 : c.attractiveness === "hard" ? 72 : 48;
-    await db.insert(carsTable).values({
-      make: c.make,
-      model: c.model,
-      year: c.year,
-      price: c.price,
-      attractiveness: c.attractiveness,
-      km: c.km,
-      fuel: c.fuel,
-      transmission: c.transmission,
-      location: c.location,
-      depositCents: c.depositCents,
-      status: "open",
-      publishedAt: new Date(now.getTime() - (i + 1) * 3 * 3600_000),
-      availableUntil: new Date(now.getTime() + wHours * 3600_000),
-      viewersNow: Math.floor(Math.random() * 9) + 1,
-      notes: `Precio original ${c.originalPrice}€. Outlet flash de la semana.`,
-    });
-  }
-
-  logger.info({ added: toAdd.length }, "Extra cars seeded to reach 15");
 }

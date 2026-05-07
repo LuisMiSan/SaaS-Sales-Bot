@@ -148,13 +148,6 @@ router.post("/cars/bulk-import", requireStaffAuth, async (req, res): Promise<voi
 const PUBLIC_ALLOWED_STATUSES = new Set(["open", "locking", "locked", "released"]);
 const PUBLIC_DEFAULT_STATUSES = ["open", "released"] as const;
 
-// Cars must have at least one photo to appear on the public site.
-// imageUrl covers the primary image; cardinality covers the photos[] array.
-const hasPhoto = or(
-  isNotNull(carsTable.imageUrl),
-  sql`cardinality(${carsTable.photos}) > 0`,
-)!;
-
 router.get("/cars", async (req, res): Promise<void> => {
   const parsed = ListCarsQueryParams.safeParse(req.query);
   if (!parsed.success) {
@@ -169,12 +162,12 @@ router.get("/cars", async (req, res): Promise<void> => {
   }
 
   const rows = requestedStatus
-    ? await db.select().from(carsTable).where(and(eq(carsTable.status, requestedStatus), hasPhoto)).orderBy(desc(carsTable.publishedAt))
+    ? await db.select().from(carsTable).where(eq(carsTable.status, requestedStatus)).orderBy(carsTable.id)
     : await db
         .select()
         .from(carsTable)
-        .where(and(inArray(carsTable.status, [...PUBLIC_DEFAULT_STATUSES]), hasPhoto))
-        .orderBy(desc(carsTable.publishedAt));
+        .where(inArray(carsTable.status, [...PUBLIC_DEFAULT_STATUSES]))
+        .orderBy(carsTable.id);
 
   res.json(rows.map(serializePublicCar));
 });
