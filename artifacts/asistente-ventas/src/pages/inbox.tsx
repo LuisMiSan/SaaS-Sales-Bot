@@ -153,7 +153,7 @@ export default function InboxPage() {
         <div className="flex-1 overflow-y-auto scrollbar-thin">
           {filtered.map((lead) => {
             const isSelected = lead.id === selectedId;
-            const target = lead.car.status === "locked" ? lead.car.lockedUntil : null;
+            const target = lead.car?.status === "locked" ? lead.car.lockedUntil : null;
             return (
               <Link key={lead.id} href={`/staff/inbox/${lead.id}`}>
                 <div
@@ -176,7 +176,7 @@ export default function InboxPage() {
                         </div>
                       </div>
                       <div className="text-[11px] text-muted-foreground truncate mt-0.5">
-                        {lead.car.make} {lead.car.model}
+                        {lead.car?.make} {lead.car?.model}
                       </div>
                       <div className="text-xs text-foreground/70 truncate mt-1">
                         {lead.lastMessagePreview ?? "—"}
