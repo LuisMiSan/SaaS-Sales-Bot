@@ -17,9 +17,7 @@ import {
   Zap,
   DoorOpen,
   Users,
-  Palette,
   CarFront,
-  Pipette,
   Wind,
   MapPin,
   Fuel,
@@ -27,35 +25,7 @@ import {
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
 import { WhatsappWidget, buildWhatsappUrl, useWhatsappNumber } from "@/components/whatsapp-widget";
-import { CustomerChat } from "@/components/customer-chat";
 import { formatPrice, sanitizePhotoUrl } from "@/lib/format";
-
-type StoredLead = { leadId: number; publicToken: string; name: string; phone: string };
-
-function loadStoredLead(carId: number): StoredLead | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(`pujamostucoche.lead.${carId}`);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as Partial<StoredLead>;
-    if (
-      typeof parsed.leadId === "number" &&
-      typeof parsed.publicToken === "string" &&
-      parsed.publicToken.length > 0 &&
-      typeof parsed.name === "string" &&
-      typeof parsed.phone === "string"
-    ) {
-      return { leadId: parsed.leadId, publicToken: parsed.publicToken, name: parsed.name, phone: parsed.phone };
-    }
-    return null;
-  } catch { return null; }
-}
-
-function saveStoredLead(carId: number, value: StoredLead) {
-  if (typeof window === "undefined") return;
-  try { window.localStorage.setItem(`pujamostucoche.lead.${carId}`, JSON.stringify(value)); }
-  catch { /* noop */ }
-}
 
 /* ─── GALERÍA ───────────────────────────────────────────────────────────── */
 function Gallery({ car }: { car: PublicCar }) {
@@ -153,21 +123,10 @@ export default function LandingCarPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [accepted, setAccepted] = useState(false);
-  const [stored, setStored] = useState<StoredLead | null>(null);
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => { document.documentElement.classList.remove("dark"); }, []);
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    if (id) setStored(loadStoredLead(id));
-  }, [id]);
-
-  useEffect(() => {
-    if (!car || !stored) return;
-    if (car.status !== "locked") {
-      try { window.localStorage.removeItem(`pujamostucoche.lead.${car.id}`); } catch { /* noop */ }
-      setStored(null);
-    }
-  }, [car?.status, car?.id]);
+  useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
   if (!car) {
     return <div className="min-h-screen bg-[#f5f7fa] flex items-center justify-center text-stone-500 font-jakarta">Cargando ficha…</div>;
@@ -177,7 +136,7 @@ export default function LandingCarPage() {
     .filter((c) => c.id !== car.id && c.status === "open")
     .slice(0, 4);
 
-  const isLockedByOther = car.status === "locked" && !stored;
+  const isLockedByOther = car.status === "locked";
   const hasConsumption = car.consumptionUrban != null || car.consumptionHighway != null || car.consumptionMixed != null;
   const monthlyEst = Math.round(car.price / 60);
 
@@ -188,15 +147,7 @@ export default function LandingCarPage() {
     if (!accepted || !name.trim() || !phone.trim()) return;
     create.mutate(
       { data: { name: name.trim(), phone: phone.trim(), carId: car.id } },
-      {
-        onSuccess: (lead) => {
-          const token = (lead as { publicToken?: string }).publicToken ?? "";
-          if (!token) return;
-          const value: StoredLead = { leadId: lead.id, publicToken: token, name: name.trim(), phone: phone.trim() };
-          saveStoredLead(car.id, value);
-          setStored(value);
-        },
-      },
+      { onSuccess: () => setSubmitted(true) },
     );
   };
 
@@ -466,8 +417,8 @@ export default function LandingCarPage() {
 
                   {/* ESTADO: reservado por otro */}
                   {isLockedByOther ? (
-                    <div className="mt-5 p-4 rounded-xl bg-stone-50 border border-stone-200 text-sm text-stone-700">
-                      <div className="font-extrabold text-stone-900 flex items-center gap-2 mb-1.5">
+                    <div className="mt-5 p-4 rounded-xl bg-stone-50 border border-stone-200">
+                      <div className="font-extrabold text-stone-900 flex items-center gap-2 mb-1.5 text-sm">
                         <Lock className="h-5 w-5" /> Reservado temporalmente
                       </div>
                       <p className="text-xs text-stone-600">
@@ -478,14 +429,12 @@ export default function LandingCarPage() {
                       </Link>
                     </div>
 
-                  ) : stored ? (
-                    <div className="mt-5">
-                      <div className="mb-3 inline-flex items-center gap-2 text-xs font-bold text-[#27AE60]">
-                        <CheckCircle2 className="h-4 w-4" /> Reserva confirmada · {stored.phone}
-                      </div>
-                      <CustomerChat leadId={stored.leadId} publicToken={stored.publicToken} customerName={stored.name} />
-                      <p className="text-[11px] text-stone-400 mt-2 leading-relaxed">
-                        Lo que escribes aquí también le llega al comercial por WhatsApp.
+                  ) : submitted ? (
+                    <div className="mt-5 p-5 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] text-center">
+                      <CheckCircle2 className="h-10 w-10 text-[#16A34A] mx-auto mb-3" />
+                      <div className="font-extrabold text-[#15803D] text-base mb-1">Reserva recibida</div>
+                      <p className="text-xs text-[#166534] leading-relaxed">
+                        Nos ponemos en contacto contigo por WhatsApp en los próximos minutos para gestionar la visita.
                       </p>
                     </div>
 
@@ -526,7 +475,7 @@ export default function LandingCarPage() {
                   )}
 
                   {/* WhatsApp directo */}
-                  {!stored && waUrl && (
+                  {!submitted && waUrl && (
                     <div className="mt-4 pt-4 border-t border-stone-100">
                       <p className="text-xs text-stone-400 text-center mb-2.5">¿Prefieres hablar directamente?</p>
                       <a
