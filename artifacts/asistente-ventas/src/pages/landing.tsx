@@ -16,6 +16,11 @@ import {
   TrendingDown,
   Search,
   Award,
+  Pencil,
+  Sparkles,
+  Settings,
+  RotateCcw,
+  Droplets,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
 import { WhatsappWidget, buildWhatsappUrl, useWhatsappNumber } from "@/components/whatsapp-widget";
@@ -293,24 +298,53 @@ export default function LandingPage() {
       )}
 
       {/* MODO IKEA */}
-      <section className="bg-[#070711] text-white py-20 px-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-[#EE7B22] border border-[#EE7B22]/30 bg-[#EE7B22]/10 mb-6">
-            Nuestra filosofía
-          </div>
-          <h2 className="text-3xl md:text-5xl font-extrabold leading-tight">
-            Modo <em className="not-italic text-[#EE7B22]">IKEA.</em>
+      <section className="bg-[#f5f7fa] py-20 px-6">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-stone-900">
+            📦 Modo IKEA
           </h2>
-          <div className="mt-6 space-y-4 text-lg text-white/55 leading-relaxed max-w-2xl">
-            <p>
-              IKEA vende muebles de calidad a precio de fábrica porque eliminó intermediarios.
-              Nosotros hacemos lo mismo con los coches: acceso directo a subastas de flotas
-              empresariales y mayoristas, sin el margen del escaparate de lujo.
+          <p className="mt-3 text-base text-stone-500">
+            Tú decides el estado final de tu coche.
+          </p>
+
+          <div className="mt-8 bg-white rounded-2xl border border-stone-200 shadow-sm p-7 text-left space-y-6">
+            <p className="text-sm text-stone-600 leading-relaxed">
+              Recibes el vehículo directamente desde la campa mayorista, tal como está. Sin pintura
+              de camuflaje. Sin ruedas nuevas que ya pagaste sin saberlo. Sin retoque cosmético inflado.
             </p>
-            <p>
-              No tenemos instalaciones que pagar ni vendedores a comisión. Tenemos algo mejor:{" "}
-              <strong className="text-white">el precio real del mercado</strong>.
+
+            <div>
+              <p className="text-sm font-bold text-stone-800 mb-4">
+                Si quieres mejorarlo, tú eliges qué y cuánto:
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { icon: Pencil, label: "Retoques de pintura" },
+                  { icon: RotateCcw, label: "Cambio de ruedas" },
+                  { icon: Sparkles, label: "Detailing profesional" },
+                  { icon: Droplets, label: "Cambio de aceites y puesta a punto" },
+                ].map(({ icon: Icon, label }) => (
+                  <div key={label} className="flex items-center gap-3 bg-stone-50 border border-stone-100 rounded-xl px-4 py-3">
+                    <div className="h-8 w-8 rounded-lg bg-[#EE7B22]/10 flex items-center justify-center shrink-0">
+                      <Icon className="h-4 w-4 text-[#EE7B22]" />
+                    </div>
+                    <span className="text-sm text-stone-700 font-medium leading-tight">{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <p className="text-sm font-bold text-stone-900">
+              Tú tienes el control total de la inversión.
             </p>
+
+            <div className="flex items-start gap-3 bg-stone-50 border border-stone-200 rounded-xl px-4 py-3">
+              <CheckCircle2 className="h-4 w-4 text-[#EE7B22] shrink-0 mt-0.5" />
+              <p className="text-sm text-stone-600">
+                La gran mayoría de los vehículos que gestionamos solo necesitan una{" "}
+                <strong className="text-stone-900">limpieza profesional</strong> para estar listos para rodar.
+              </p>
+            </div>
           </div>
         </div>
       </section>
