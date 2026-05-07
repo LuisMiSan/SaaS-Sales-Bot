@@ -5,7 +5,6 @@ import { logger } from "./logger";
 export async function seedIfEmpty(): Promise<void> {
   const existing = await db.select().from(carsTable).limit(1);
   if (existing.length > 0) {
-    await ensureFifteenCars();
     return;
   }
 

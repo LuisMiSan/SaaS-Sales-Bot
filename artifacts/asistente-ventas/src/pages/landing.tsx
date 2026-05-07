@@ -216,66 +216,77 @@ export default function LandingPage() {
       {/* EJEMPLO REAL */}
       {featuredCar && (
         <section className="bg-white py-20 px-6">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-2xl mx-auto">
             <div className="text-center mb-10">
               <h2 className="text-3xl md:text-4xl font-extrabold">
                 Un ejemplo real.{" "}
                 <em className="not-italic text-[#EE7B22]">Con números reales.</em>
               </h2>
             </div>
+
             <div className="bg-[#f5f7fa] border border-stone-200 rounded-2xl overflow-hidden">
-              <div className="flex flex-col sm:flex-row">
-                <div className="sm:w-56 shrink-0">
-                  <CarThumb
-                    make={featuredCar.make}
-                    model={featuredCar.model}
-                    imageUrl={featuredCar.imageUrl}
-                    photos={featuredCar.photos}
-                    className="h-52 sm:h-full w-full"
-                  />
+              {/* Car header */}
+              <div className="flex items-center gap-3 px-6 py-4 border-b border-stone-200 bg-white">
+                <div className="w-10 h-8 bg-[#EE7B22] rounded flex items-center justify-center shrink-0">
+                  <CarIcon className="h-5 w-5 text-white" />
                 </div>
-                <div className="flex-1 p-6 sm:p-8">
-                  <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22] mb-1">
-                    {featuredCar.make}
+                <div>
+                  <div className="font-extrabold text-sm text-stone-900">
+                    {featuredCar.make} {featuredCar.model} {featuredCar.year}
                   </div>
-                  <div className="text-xl font-extrabold">
-                    {featuredCar.model} · {featuredCar.year}
+                  <div className="text-xs text-stone-400">
+                    {featuredCar.km.toLocaleString("es-ES")} km · {featuredCar.fuel} · {featuredCar.transmission}
                   </div>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    <span className="bg-stone-200 text-stone-600 text-xs px-2 py-0.5 rounded">
-                      {(featuredCar.km / 1000).toFixed(0)}k km
-                    </span>
-                    <span className="bg-stone-200 text-stone-600 text-xs px-2 py-0.5 rounded">{featuredCar.fuel}</span>
-                    <span className="bg-stone-200 text-stone-600 text-xs px-2 py-0.5 rounded">
-                      {featuredCar.transmission}
-                    </span>
-                  </div>
-                  <div className="mt-6 space-y-2.5 border-t border-stone-200 pt-5">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-stone-400">Precio estimado en concesionario</span>
-                      <span className="line-through text-stone-400 font-semibold">
-                        {formatPrice(Math.round(featuredCar.price * 1.20))}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-stone-700 font-bold text-sm">Nuestro precio</span>
-                      <span className="text-2xl font-black text-[#EE7B22]">{formatPrice(featuredCar.price)}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm bg-green-50 border border-green-100 rounded-lg px-3 py-2 mt-1">
-                      <span className="text-green-700 font-bold">Ahorro estimado (20%)</span>
-                      <span className="text-green-700 font-extrabold">
-                        {formatPrice(Math.round(featuredCar.price * 0.20))}
-                      </span>
-                    </div>
-                  </div>
-                  <Link
-                    href={`/coche/${featuredCar.id}`}
-                    className="mt-5 w-full inline-flex items-center justify-center gap-2 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold py-3 rounded-lg transition-colors text-sm"
-                  >
-                    Consultar este {featuredCar.make} <ArrowRight className="h-4 w-4" />
-                  </Link>
                 </div>
               </div>
+
+              {/* Price breakdown */}
+              <div className="px-6 py-4 space-y-0">
+                {[
+                  { label: "Precio mayorista AUTO1", value: featuredCar.price - 1730, bold: false },
+                  { label: "Fees de compra profesional", value: 280, bold: false },
+                  { label: "Transporte hasta entrega", value: 200, bold: false },
+                  { label: "Gastos administrativos", value: 250, bold: false },
+                  { label: "Total pagado al mayorista", value: featuredCar.price - 1000, bold: true },
+                  { label: "Fee Pujamostucoche (gestión)", value: 1000, bold: false },
+                ].map(({ label, value, bold }) => (
+                  <div key={label} className={`flex justify-between items-center py-2.5 border-b border-stone-100 last:border-0 text-sm ${bold ? "font-extrabold text-stone-900" : "text-stone-600"}`}>
+                    <span>{label}</span>
+                    <span className={bold ? "tabular-nums" : "tabular-nums text-stone-700"}>{formatPrice(value)}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Total final */}
+              <div className="mx-4 mb-4 bg-[#EE7B22] rounded-xl px-5 py-4 flex items-center justify-between">
+                <span className="text-white font-extrabold text-sm uppercase tracking-wider">Precio total final</span>
+                <span className="text-white font-black text-2xl tabular-nums">{formatPrice(featuredCar.price)}</span>
+              </div>
+
+              {/* Market comparison */}
+              <div className="px-6 pb-6 text-center space-y-1.5">
+                <div className="text-sm font-semibold text-stone-700">
+                  Este mismo coche en el mercado tradicional:{" "}
+                  <span className="line-through text-stone-400">
+                    {formatPrice(Math.round(featuredCar.price * 1.12))} — {formatPrice(Math.round(featuredCar.price * 1.25))}
+                  </span>
+                </div>
+                <div className="text-[11px] text-stone-400">
+                  Coches.net · Milanuncios · Concesionarios de ocasión — verificado hoy
+                </div>
+                <div className="text-[#EE7B22] font-extrabold text-sm">
+                  Tu ahorro real: entre {formatPrice(Math.round(featuredCar.price * 0.12))} y {formatPrice(Math.round(featuredCar.price * 0.25))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 text-center">
+              <Link
+                href={`/coche/${featuredCar.id}`}
+                className="inline-flex items-center gap-2 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold px-7 py-3.5 rounded-xl transition-colors text-sm"
+              >
+                Ver este {featuredCar.make} <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
           </div>
         </section>
