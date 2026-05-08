@@ -247,11 +247,11 @@ export default function LandingPage() {
 
               {/* Car photo */}
               {featuredCar.imageUrl && (
-                <div className="w-full h-52 overflow-hidden">
+                <div className="w-full h-52 bg-stone-100 flex items-center justify-center overflow-hidden">
                   <img
                     src={featuredCar.imageUrl}
                     alt={`${featuredCar.make} ${featuredCar.model}`}
-                    className="w-full h-full object-cover object-center"
+                    className="w-full h-full object-contain"
                   />
                 </div>
               )}

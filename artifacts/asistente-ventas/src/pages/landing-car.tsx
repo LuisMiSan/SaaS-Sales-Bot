@@ -570,7 +570,7 @@ export default function LandingCarPage() {
                           <Phone className="h-3.5 w-3.5" /> Llamar ahora
                         </a>
                         <a
-                          href={buildWhatsappUrl(waNumber, `Hola, me gustaría agendar una cita para ver el ${car.make} ${car.model} ${car.year}. ¿Cuándo os va bien?`)}
+                          href={buildWhatsappUrl(waNumber, `Hola, me gustaría agendar una cita para ver el ${car.make} ${car.model} ${car.year}. ¿Cuándo os va bien?`) ?? undefined}
                           target="_blank" rel="noopener noreferrer"
                           className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 font-bold text-xs transition-colors"
                         >
