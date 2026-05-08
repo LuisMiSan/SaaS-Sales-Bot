@@ -245,6 +245,17 @@ export default function LandingPage() {
                 </div>
               </div>
 
+              {/* Car photo */}
+              {featuredCar.imageUrl && (
+                <div className="w-full h-52 overflow-hidden">
+                  <img
+                    src={featuredCar.imageUrl}
+                    alt={`${featuredCar.make} ${featuredCar.model}`}
+                    className="w-full h-full object-cover object-center"
+                  />
+                </div>
+              )}
+
               {/* Price breakdown */}
               <div className="px-6 py-4 space-y-0">
                 {[
