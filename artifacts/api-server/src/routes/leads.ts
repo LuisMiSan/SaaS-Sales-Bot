@@ -291,4 +291,13 @@ router.post("/leads/:id/draft", requireStaffAuth, async (req, res): Promise<void
   res.json({ intent: body.data.intent, content: draft.content, rationale: draft.rationale });
 });
 
+router.delete("/staff/leads/:id", requireStaffAuth, async (req, res): Promise<void> => {
+  const id = Number(req.params.id);
+  if (!id) { res.status(400).json({ error: "Invalid id" }); return; }
+  await db.delete(messagesTable).where(eq(messagesTable.leadId, id));
+  const [deleted] = await db.delete(leadsTable).where(eq(leadsTable.id, id)).returning();
+  if (!deleted) { res.status(404).json({ error: "Lead not found" }); return; }
+  res.status(204).end();
+});
+
 export default router;
