@@ -204,8 +204,6 @@ export default function LandingCarPage() {
   const savingsMax = hasMarket ? car.marketPriceMax! - car.price : null;
   const monthlyEst = Math.round(car.price / 60);
 
-  const waVoiceUrl = buildWhatsappUrl(waNumber, `Hola, tengo dudas sobre el ${car.make} ${car.model} ${car.year} (${formatPrice(car.price)}). ¿Podéis responderme?`);
-  const waHeaderUrl = buildWhatsappUrl(waNumber, `Hola, quiero este ${car.make} ${car.model} ${car.year} (${formatPrice(car.price)}). ¿Podéis ayudarme?`);
 
   const onScrollToCta = () => {
     ctaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
