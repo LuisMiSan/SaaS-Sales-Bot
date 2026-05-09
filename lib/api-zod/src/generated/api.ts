@@ -87,6 +87,8 @@ export const ListCarsResponseItem = zod.object({
   consumptionUrban: zod.number().nullish(),
   consumptionHighway: zod.number().nullish(),
   consumptionMixed: zod.number().nullish(),
+  marketPriceMin: zod.number().nullish(),
+  marketPriceMax: zod.number().nullish(),
   publishedAt: zod.coerce.date(),
 });
 export const ListCarsResponse = zod.array(ListCarsResponseItem);
@@ -150,6 +152,8 @@ export const GetCarResponse = zod.object({
   consumptionUrban: zod.number().nullish(),
   consumptionHighway: zod.number().nullish(),
   consumptionMixed: zod.number().nullish(),
+  marketPriceMin: zod.number().nullish(),
+  marketPriceMax: zod.number().nullish(),
   publishedAt: zod.coerce.date(),
 });
 
@@ -536,6 +540,7 @@ export const ListLeadsResponse = zod.array(ListLeadsResponseItem);
 export const CreateLeadBody = zod.object({
   name: zod.string(),
   phone: zod.string(),
+  email: zod.string().optional(),
   carId: zod.number(),
 });
 

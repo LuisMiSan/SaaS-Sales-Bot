@@ -49,6 +49,7 @@ export const leadsTable = pgTable("leads", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   phone: text("phone").notNull(),
+  email: text("email"),
   carId: integer("car_id").notNull(),
   stage: text("stage").notNull().default("new"),
   depositPaid: boolean("deposit_paid").notNull().default(false),

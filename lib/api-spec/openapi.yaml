@@ -401,6 +401,8 @@ components:
         consumptionUrban: { type: ["number", "null"] }
         consumptionHighway: { type: ["number", "null"] }
         consumptionMixed: { type: ["number", "null"] }
+        marketPriceMin: { type: ["integer", "null"] }
+        marketPriceMax: { type: ["integer", "null"] }
         publishedAt: { type: string, format: date-time }
       required: [id, make, model, year, price, priceLabel, status, km, fuel, transmission, location, publishedAt]
 
@@ -562,6 +564,7 @@ components:
       properties:
         name: { type: string }
         phone: { type: string }
+        email: { type: string }
         carId: { type: integer }
       required: [name, phone, carId]
 

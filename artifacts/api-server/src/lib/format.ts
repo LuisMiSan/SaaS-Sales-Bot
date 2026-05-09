@@ -78,6 +78,8 @@ export function serializePublicCar(car: DbCar) {
     fuel: car.fuel,
     transmission: car.transmission,
     location: car.location,
+    marketPriceMin: car.marketPriceMin ?? null,
+    marketPriceMax: car.marketPriceMax ?? null,
     publishedAt: car.publishedAt.toISOString(),
     ...extendedSpecFields(car),
   };

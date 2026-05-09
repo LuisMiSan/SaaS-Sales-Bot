@@ -46,5 +46,9 @@ export interface PublicCar {
   consumptionHighway?: number | null;
   /** @nullable */
   consumptionMixed?: number | null;
+  /** @nullable */
+  marketPriceMin?: number | null;
+  /** @nullable */
+  marketPriceMax?: number | null;
   publishedAt: Date;
 }

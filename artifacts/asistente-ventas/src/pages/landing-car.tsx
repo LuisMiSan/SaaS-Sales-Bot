@@ -127,6 +127,7 @@ export default function LandingCarPage() {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [accepted, setAccepted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -147,11 +148,20 @@ export default function LandingCarPage() {
 
   const waUrl = buildWhatsappUrl(waNumber, `Hola, me interesa el ${car.make} ${car.model} ${car.year} (${formatPrice(car.price)}) que vi en Pujamostucoche.es. ¿Podéis darme más información?`);
 
+  const auto1Price = Math.round(car.price - 1730);
+  const transport = 200;
+  const conditioning = 530;
+  const management = 1000;
+  const marketAvg = car.marketPriceMin && car.marketPriceMax
+    ? Math.round((car.marketPriceMin + car.marketPriceMax) / 2)
+    : null;
+  const savings = marketAvg ? marketAvg - car.price : null;
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!accepted || !name.trim() || !phone.trim()) return;
     create.mutate(
-      { data: { name: name.trim(), phone: phone.trim(), carId: car.id } },
+      { data: { name: name.trim(), phone: phone.trim(), email: email.trim() || undefined, carId: car.id } },
       { onSuccess: () => setSubmitted(true) },
     );
   };
@@ -451,51 +461,89 @@ export default function LandingCarPage() {
             <aside className="lg:col-span-2 order-1 lg:order-2">
               <div className="lg:sticky lg:top-24 space-y-4">
 
-                {/* PRECIO Y BLOQUEO */}
-                <div className="bg-white rounded-xl p-5 sm:p-6 border border-stone-200 shadow-sm">
-                  <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22]">{car.make}</div>
-                  <h1 className="text-xl font-extrabold mt-0.5 leading-snug">{car.make} {car.model}</h1>
-                  {car.bodyType && <div className="text-xs text-stone-400 mt-0.5">{car.bodyType}</div>}
-
-                  {/* Specs rápidos */}
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    <span className="inline-flex items-center gap-1 text-xs text-stone-500 bg-stone-50 border border-stone-200 px-2.5 py-1 rounded-full">
-                      <Calendar className="h-3 w-3" /> {car.year}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-xs text-stone-500 bg-stone-50 border border-stone-200 px-2.5 py-1 rounded-full">
-                      <Gauge className="h-3 w-3" /> {(car.km / 1000).toFixed(0)}k km
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-xs text-stone-500 bg-stone-50 border border-stone-200 px-2.5 py-1 rounded-full">
-                      <Wind className="h-3 w-3" /> {car.fuel}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-xs text-stone-500 bg-stone-50 border border-stone-200 px-2.5 py-1 rounded-full">
-                      <Settings2 className="h-3 w-3" /> {car.transmission}
-                    </span>
-                    {car.horsepower != null && (
-                      <span className="inline-flex items-center gap-1 text-xs text-stone-500 bg-stone-50 border border-stone-200 px-2.5 py-1 rounded-full">
-                        <Zap className="h-3 w-3" /> {car.horsepower} CV
+                {/* CABECERA: título + specs */}
+                <div className="bg-white rounded-xl p-5 border border-stone-200 shadow-sm">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22]">{car.make}</div>
+                      <h1 className="text-xl font-extrabold mt-0.5 leading-snug">{car.make} {car.model} {car.year}</h1>
+                      <div className="text-xs text-stone-500 mt-0.5">{(car.km / 1000).toFixed(0)}k km · {car.fuel} · {car.transmission}{car.color ? ` · ${car.color}` : ""}</div>
+                    </div>
+                    {car.status === "open" && (
+                      <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider bg-green-100 text-green-700 border border-green-200 px-2.5 py-1 rounded-full">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" /> Disponible
                       </span>
                     )}
                   </div>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {[
+                      { icon: Calendar, v: String(car.year) },
+                      { icon: Gauge, v: `${(car.km / 1000).toFixed(0)}k km` },
+                      { icon: Fuel, v: car.fuel },
+                      { icon: Settings2, v: car.transmission },
+                      ...(car.horsepower != null ? [{ icon: Zap, v: `${car.horsepower} CV` }] : []),
+                      ...(car.doors != null ? [{ icon: DoorOpen, v: `${car.doors} puertas` }] : []),
+                    ].map(({ icon: Icon, v }) => (
+                      <span key={v} className="inline-flex items-center gap-1 text-xs text-stone-500 bg-stone-50 border border-stone-200 px-2.5 py-1 rounded-full">
+                        <Icon className="h-3 w-3" /> {v}
+                      </span>
+                    ))}
+                  </div>
+                </div>
 
-                  {/* Precio */}
-                  <div className="mt-5 pb-4 border-b border-stone-100">
-                    <div className="flex items-baseline gap-3 justify-between">
-                      <div>
-                        <div className="text-[10px] uppercase tracking-widest text-stone-400 font-semibold">Al contado</div>
-                        <div className="text-3xl font-black tabular-nums text-[#0A0A1A]">{formatPrice(car.price)}</div>
+                {/* TRANSPARENCIA TOTAL DE PRECIO */}
+                <div className="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+                  <div className="bg-[#070711] px-5 py-3">
+                    <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22]">Transparencia total · Sin letra pequeña</div>
+                    <div className="text-white text-sm font-bold mt-0.5">Así calculamos tu precio</div>
+                  </div>
+                  <div className="p-5 space-y-2.5">
+                    <PriceLine label="Precio mayorista AUTO1" amount={auto1Price} />
+                    <PriceLine label="Transporte hasta Madrid" amount={transport} prefix="+" />
+                    <PriceLine label="Acondicionamiento y revisión" amount={conditioning} prefix="+" />
+                    <PriceLine label="Gestión y tramitación" amount={management} prefix="+" />
+                    <div className="pt-2.5 border-t-2 border-[#EE7B22]">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-extrabold text-[#0A0A1A] uppercase tracking-wide">Precio total final</span>
+                        <span className="text-2xl font-black tabular-nums text-[#EE7B22]">{formatPrice(car.price)}</span>
                       </div>
-                      <div className="text-right">
-                        <div className="text-[10px] uppercase tracking-widest text-stone-400 font-semibold">Financiado</div>
-                        <div className="text-xl font-black text-[#EE7B22]">{monthlyEst} €<span className="text-sm font-bold">/mes</span></div>
-                      </div>
+                      <div className="text-[10px] text-stone-400 mt-1">IVA incluido · Transferencia incluida</div>
                     </div>
-                    <div className="mt-1.5 text-[10px] text-stone-400">*Financiación estimada a 60 meses. Sujeto a aprobación bancaria.</div>
                   </div>
 
-                  {/* ESTADO: reservado por otro */}
+                  {/* Comparativa de mercado */}
+                  {marketAvg && savings != null && (
+                    <div className="mx-5 mb-5 rounded-xl bg-blue-50 border border-blue-100 p-4">
+                      <div className="text-[10px] font-extrabold uppercase tracking-widest text-blue-600 mb-2">Comparativa de mercado</div>
+                      <div className="flex items-end justify-between gap-2">
+                        <div>
+                          <div className="text-[11px] text-stone-500">Portales (AutoScout24, Wallapop…)</div>
+                          <div className="text-base font-black text-stone-700 tabular-nums">{formatPrice(marketAvg)} <span className="text-xs font-semibold text-stone-400">media</span></div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-[11px] text-stone-500">Tu ahorro real</div>
+                          <div className="text-xl font-black text-[#27AE60] tabular-nums">-{formatPrice(savings)}</div>
+                        </div>
+                      </div>
+                      <div className="mt-3 h-2 rounded-full bg-stone-200 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-blue-400 to-[#EE7B22]"
+                          style={{ width: `${Math.min(100, Math.round((car.price / marketAvg) * 100))}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-[10px] text-stone-400 mt-1">
+                        <span>{formatPrice(car.marketPriceMin!)} mín.</span>
+                        <span className="font-bold text-[#EE7B22]">Tú pagas {formatPrice(car.price)}</span>
+                        <span>{formatPrice(car.marketPriceMax!)} máx.</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* FORMULARIO / ACCIÓN */}
+                <div className="bg-white rounded-xl p-5 sm:p-6 border border-stone-200 shadow-sm">
                   {isLockedByOther ? (
-                    <div className="mt-5 p-4 rounded-xl bg-stone-50 border border-stone-200">
+                    <div className="p-4 rounded-xl bg-stone-50 border border-stone-200">
                       <div className="font-extrabold text-stone-900 flex items-center gap-2 mb-1.5 text-sm">
                         <Lock className="h-5 w-5" /> Reservado temporalmente
                       </div>
@@ -508,76 +556,97 @@ export default function LandingCarPage() {
                     </div>
 
                   ) : submitted ? (
-                    <div className="mt-5 p-5 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] text-center">
+                    <div className="p-5 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] text-center">
                       <CheckCircle2 className="h-10 w-10 text-[#16A34A] mx-auto mb-3" />
-                      <div className="font-extrabold text-[#15803D] text-base mb-1">Reserva recibida</div>
+                      <div className="font-extrabold text-[#15803D] text-base mb-1">Solicitud recibida</div>
                       <p className="text-xs text-[#166534] leading-relaxed">
                         Nos ponemos en contacto contigo por WhatsApp en los próximos minutos para gestionar la visita.
                       </p>
                     </div>
 
                   ) : (
-                    <form onSubmit={onSubmit} className="mt-5 space-y-3">
-                      <div>
-                        <label className="block text-xs font-semibold text-stone-600 mb-1.5">Tu nombre</label>
-                        <input
-                          required value={name} onChange={(e) => setName(e.target.value)}
-                          placeholder="Ej: María García"
-                          className="w-full px-3 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-[#EE7B22] focus:ring-2 focus:ring-[#EE7B22]/15"
-                        />
+                    <>
+                      <div className="mb-4">
+                        <div className="text-sm font-extrabold text-stone-900">Quiero comprar como un profesional</div>
+                        <div className="text-xs text-stone-500 mt-0.5">Sin intermediarios · Sin comisiones ocultas · Transferencia incluida</div>
                       </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-stone-600 mb-1.5">Teléfono (WhatsApp)</label>
-                        <input
-                          required type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
-                          placeholder="+34 600 000 000"
-                          className="w-full px-3 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-[#EE7B22] focus:ring-2 focus:ring-[#EE7B22]/15"
-                        />
-                      </div>
-                      <label className="flex items-start gap-2 text-xs text-stone-500 cursor-pointer">
-                        <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className="mt-0.5 shrink-0" />
-                        <span>Acepto que un comercial me contacte para gestionar el bloqueo gratuito de 2h.</span>
-                      </label>
-                      <button
-                        type="submit"
-                        disabled={!accepted || create.isPending}
-                        className="w-full py-3.5 rounded-lg bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
-                      >
-                        <Lock className="h-4 w-4" />
-                        {create.isPending ? "Enviando…" : "Reservar vehículo"}
-                      </button>
-                      <div className="flex items-center justify-center gap-1.5 text-[11px] text-stone-400">
-                        <ShieldCheck className="h-3.5 w-3.5 text-[#27AE60]" /> Sin pagos · Sin compromiso · Cancelas cuando quieras
-                      </div>
-                    </form>
-                  )}
+                      <form onSubmit={onSubmit} className="space-y-3">
+                        {/* Coche de interés: read-only */}
+                        <div>
+                          <label className="block text-xs font-semibold text-stone-500 mb-1">Coche de interés</label>
+                          <div className="w-full px-3 py-2.5 border border-stone-100 rounded-lg text-sm bg-stone-50 text-stone-600 font-semibold">
+                            {car.make} {car.model} {car.year} — {formatPrice(car.price)}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-stone-600 mb-1.5">Tu nombre</label>
+                          <input
+                            required value={name} onChange={(e) => setName(e.target.value)}
+                            placeholder="Ej: María García"
+                            className="w-full px-3 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-[#EE7B22] focus:ring-2 focus:ring-[#EE7B22]/15"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-stone-600 mb-1.5">Teléfono WhatsApp</label>
+                          <input
+                            required type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
+                            placeholder="+34 600 000 000"
+                            className="w-full px-3 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-[#EE7B22] focus:ring-2 focus:ring-[#EE7B22]/15"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-stone-600 mb-1.5">Email <span className="text-stone-400 font-normal">(opcional)</span></label>
+                          <input
+                            type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                            placeholder="tu@correo.es"
+                            className="w-full px-3 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-[#EE7B22] focus:ring-2 focus:ring-[#EE7B22]/15"
+                          />
+                        </div>
+                        <label className="flex items-start gap-2 text-xs text-stone-500 cursor-pointer">
+                          <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className="mt-0.5 shrink-0" />
+                          <span>Acepto que un comercial me contacte por WhatsApp para gestionar la visita.</span>
+                        </label>
+                        <button
+                          type="submit"
+                          disabled={!accepted || create.isPending}
+                          className="w-full py-4 rounded-xl bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold text-sm tracking-wide uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2 shadow-lg shadow-[#EE7B22]/25"
+                        >
+                          <Lock className="h-4 w-4" />
+                          {create.isPending ? "Enviando…" : "Quiero este coche"}
+                        </button>
+                        <div className="flex items-center justify-center gap-1.5 text-[11px] text-stone-400">
+                          <ShieldCheck className="h-3.5 w-3.5 text-[#27AE60]" /> Sin pagos · Sin compromiso · 2h de bloqueo gratuito
+                        </div>
+                      </form>
 
-                  {/* WhatsApp directo */}
-                  {!submitted && waUrl && (
-                    <div className="mt-4 pt-4 border-t border-stone-100">
-                      <p className="text-xs text-stone-400 text-center mb-2.5">¿Prefieres hablar directamente?</p>
-                      <a
-                        href={waUrl} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex w-full items-center justify-center gap-2 py-3 rounded-lg bg-[#25D366] hover:bg-[#1FBA57] text-white font-extrabold text-sm transition-colors"
-                      >
-                        <MessageSquare className="h-4 w-4" /> Preguntar por WhatsApp
-                      </a>
-                      <div className="grid grid-cols-2 gap-2 mt-2">
-                        <a
-                          href={`tel:+${waNumber || "34604928624"}`}
-                          className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 font-bold text-xs transition-colors"
-                        >
-                          <Phone className="h-3.5 w-3.5" /> Llamar ahora
-                        </a>
-                        <a
-                          href={buildWhatsappUrl(waNumber, `Hola, me gustaría agendar una cita para ver el ${car.make} ${car.model} ${car.year}. ¿Cuándo os va bien?`) ?? undefined}
-                          target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 font-bold text-xs transition-colors"
-                        >
-                          <CalendarDays className="h-3.5 w-3.5" /> Agendar cita
-                        </a>
-                      </div>
-                    </div>
+                      {/* WhatsApp directo */}
+                      {waUrl && (
+                        <div className="mt-4 pt-4 border-t border-stone-100">
+                          <p className="text-xs text-stone-400 text-center mb-2.5">¿Tienes dudas? Escríbenos directamente</p>
+                          <a
+                            href={waUrl} target="_blank" rel="noopener noreferrer"
+                            className="inline-flex w-full items-center justify-center gap-2 py-3 rounded-lg bg-[#25D366] hover:bg-[#1FBA57] text-white font-extrabold text-sm transition-colors"
+                          >
+                            <MessageSquare className="h-4 w-4" /> Preguntar por WhatsApp
+                          </a>
+                          <div className="grid grid-cols-2 gap-2 mt-2">
+                            <a
+                              href={`tel:+${waNumber || "34604928624"}`}
+                              className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 font-bold text-xs transition-colors"
+                            >
+                              <Phone className="h-3.5 w-3.5" /> Llamar ahora
+                            </a>
+                            <a
+                              href={buildWhatsappUrl(waNumber, `Hola, me gustaría agendar una cita para ver el ${car.make} ${car.model} ${car.year}. ¿Cuándo os va bien?`) ?? undefined}
+                              target="_blank" rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 font-bold text-xs transition-colors"
+                            >
+                              <CalendarDays className="h-3.5 w-3.5" /> Agendar cita
+                            </a>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -733,6 +802,18 @@ function LockStep({ n, icon: Icon, title, body }: { n: number; icon: React.Eleme
       </div>
       <h3 className="text-sm font-extrabold text-stone-900">{title}</h3>
       <p className="text-xs text-stone-500 mt-1 leading-relaxed">{body}</p>
+    </div>
+  );
+}
+
+function PriceLine({ label, amount, prefix }: { label: string; amount: number; prefix?: string }) {
+  return (
+    <div className="flex items-center justify-between text-sm">
+      <span className="text-stone-500">{label}</span>
+      <span className="font-semibold tabular-nums text-stone-800">
+        {prefix && <span className="text-stone-400 mr-0.5">{prefix}</span>}
+        {amount.toLocaleString("es-ES")} €
+      </span>
     </div>
   );
 }

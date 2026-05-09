@@ -57,6 +57,10 @@ export interface PublicCar {
   consumptionHighway?: number | null;
   /** @nullable */
   consumptionMixed?: number | null;
+  /** @nullable */
+  marketPriceMin?: number | null;
+  /** @nullable */
+  marketPriceMax?: number | null;
   publishedAt: string;
 }
 
@@ -314,6 +318,7 @@ export type LeadDetail = LeadWithCar & {
 export interface CreateLeadBody {
   name: string;
   phone: string;
+  email?: string;
   carId: number;
 }
 
