@@ -245,9 +245,18 @@ export default function LandingCarPage() {
       {/* ── HEADER ── */}
       <header className="sticky top-0 z-50 bg-[#0B1D3A]/95 backdrop-blur-md shadow-lg">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
-          <Link href="/" className="text-base font-extrabold tracking-tight whitespace-nowrap text-white">
-            pujamos<span className="text-[#F47B20]">tu</span>coche
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/tienda"
+              className="inline-flex items-center gap-1.5 text-white/60 hover:text-white text-[11px] font-semibold uppercase tracking-wide transition-colors"
+            >
+              <ChevronLeft className="h-4 w-4" /> Volver
+            </Link>
+            <span className="text-white/20 text-sm">|</span>
+            <Link href="/" className="text-sm font-extrabold tracking-tight whitespace-nowrap text-white">
+              pujamos<span className="text-[#F47B20]">tu</span>coche
+            </Link>
+          </div>
           <nav className="hidden md:flex items-center gap-6 text-[11px] font-semibold text-white/60 uppercase tracking-wide">
             <a href="#como-funciona" className="hover:text-[#F47B20] transition-colors">Cómo funciona</a>
             <Link href="/tienda" className="hover:text-[#F47B20] transition-colors">Ver coches disponibles</Link>
