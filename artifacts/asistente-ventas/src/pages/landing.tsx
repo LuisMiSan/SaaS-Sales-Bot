@@ -4,7 +4,6 @@ import { useListCars } from "@workspace/api-client-react";
 import {
   ArrowRight,
   Lock,
-  MessageSquare,
   CheckCircle2,
   Car as CarIcon,
   Menu,
@@ -23,7 +22,7 @@ import {
   Droplets,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
-import { WhatsappWidget, buildWhatsappUrl, useWhatsappNumber } from "@/components/whatsapp-widget";
+import { WhatsappWidget, useWhatsappNumber } from "@/components/whatsapp-widget";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -66,7 +65,6 @@ export default function LandingPage() {
 
   useEffect(() => { document.documentElement.classList.remove("dark"); }, []);
 
-  const waHeroUrl = buildWhatsappUrl(waNumber, "Hola, me gustaría consultar los coches disponibles hoy en Pujamostucoche.es.");
 
   return (
     <div className="bg-white text-[#0A0A1A] font-jakarta min-h-screen">
@@ -134,24 +132,6 @@ export default function LandingPage() {
               Compramos directamente a mayoristas y subastas. Sin intermediarios.
               Sin margen inflado. Solo el precio <strong className="text-white font-extrabold">justo</strong>.
             </p>
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <a
-                href="#catalogo"
-                className="inline-flex items-center gap-2 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold px-8 py-4 rounded-md transition-colors text-base"
-              >
-                Consultar coche disponible hoy <ArrowRight className="h-4 w-4" />
-              </a>
-              {waHeroUrl && (
-                <a
-                  href={waHeroUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/20 text-white font-extrabold px-8 py-4 rounded-md transition-colors text-base"
-                >
-                  <MessageSquare className="h-4 w-4" /> Hablar por WhatsApp
-                </a>
-              )}
-            </div>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-5 text-xs font-semibold text-white/40">
               <div className="flex items-center gap-1.5">
                 {[1, 2, 3, 4, 5].map((i) => (
@@ -561,16 +541,6 @@ export default function LandingPage() {
             >
               Ver coches disponibles hoy <ArrowRight className="h-4 w-4" />
             </a>
-            {waHeroUrl && (
-              <a
-                href={waHeroUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/20 text-white font-extrabold px-8 py-4 rounded-md transition-colors"
-              >
-                <MessageSquare className="h-4 w-4" /> Consultar por WhatsApp
-              </a>
-            )}
           </div>
         </div>
       </section>
