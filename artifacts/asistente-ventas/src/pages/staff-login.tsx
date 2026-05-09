@@ -1,44 +1,32 @@
 import { useState } from "react";
 import { Lock } from "lucide-react";
-import { setStoredToken } from "@/lib/staff-auth";
+import { login } from "@/lib/staff-auth";
 
 interface Props {
   onLogin: () => void;
 }
 
 export default function StaffLogin({ onLogin }: Props) {
-  const [key, setKey] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const trimmed = key.trim();
-    if (!trimmed) {
-      setError("Introduce la clave de acceso.");
-      return;
-    }
+    const u = username.trim();
+    const p = password;
+    if (!u) { setError("Introduce tu usuario."); return; }
+    if (!p) { setError("Introduce tu contraseña."); return; }
     setLoading(true);
     setError(null);
-    try {
-      const res = await fetch("/api/dashboard/summary", {
-        headers: { Authorization: `Bearer ${trimmed}` },
-      });
-      if (res.status === 401) {
-        setError("Clave incorrecta. Inténtalo de nuevo.");
-        return;
-      }
-      if (!res.ok && res.status !== 200) {
-        setError("Clave incorrecta. Inténtalo de nuevo.");
-        return;
-      }
-      setStoredToken(trimmed);
-      onLogin();
-    } catch {
-      setError("No se pudo conectar con el servidor.");
-    } finally {
-      setLoading(false);
+    const result = await login(u, p);
+    setLoading(false);
+    if (!result.ok) {
+      setError(result.error ?? "Error desconocido.");
+      return;
     }
+    onLogin();
   }
 
   return (
@@ -53,14 +41,28 @@ export default function StaffLogin({ onLogin }: Props) {
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="staff-key" className="block text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1.5">
-              Clave de acceso
+            <label htmlFor="staff-username" className="block text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1.5">
+              Usuario
             </label>
             <input
-              id="staff-key"
+              id="staff-username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="admin"
+              autoComplete="username"
+              className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white placeholder-stone-500 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label htmlFor="staff-password" className="block text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1.5">
+              Contraseña
+            </label>
+            <input
+              id="staff-password"
               type="password"
-              value={key}
-              onChange={(e) => setKey(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••••••••"
               autoComplete="current-password"
               className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white placeholder-stone-500 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Save, Phone, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { getStoredToken } from "@/lib/staff-auth";
 
 const BASE = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "");
 
@@ -13,10 +12,7 @@ export default function SettingsPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const token = getStoredToken();
-    fetch(`${BASE}/api/settings`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    })
+    fetch(`${BASE}/api/settings`, { credentials: "include" })
       .then((r) => r.json())
       .then((data: Record<string, string>) => {
         const num = data.whatsapp_number ?? "";
@@ -34,13 +30,10 @@ export default function SettingsPage() {
     if (!valid) return;
     setSaving(true);
     try {
-      const token = getStoredToken();
       const res = await fetch(`${BASE}/api/settings`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ whatsapp_number: waNumber }),
       });
       if (!res.ok) throw new Error();

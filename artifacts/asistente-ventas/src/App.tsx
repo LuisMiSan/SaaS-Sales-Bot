@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Switch, Route, Router as WouterRouter, useLocation, Redirect } from "wouter";
+import { useState, useEffect, useCallback } from "react";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { setAuthTokenGetter } from "@workspace/api-client-react";
 import { Toaster } from "@/components/ui/toaster";
@@ -19,8 +19,8 @@ import PrivacyPage from "@/pages/legal-privacy";
 import CookiesPage from "@/pages/legal-cookies";
 import TermsPage from "@/pages/legal-terms";
 import StaffLogin from "@/pages/staff-login";
-import { getStoredToken, isAuthenticated } from "@/lib/staff-auth";
 import { CookieConsent } from "@/components/cookie-consent";
+import { checkSession, logout as doLogout } from "@/lib/staff-auth";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,14 +33,33 @@ const queryClient = new QueryClient({
   },
 });
 
-setAuthTokenGetter(() => getStoredToken());
+// No bearer token needed — auth is handled via HttpOnly session cookie.
+setAuthTokenGetter(null);
 
 function CockpitRouter() {
-  const [authed, setAuthed] = useState(() => isAuthenticated());
+  const [authed, setAuthed] = useState<boolean | null>(null);
 
-  function handleLogin() {
+  useEffect(() => {
+    checkSession().then((ok) => setAuthed(ok));
+  }, []);
+
+  const handleLogin = useCallback(() => {
     setAuthed(true);
     void queryClient.invalidateQueries();
+  }, []);
+
+  const handleLogout = useCallback(async () => {
+    await doLogout();
+    setAuthed(false);
+    void queryClient.clear();
+  }, []);
+
+  if (authed === null) {
+    return (
+      <div className="min-h-screen bg-stone-950 flex items-center justify-center">
+        <div className="text-stone-400 text-sm">Cargando…</div>
+      </div>
+    );
   }
 
   if (!authed) {
@@ -48,7 +67,7 @@ function CockpitRouter() {
   }
 
   return (
-    <Layout>
+    <Layout onLogout={handleLogout}>
       <Switch>
         <Route path="/staff" component={DashboardPage} />
         <Route path="/staff/pipeline" component={PipelinePage} />
@@ -103,10 +122,6 @@ function Router() {
 }
 
 function App() {
-  useEffect(() => {
-    setAuthTokenGetter(() => getStoredToken());
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

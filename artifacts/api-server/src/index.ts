@@ -1,6 +1,7 @@
 import app from "./app";
 import { logger } from "./lib/logger";
 import { seedIfEmpty } from "./lib/seed";
+import { bootstrapAdminIfNeeded } from "./lib/bootstrap-admin";
 import { db, carsTable, leadsTable, activityTable } from "@workspace/db";
 import { eq, and, lt } from "drizzle-orm";
 import { windowHoursForAttractiveness } from "./lib/format";
@@ -67,6 +68,11 @@ app.listen(port, async (err) => {
   }
 
   logger.info({ port }, "Server listening");
+  try {
+    await bootstrapAdminIfNeeded();
+  } catch (e) {
+    logger.error({ err: e }, "Admin bootstrap failed");
+  }
   try {
     await seedIfEmpty();
   } catch (e) {

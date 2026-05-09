@@ -57,8 +57,7 @@ interface BulkImportResult {
 }
 
 router.post("/cars/bulk-import", requireStaffAuth, async (req, res): Promise<void> => {
-  const authHeader = req.headers["authorization"] ?? "";
-  const userId = authHeader.startsWith("Bearer ") ? authHeader.slice(7, 47) : "unknown";
+  const userId = req.staffUser ? String(req.staffUser.userId) : "unknown";
   const rateCheck = checkBulkImportRateLimit(userId);
   if (!rateCheck.allowed) {
     res.setHeader("Retry-After", String(rateCheck.retryAfterSecs));
