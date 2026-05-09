@@ -67,19 +67,19 @@ export default function LandingPage() {
 
 
   return (
-    <div className="bg-white text-[#0A0A1A] font-jakarta min-h-screen">
+    <div className="bg-white text-[#0B1D3A] font-sans min-h-screen">
 
       {/* HEADER */}
-      <header className="fixed top-0 inset-x-0 z-50 bg-[#070711]/95 backdrop-blur border-b border-white/5">
+      <header className="fixed top-0 inset-x-0 z-50 bg-[#0B1D3A]/95 backdrop-blur border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between gap-3">
           <Link href="/" className="text-base sm:text-xl font-extrabold tracking-tight whitespace-nowrap text-white">
-            Pujamos<span className="text-[#EE7B22]">tu</span>coche.es
+            Pujamos<span className="text-[#F47B20]">tu</span>coche.es
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-white/60">
-            <a href="#catalogo" className="hover:text-[#EE7B22] transition-colors">Ver coches</a>
-            <a href="#como-funciona" className="hover:text-[#EE7B22] transition-colors">Cómo funciona</a>
-            <a href="#nosotros" className="hover:text-[#EE7B22] transition-colors">Nosotros</a>
-            <a href="#catalogo" className="ml-2 px-4 py-2 rounded-md bg-[#EE7B22] hover:bg-[#C4621A] text-white transition-colors">
+            <a href="#catalogo" className="hover:text-[#F47B20] transition-colors">Ver coches</a>
+            <a href="#como-funciona" className="hover:text-[#F47B20] transition-colors">Cómo funciona</a>
+            <a href="#nosotros" className="hover:text-[#F47B20] transition-colors">Nosotros</a>
+            <a href="#catalogo" className="ml-2 px-6 py-2.5 rounded-lg bg-[#F47B20] hover:bg-[#D66A15] text-white font-bold transition-all hover:scale-105 shadow-lg shadow-[#F47B20]/30">
               Ver coches
             </a>
           </nav>
@@ -93,7 +93,7 @@ export default function LandingPage() {
           </button>
         </div>
         {menuOpen && (
-          <div className="md:hidden border-t border-white/10 bg-[#070711]">
+          <div className="md:hidden border-t border-white/10 bg-[#0B1D3A]">
             <nav className="px-4 py-3 flex flex-col gap-1 text-sm font-semibold text-white/70">
               <a href="#catalogo" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 rounded-md hover:bg-white/5 hover:text-white">Ver coches</a>
               <a href="#como-funciona" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 rounded-md hover:bg-white/5 hover:text-white">Cómo funciona</a>
@@ -104,7 +104,7 @@ export default function LandingPage() {
       </header>
 
       {/* HERO */}
-      <section className="pt-16 bg-[#070711] text-white">
+      <section className="pt-16 bg-[#0B1D3A] text-white">
         <div className="relative overflow-hidden px-6 py-28 md:py-40 text-center">
           <div
             className="absolute inset-0 opacity-[0.025]"
@@ -114,28 +114,37 @@ export default function LandingPage() {
           />
           <div
             className="absolute inset-0 pointer-events-none"
-            style={{ background: "radial-gradient(ellipse at 50% 60%,rgba(238,123,34,0.10) 0%,transparent 65%)" }}
+            style={{ background: "radial-gradient(ellipse at 50% 60%,rgba(244,123,32,0.12) 0%,transparent 65%)" }}
           />
           <div className="relative max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-[#EE7B22] border border-[#EE7B22]/30 bg-[#EE7B22]/10 mb-7">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-[#F47B20] border border-[#F47B20]/30 bg-[#F47B20]/10 mb-7">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#EE7B22] opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#EE7B22]" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F47B20] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F47B20]" />
               </span>
               Coches disponibles ahora
             </div>
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.05]">
               Deja de pagar el margen<br className="hidden sm:block" /> de los{" "}
-              <em className="not-italic text-[#EE7B22]">concesionarios.</em>
+              <em className="not-italic text-[#F47B20]">concesionarios.</em>
             </h1>
             <p className="mt-7 text-lg md:text-xl text-white/55 max-w-2xl mx-auto leading-relaxed">
               Compramos directamente a mayoristas y subastas. Sin intermediarios.
               Sin margen inflado. Solo el precio <strong className="text-white font-extrabold">justo</strong>.
             </p>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+              <a
+                href="#catalogo"
+                className="inline-flex items-center gap-2 bg-[#F47B20] hover:bg-[#D66A15] text-white font-bold px-10 py-4 rounded-xl shadow-lg shadow-[#F47B20]/30 hover:scale-105 transition-all text-lg"
+              >
+                Ver los coches disponibles hoy <ArrowRight className="h-5 w-5" />
+              </a>
+            </div>
+            <p className="mt-3 text-[11px] text-white/30">Stock limitado · Entre 4 y 12 vehículos activos · Sin compromiso hasta que tú decides</p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-5 text-xs font-semibold text-white/40">
               <div className="flex items-center gap-1.5">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} className="h-3.5 w-3.5 fill-[#EE7B22] text-[#EE7B22]" />
+                  <Star key={i} className="h-3.5 w-3.5 fill-[#F47B20] text-[#F47B20]" />
                 ))}
                 <span className="ml-1 text-white/60">4,8 en Google</span>
               </div>
@@ -157,41 +166,41 @@ export default function LandingPage() {
           <div className="mt-6 space-y-4 text-stone-500 leading-relaxed text-lg">
             <p>
               El margen medio de un concesionario en un coche de ocasión es del{" "}
-              <strong className="text-[#0A0A1A]">15 al 25%</strong> sobre el precio real de mercado.
+              <strong className="text-[#0B1D3A]">15 al 25%</strong> sobre el precio real de mercado.
               Eso significa que en un coche de 15.000 €, estás pagando entre{" "}
-              <strong className="text-[#0A0A1A]">2.250 € y 3.750 € de más</strong>, solo por el nombre en la fachada.
+              <strong className="text-[#0B1D3A]">2.250 € y 3.750 € de más</strong>, solo por el nombre en la fachada.
             </p>
             <p>
               Nosotros accedemos directamente a subastas de flotas y mayoristas. Sin escaparates de lujo.
               Sin vendedores a comisión. Sin ese margen.
             </p>
           </div>
-          <a href="#catalogo" className="mt-8 inline-flex items-center gap-1.5 text-[#EE7B22] font-bold text-sm hover:underline">
+          <a href="#catalogo" className="mt-8 inline-flex items-center gap-1.5 text-[#F47B20] font-bold text-sm hover:underline">
             <ChevronRight className="h-4 w-4" /> Ver coches disponibles hoy
           </a>
         </div>
       </section>
 
       {/* COMPARATIVA */}
-      <section className="bg-[#f5f7fa] py-20 px-6">
+      <section className="bg-[#F9FAFB] py-20 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-extrabold">
               Nosotros vs. Ellos.{" "}
-              <em className="not-italic text-[#EE7B22]">Sin rodeos.</em>
+              <em className="not-italic text-[#F47B20]">Sin rodeos.</em>
             </h2>
           </div>
           <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-200">
-            <div className="grid grid-cols-3 bg-[#070711] text-xs font-extrabold uppercase tracking-widest">
+            <div className="grid grid-cols-3 bg-[#0B1D3A] text-xs font-extrabold uppercase tracking-widest">
               <div className="px-4 sm:px-6 py-4 text-white/30">Característica</div>
               <div className="px-4 sm:px-6 py-4 text-center text-white/50">Concesionario</div>
-              <div className="px-4 sm:px-6 py-4 text-center text-[#EE7B22]">Pujamostucoche</div>
+              <div className="px-4 sm:px-6 py-4 text-center text-[#F47B20]">Pujamostucoche</div>
             </div>
             {COMPARE_ROWS.map(([feat, them, us], i) => (
               <div key={i} className={cn("grid grid-cols-3 border-t border-stone-100", i % 2 === 1 && "bg-stone-50")}>
                 <div className="px-4 sm:px-6 py-3.5 text-xs sm:text-sm font-semibold text-stone-600">{feat}</div>
                 <div className="px-4 sm:px-6 py-3.5 text-center text-xs sm:text-sm text-stone-400">{them}</div>
-                <div className="px-4 sm:px-6 py-3.5 text-center text-xs sm:text-sm font-bold text-[#EE7B22]">{us}</div>
+                <div className="px-4 sm:px-6 py-3.5 text-center text-xs sm:text-sm font-bold text-[#F47B20]">{us}</div>
               </div>
             ))}
           </div>
@@ -205,14 +214,14 @@ export default function LandingPage() {
             <div className="text-center mb-10">
               <h2 className="text-3xl md:text-4xl font-extrabold">
                 Un ejemplo real.{" "}
-                <em className="not-italic text-[#EE7B22]">Con números reales.</em>
+                <em className="not-italic text-[#F47B20]">Con números reales.</em>
               </h2>
             </div>
 
-            <div className="bg-[#f5f7fa] border border-stone-200 rounded-2xl overflow-hidden">
+            <div className="bg-[#F9FAFB] border border-stone-200 rounded-2xl overflow-hidden">
               {/* Car header */}
               <div className="flex items-center gap-3 px-6 py-4 border-b border-stone-200 bg-white">
-                <div className="w-10 h-8 bg-[#EE7B22] rounded flex items-center justify-center shrink-0">
+                <div className="w-10 h-8 bg-[#F47B20] rounded flex items-center justify-center shrink-0">
                   <CarIcon className="h-5 w-5 text-white" />
                 </div>
                 <div>
@@ -254,7 +263,7 @@ export default function LandingPage() {
               </div>
 
               {/* Total final */}
-              <div className="mx-4 mb-4 bg-[#EE7B22] rounded-xl px-5 py-4 flex items-center justify-between">
+              <div className="mx-4 mb-4 bg-[#F47B20] rounded-xl px-5 py-4 flex items-center justify-between">
                 <span className="text-white font-extrabold text-sm uppercase tracking-wider">Precio total final</span>
                 <span className="text-white font-black text-2xl tabular-nums">{formatPrice(featuredCar.price)}</span>
               </div>
@@ -270,7 +279,7 @@ export default function LandingPage() {
                 <div className="text-[11px] text-stone-400">
                   Coches.net · Milanuncios · Concesionarios de ocasión — verificado hoy
                 </div>
-                <div className="text-[#EE7B22] font-extrabold text-sm">
+                <div className="text-[#F47B20] font-extrabold text-sm">
                   Tu ahorro real: entre {formatPrice(Math.round(featuredCar.price * 0.12))} y {formatPrice(Math.round(featuredCar.price * 0.25))}
                 </div>
               </div>
@@ -279,7 +288,7 @@ export default function LandingPage() {
             <div className="mt-6 text-center">
               <Link
                 href={`/coche/${featuredCar.id}`}
-                className="inline-flex items-center gap-2 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold px-7 py-3.5 rounded-xl transition-colors text-sm"
+                className="inline-flex items-center gap-2 bg-[#F47B20] hover:bg-[#D66A15] text-white font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-[#F47B20]/30 hover:scale-105 transition-all text-sm"
               >
                 Ver este {featuredCar.make} <ArrowRight className="h-4 w-4" />
               </Link>
@@ -289,7 +298,7 @@ export default function LandingPage() {
       )}
 
       {/* MODO IKEA */}
-      <section className="bg-[#f5f7fa] py-20 px-6">
+      <section className="bg-[#F9FAFB] py-20 px-6">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-extrabold text-stone-900">
             📦 Modo IKEA
@@ -316,8 +325,8 @@ export default function LandingPage() {
                   { icon: Droplets, label: "Cambio de aceites y puesta a punto" },
                 ].map(({ icon: Icon, label }) => (
                   <div key={label} className="flex items-center gap-3 bg-stone-50 border border-stone-100 rounded-xl px-4 py-3">
-                    <div className="h-8 w-8 rounded-lg bg-[#EE7B22]/10 flex items-center justify-center shrink-0">
-                      <Icon className="h-4 w-4 text-[#EE7B22]" />
+                    <div className="h-8 w-8 rounded-lg bg-[#F47B20]/10 flex items-center justify-center shrink-0">
+                      <Icon className="h-4 w-4 text-[#F47B20]" />
                     </div>
                     <span className="text-sm text-stone-700 font-medium leading-tight">{label}</span>
                   </div>
@@ -330,7 +339,7 @@ export default function LandingPage() {
             </p>
 
             <div className="flex items-start gap-3 bg-stone-50 border border-stone-200 rounded-xl px-4 py-3">
-              <CheckCircle2 className="h-4 w-4 text-[#EE7B22] shrink-0 mt-0.5" />
+              <CheckCircle2 className="h-4 w-4 text-[#F47B20] shrink-0 mt-0.5" />
               <p className="text-sm text-stone-600">
                 La gran mayoría de los vehículos que gestionamos solo necesitan una{" "}
                 <strong className="text-stone-900">limpieza profesional</strong> para estar listos para rodar.
@@ -346,7 +355,7 @@ export default function LandingPage() {
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-extrabold">
               Nuestra misión: que pagues{" "}
-              <em className="not-italic text-[#EE7B22]">solo lo justo.</em>
+              <em className="not-italic text-[#F47B20]">solo lo justo.</em>
             </h2>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
@@ -370,12 +379,12 @@ export default function LandingPage() {
       </section>
 
       {/* CÓMO FUNCIONA */}
-      <section id="como-funciona" className="bg-[#f5f7fa] py-20 px-6">
+      <section id="como-funciona" className="bg-[#F9FAFB] py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-extrabold">
               Así de simple.{" "}
-              <em className="not-italic text-[#EE7B22]">Así de distinto.</em>
+              <em className="not-italic text-[#F47B20]">Así de distinto.</em>
             </h2>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
@@ -402,14 +411,14 @@ export default function LandingPage() {
       </section>
 
       {/* CATÁLOGO — coches reales */}
-      <section id="catalogo" className="bg-[#0E1A2E] py-20 px-4 sm:px-6 scroll-mt-16">
+      <section id="catalogo" className="bg-[#0B1D3A] py-20 px-4 sm:px-6 scroll-mt-16">
         <div className="max-w-7xl mx-auto">
           <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
-              <div className="text-xs font-bold uppercase tracking-widest text-[#EE7B22] mb-2">Inventario en directo</div>
+              <div className="text-xs font-bold uppercase tracking-widest text-[#F47B20] mb-2">Inventario en directo</div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">
                 Coches disponibles hoy —{" "}
-                <em className="not-italic text-[#EE7B22]">Precio mayorista verificado</em>
+                <em className="not-italic text-[#F47B20]">Precio mayorista verificado</em>
               </h2>
             </div>
             {!carsLoading && (
@@ -438,7 +447,7 @@ export default function LandingPage() {
               <button
                 type="button"
                 onClick={() => void refetchCars()}
-                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#EE7B22] text-white text-xs font-extrabold"
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#F47B20] text-white text-xs font-extrabold"
               >
                 Volver a intentarlo
               </button>
@@ -458,10 +467,10 @@ export default function LandingPage() {
                   <Link key={car.id} href={`/coche/${car.id}`}>
                     <article
                       className={cn(
-                        "bg-[#162033] border rounded-xl overflow-hidden h-full flex flex-col transition-all",
+                        "bg-[#132B52] border rounded-xl overflow-hidden h-full flex flex-col transition-all",
                         isLocked
                           ? "border-white/5 opacity-70 cursor-pointer"
-                          : "border-white/10 cursor-pointer hover:border-[#EE7B22]/50 hover:shadow-2xl hover:-translate-y-1",
+                          : "border-white/10 cursor-pointer hover:border-[#F47B20]/50 hover:shadow-2xl hover:-translate-y-1",
                       )}
                     >
                       <div className="relative">
@@ -477,13 +486,13 @@ export default function LandingPage() {
                             <Lock className="h-3 w-3" /> Reservado
                           </span>
                         ) : (
-                          <span className="absolute top-3 left-3 bg-[#EE7B22] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+                          <span className="absolute top-3 left-3 bg-[#F47B20] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
                             Disponible
                           </span>
                         )}
                       </div>
                       <div className="p-4 flex-1 flex flex-col">
-                        <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22]">
+                        <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#F47B20]">
                           {car.make}
                         </div>
                         <div className="text-sm font-extrabold leading-tight mt-0.5 text-white line-clamp-1">
@@ -509,7 +518,7 @@ export default function LandingPage() {
                             Reservado por otro cliente
                           </button>
                         ) : (
-                          <button className="mt-4 w-full py-2.5 rounded-lg bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold text-sm transition-colors">
+                          <button className="mt-4 w-full py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#D66A15] text-white font-bold text-sm transition-all hover:scale-105 shadow-lg shadow-[#F47B20]/20">
                             Ver este coche
                           </button>
                         )}
@@ -524,11 +533,11 @@ export default function LandingPage() {
       </section>
 
       {/* FOOTER CTA */}
-      <section className="bg-[#070711] py-20 px-6 text-center text-white">
+      <section className="bg-[#0B1D3A] py-20 px-6 text-center text-white">
         <div className="max-w-2xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-extrabold leading-tight">
             En este sector, la transparencia<br /> es una{" "}
-            <em className="not-italic text-[#EE7B22]">revolución.</em>
+            <em className="not-italic text-[#F47B20]">revolución.</em>
           </h2>
           <p className="mt-5 text-white/45 text-lg max-w-xl mx-auto">
             Compramos directamente a mayoristas para que tú pagues el precio real. Sin margen de
@@ -537,23 +546,23 @@ export default function LandingPage() {
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
               href="#catalogo"
-              className="inline-flex items-center gap-2 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold px-8 py-4 rounded-md transition-colors"
+              className="inline-flex items-center gap-2 bg-[#F47B20] hover:bg-[#D66A15] text-white font-bold px-10 py-4 rounded-xl shadow-lg shadow-[#F47B20]/30 hover:scale-105 transition-all text-lg"
             >
-              Ver coches disponibles hoy <ArrowRight className="h-4 w-4" />
+              Ver coches disponibles hoy <ArrowRight className="h-5 w-5" />
             </a>
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-[#040408] text-white/25 py-10 px-6 text-center text-sm border-t border-white/5">
+      <footer className="bg-[#06101F] text-white/25 py-10 px-6 text-center text-sm border-t border-white/5">
         <div className="max-w-5xl mx-auto space-y-3">
           <div className="text-white font-extrabold text-lg">
-            Pujamos<span className="text-[#EE7B22]">tu</span>coche.es
+            Pujamos<span className="text-[#F47B20]">tu</span>coche.es
           </div>
           <p>
             Concesionario de coches de ocasión · Madrid ·{" "}
-            <a className="text-[#EE7B22] hover:underline" href="mailto:pujamostucoche@gmail.com">
+            <a className="text-[#F47B20] hover:underline" href="mailto:pujamostucoche@gmail.com">
               pujamostucoche@gmail.com
             </a>
           </p>
@@ -574,7 +583,7 @@ export default function LandingPage() {
       />
 
       <style>{`
-        .font-jakarta { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        .font-sans { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
       `}</style>
     </div>
   );
@@ -582,8 +591,8 @@ export default function LandingPage() {
 
 function ValueCard({ icon: Icon, title, body }: { icon: React.ElementType; title: string; body: string }) {
   return (
-    <div className="bg-[#f5f7fa] border border-stone-200 rounded-2xl p-8 flex flex-col gap-4 hover:shadow-lg hover:-translate-y-1 transition-all">
-      <div className="h-12 w-12 rounded-xl bg-[#EE7B22]/10 text-[#EE7B22] flex items-center justify-center">
+    <div className="bg-[#F9FAFB] border border-stone-200 rounded-2xl p-8 flex flex-col gap-4 hover:shadow-lg hover:-translate-y-1 transition-all">
+      <div className="h-12 w-12 rounded-xl bg-[#F47B20]/10 text-[#F47B20] flex items-center justify-center">
         <Icon className="h-6 w-6" />
       </div>
       <h3 className="text-lg font-extrabold">{title}</h3>
@@ -596,10 +605,10 @@ function StepCard({ n, icon: Icon, title, body }: { n: number; icon: React.Eleme
   return (
     <div className="flex flex-col gap-4 p-7 rounded-2xl bg-white border border-stone-200 hover:shadow-lg hover:-translate-y-1 transition-all">
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-lg bg-[#EE7B22] text-white flex items-center justify-center font-black text-lg shrink-0">
+        <div className="h-10 w-10 rounded-lg bg-[#F47B20] text-white flex items-center justify-center font-black text-lg shrink-0">
           {n}
         </div>
-        <div className="h-10 w-10 rounded-lg bg-[#EE7B22]/10 text-[#EE7B22] flex items-center justify-center shrink-0">
+        <div className="h-10 w-10 rounded-lg bg-[#F47B20]/10 text-[#F47B20] flex items-center justify-center shrink-0">
           <Icon className="h-5 w-5" />
         </div>
       </div>

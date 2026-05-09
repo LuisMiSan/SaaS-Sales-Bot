@@ -54,14 +54,14 @@ function Gallery({ car }: { car: PublicCar }) {
 
   return (
     <div>
-      <div className="relative overflow-hidden bg-[#f4f5f7] h-64 sm:h-[340px] flex items-center justify-center">
+      <div className="relative overflow-hidden bg-[#F9FAFB] h-64 sm:h-[340px] flex items-center justify-center">
         <img
           src={photos[idx]}
           alt={`${car.make} ${car.model}`}
           className="w-full h-full object-contain"
           onError={(e) => { (e.target as HTMLImageElement).style.opacity = "0"; }}
         />
-        <div className="absolute top-3 left-3 bg-[#EE7B22] text-white text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded">
+        <div className="absolute top-3 left-3 bg-[#F47B20] text-white text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded">
           Stock limitado
         </div>
         {photos.length > 1 && (
@@ -89,9 +89,9 @@ function Gallery({ car }: { car: PublicCar }) {
             <button
               key={i}
               onClick={() => setIdx(i)}
-              className={`relative flex-1 h-16 overflow-hidden rounded border-2 transition-all ${idx === i ? "border-[#EE7B22]" : "border-transparent hover:border-stone-300"}`}
+              className={`relative flex-1 h-16 overflow-hidden rounded border-2 transition-all ${idx === i ? "border-[#F47B20]" : "border-transparent hover:border-stone-300"}`}
             >
-              <img src={url} alt="" className="w-full h-full object-contain bg-[#f4f5f7]" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+              <img src={url} alt="" className="w-full h-full object-contain bg-[#F9FAFB]" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
             </button>
           ))}
           {extra > 0 && (
@@ -120,7 +120,7 @@ function InvoiceMock({ car, mayorista, transporte, gestion }: { car: PublicCar; 
       {/* Invoice header */}
       <div className="bg-[#003B7A] text-white px-4 py-3 flex items-center justify-between">
         <div>
-          <div className="text-base font-black tracking-tight text-white">AUTO<span className="text-[#EE7B22]">1</span><span className="text-[10px] font-normal">.com</span></div>
+          <div className="text-base font-black tracking-tight text-white">AUTO<span className="text-[#F47B20]">1</span><span className="text-[10px] font-normal">.com</span></div>
           <div className="text-[10px] text-blue-200 mt-0.5">AUTO1 European Cars B.V.</div>
         </div>
         <div className="text-right text-[10px] text-blue-200">
@@ -191,7 +191,7 @@ export default function LandingCarPage() {
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
   if (!car) {
-    return <div className="min-h-screen bg-white flex items-center justify-center text-stone-500 font-jakarta">Cargando ficha…</div>;
+    return <div className="min-h-screen bg-white flex items-center justify-center text-stone-500 font-sans">Cargando ficha…</div>;
   }
 
   const others = (allCars ?? []).filter((c) => c.id !== car.id && c.status === "open").slice(0, 4);
@@ -240,23 +240,23 @@ export default function LandingCarPage() {
   };
 
   return (
-    <div className="bg-white text-[#111827] font-jakarta min-h-screen">
+    <div className="bg-white text-[#0B1D3A] font-sans min-h-screen">
 
       {/* ── HEADER ── */}
-      <header className="sticky top-0 z-50 bg-white border-b border-stone-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-[#0B1D3A]/95 backdrop-blur-md shadow-lg">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
-          <Link href="/" className="text-base font-extrabold tracking-tight whitespace-nowrap">
-            pujamos<span className="text-[#EE7B22]">tu</span>coche
+          <Link href="/" className="text-base font-extrabold tracking-tight whitespace-nowrap text-white">
+            pujamos<span className="text-[#F47B20]">tu</span>coche
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-[11px] font-semibold text-stone-500 uppercase tracking-wide">
-            <a href="#como-funciona" className="hover:text-[#EE7B22] transition-colors">Cómo funciona</a>
-            <Link href="/tienda" className="hover:text-[#EE7B22] transition-colors">Ver coches disponibles</Link>
-            <a href="#sobre-nosotros" className="hover:text-[#EE7B22] transition-colors">Sobre nosotros</a>
+          <nav className="hidden md:flex items-center gap-6 text-[11px] font-semibold text-white/60 uppercase tracking-wide">
+            <a href="#como-funciona" className="hover:text-[#F47B20] transition-colors">Cómo funciona</a>
+            <Link href="/tienda" className="hover:text-[#F47B20] transition-colors">Ver coches disponibles</Link>
+            <a href="#sobre-nosotros" className="hover:text-[#F47B20] transition-colors">Sobre nosotros</a>
           </nav>
           <div className="flex items-center gap-2">
             <button
               onClick={onScrollToCta}
-              className="inline-flex items-center gap-1.5 bg-[#EE7B22] hover:bg-[#C4621A] text-white text-[11px] font-extrabold uppercase tracking-wide px-4 py-2 rounded-full transition-colors"
+              className="inline-flex items-center gap-1.5 bg-[#F47B20] hover:bg-[#D66A15] text-white text-[11px] font-extrabold uppercase tracking-wide px-6 py-2.5 rounded-lg hover:scale-105 transition-all shadow-lg shadow-[#F47B20]/30"
             >
               Quiero este coche <ArrowRight className="h-3.5 w-3.5" />
             </button>
@@ -308,8 +308,8 @@ export default function LandingCarPage() {
                   <div className="flex items-end justify-between">
                     <div>
                       <div className="text-[11px] text-stone-400 font-semibold uppercase tracking-wide">Precio total final</div>
-                      <div className="text-3xl font-black tabular-nums text-[#EE7B22]">{formatPrice(car.price)}</div>
-                      <div className="text-xs text-stone-400 mt-0.5">Desde <strong className="text-[#EE7B22]">{monthlyEst} €/mes</strong> con financiación</div>
+                      <div className="text-3xl font-black tabular-nums text-[#F47B20]">{formatPrice(car.price)}</div>
+                      <div className="text-xs text-stone-400 mt-0.5">Desde <strong className="text-[#F47B20]">{monthlyEst} €/mes</strong> con financiación</div>
                     </div>
                     {car.status === "open" && (
                       <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider bg-green-100 text-green-700 border border-green-200 px-2.5 py-1.5 rounded-full">
@@ -329,26 +329,26 @@ export default function LandingCarPage() {
             <div className="grid md:grid-cols-2">
 
               {/* Panel de precios — fondo oscuro */}
-              <div className="bg-[#0d1b2a] text-white px-6 py-8 md:border-r border-white/10">
+              <div className="bg-[#0B1D3A] text-white px-6 py-8 md:border-r border-white/10">
                 <h2 className="text-xl font-black leading-tight">
                   TRANSPARENCIA TOTAL.<br />
-                  <span className="text-[#EE7B22]">SIN LETRA PEQUEÑA.</span>
+                  <span className="text-[#F47B20]">SIN LETRA PEQUEÑA.</span>
                 </h2>
 
                 <div className="mt-6 space-y-3">
                   <PriceRow
-                    icon={<Receipt className="h-4 w-4 text-[#EE7B22]" />}
+                    icon={<Receipt className="h-4 w-4 text-[#F47B20]" />}
                     label="Precio Mayorista AUTO1"
                     amount={formatPrice(mayorista)}
-                    action={<a href="#factura" className="text-[10px] text-[#EE7B22] font-bold hover:underline whitespace-nowrap">VER FACTURA →</a>}
+                    action={<a href="#factura" className="text-[10px] text-[#F47B20] font-bold hover:underline whitespace-nowrap">VER FACTURA →</a>}
                   />
                   <PriceRow
-                    icon={<Truck className="h-4 w-4 text-[#EE7B22]" />}
+                    icon={<Truck className="h-4 w-4 text-[#F47B20]" />}
                     label="Transporte"
                     amount={formatPrice(transporteFee)}
                   />
                   <PriceRow
-                    icon={<Wrench className="h-4 w-4 text-[#EE7B22]" />}
+                    icon={<Wrench className="h-4 w-4 text-[#F47B20]" />}
                     label="Gestión Pujamostucoche"
                     amount={formatPrice(gestionFee)}
                   />
@@ -367,14 +367,14 @@ export default function LandingCarPage() {
                     <div className="mt-2 text-xl font-black tabular-nums text-white/60">
                       {formatPrice(car.marketPriceMin!)} – {formatPrice(car.marketPriceMax!)}
                     </div>
-                    <div className="mt-1 text-sm font-extrabold text-[#EE7B22]">
+                    <div className="mt-1 text-sm font-extrabold text-[#F47B20]">
                       Tu ahorro real&nbsp;&nbsp;
                       <span className="tabular-nums">{formatPrice(savingsMin!)} – {formatPrice(savingsMax!)}</span>
                     </div>
                   </div>
                 )}
 
-                <div className="mt-6 bg-[#EE7B22] rounded-xl px-5 py-4">
+                <div className="mt-6 bg-[#F47B20] rounded-xl px-5 py-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-extrabold uppercase tracking-wide">Precio total final</span>
                     <span className="text-2xl font-black tabular-nums">{formatPrice(car.price)}</span>
@@ -398,9 +398,9 @@ export default function LandingCarPage() {
         </section>
 
         {/* ── SECCIÓN 3: ¿Tienes dudas? Nota de voz ── */}
-        <section className="py-10 px-6 bg-[#f8f9fb] border-b border-stone-100">
+        <section className="py-10 px-6 bg-[#F9FAFB] border-b border-stone-100">
           <div className="max-w-lg mx-auto text-center">
-            <div className="h-14 w-14 rounded-full bg-[#EE7B22] flex items-center justify-center mx-auto shadow-lg shadow-[#EE7B22]/25">
+            <div className="h-14 w-14 rounded-full bg-[#F47B20] flex items-center justify-center mx-auto shadow-lg shadow-[#F47B20]/25">
               <Mic className="h-6 w-6 text-white" />
             </div>
             <h3 className="mt-4 text-xl font-extrabold text-stone-900">¿Tienes dudas?</h3>
@@ -425,7 +425,7 @@ export default function LandingCarPage() {
               ].map(({ icon: Icon, label, sub }) => (
                 <div key={label} className="flex flex-col items-center gap-2">
                   <div className="h-10 w-10 rounded-full border border-stone-200 bg-white flex items-center justify-center shadow-sm">
-                    <Icon className="h-5 w-5 text-[#EE7B22]" />
+                    <Icon className="h-5 w-5 text-[#F47B20]" />
                   </div>
                   <div className="text-[11px] font-semibold text-stone-700 leading-tight">{label}<br />{sub}</div>
                 </div>
@@ -435,7 +435,7 @@ export default function LandingCarPage() {
         </section>
 
         {/* ── SECCIÓN 4: Extras opcionales + CTA final ── */}
-        <section className="py-8 px-6 bg-[#f0f2f5] border-b border-stone-200">
+        <section className="py-8 px-6 bg-[#F9FAFB] border-b border-stone-200">
           <div className="max-w-3xl mx-auto">
             <p className="text-[10px] font-extrabold uppercase tracking-widest text-stone-400 mb-4">
               Añade, solo lo que quieras, opcionalmente o sin — al contado o financiado:
@@ -447,9 +447,9 @@ export default function LandingCarPage() {
                 { label: "Limpieza profesional", sub: "Detailing Deluxe" },
                 { label: "Neumáticos", sub: "Cambio aceite" },
               ].map(({ label, sub }) => (
-                <label key={label} className="flex items-start gap-2 bg-white border border-stone-200 rounded-xl p-3 cursor-pointer hover:border-[#EE7B22] transition-colors group">
-                  <input type="checkbox" className="mt-0.5 shrink-0 accent-[#EE7B22]" />
-                  <span className="text-[11px] font-semibold text-stone-700 leading-tight group-hover:text-[#EE7B22] transition-colors">
+                <label key={label} className="flex items-start gap-2 bg-white border border-stone-200 rounded-xl p-3 cursor-pointer hover:border-[#F47B20] transition-colors group">
+                  <input type="checkbox" className="mt-0.5 shrink-0 accent-[#F47B20]" />
+                  <span className="text-[11px] font-semibold text-stone-700 leading-tight group-hover:text-[#F47B20] transition-colors">
                     {label}<br /><span className="font-normal text-stone-400">{sub}</span>
                   </span>
                 </label>
@@ -472,7 +472,7 @@ export default function LandingCarPage() {
                 {!showForm ? (
                   <button
                     onClick={() => setShowForm(true)}
-                    className="w-full py-5 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold text-base tracking-wide uppercase rounded-2xl transition-colors shadow-xl shadow-[#EE7B22]/25 inline-flex items-center justify-center gap-2"
+                    className="w-full py-5 bg-[#F47B20] hover:bg-[#D66A15] text-white font-extrabold text-base tracking-wide uppercase rounded-2xl transition-colors shadow-xl shadow-[#F47B20]/25 inline-flex items-center justify-center gap-2"
                   >
                     <Lock className="h-5 w-5" />
                     Quiero comprar como un profesional
@@ -486,21 +486,21 @@ export default function LandingCarPage() {
                     <input
                       required value={name} onChange={(e) => setName(e.target.value)}
                       placeholder="Tu nombre"
-                      className="w-full px-4 py-3 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-[#EE7B22] focus:ring-2 focus:ring-[#EE7B22]/15"
+                      className="w-full px-4 py-3 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-[#F47B20] focus:ring-2 focus:ring-[#F47B20]/15"
                     />
                     <input
                       required type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
                       placeholder="Teléfono WhatsApp (+34 600 000 000)"
-                      className="w-full px-4 py-3 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-[#EE7B22] focus:ring-2 focus:ring-[#EE7B22]/15"
+                      className="w-full px-4 py-3 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-[#F47B20] focus:ring-2 focus:ring-[#F47B20]/15"
                     />
                     <label className="flex items-start gap-2 text-xs text-stone-500 cursor-pointer">
-                      <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className="mt-0.5 shrink-0 accent-[#EE7B22]" />
+                      <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className="mt-0.5 shrink-0 accent-[#F47B20]" />
                       <span>Acepto que un comercial me contacte por WhatsApp para gestionar la compra.</span>
                     </label>
                     <button
                       type="submit"
                       disabled={!accepted || sending}
-                      className="w-full py-5 bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold text-base tracking-wide uppercase rounded-2xl transition-colors shadow-xl shadow-[#EE7B22]/25 inline-flex items-center justify-center gap-2 disabled:opacity-50"
+                      className="w-full py-5 bg-[#F47B20] hover:bg-[#D66A15] text-white font-extrabold text-base tracking-wide uppercase rounded-2xl transition-all hover:scale-105 shadow-xl shadow-[#F47B20]/30 inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100"
                     >
                       <Lock className="h-5 w-5" />
                       {sending ? "Enviando…" : "Quiero comprar como un profesional"}
@@ -517,21 +517,21 @@ export default function LandingCarPage() {
 
         {/* ── SECCIÓN 6: Otros coches disponibles ── */}
         {others.length > 0 && (
-          <section className="py-10 px-6 bg-[#f8f9fb]">
+          <section className="py-10 px-6 bg-[#F9FAFB]">
             <div className="max-w-6xl mx-auto">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-xl font-extrabold">Otros coches <em className="not-italic text-[#EE7B22]">disponibles</em></h2>
-                <Link href="/tienda" className="text-xs font-bold uppercase tracking-widest text-[#EE7B22] hover:underline">
+                <h2 className="text-xl font-extrabold">Otros coches <em className="not-italic text-[#F47B20]">disponibles</em></h2>
+                <Link href="/tienda" className="text-xs font-bold uppercase tracking-widest text-[#F47B20] hover:underline">
                   Ver todos →
                 </Link>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {others.map((o) => (
                   <Link key={o.id} href={`/tienda/coche/${o.id}`}>
-                    <article className="bg-white border border-stone-200 rounded-xl overflow-hidden hover:shadow-lg hover:border-[#EE7B22] hover:-translate-y-1 transition-all">
+                    <article className="bg-white border border-stone-200 rounded-xl overflow-hidden hover:shadow-lg hover:border-[#F47B20] hover:-translate-y-1 transition-all">
                       <CarThumb make={o.make} model={o.model} imageUrl={o.imageUrl} photos={o.photos} className="h-32 w-full" />
                       <div className="p-3">
-                        <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#EE7B22]">{o.make}</div>
+                        <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#F47B20]">{o.make}</div>
                         <div className="text-sm font-extrabold leading-tight mt-0.5 line-clamp-1">{o.model}</div>
                         <div className="text-[11px] text-stone-500 mt-0.5">{o.year} · {(o.km / 1000).toFixed(0)}k km</div>
                         <div className="mt-1.5 text-base font-black tabular-nums">{formatPrice(o.price)}</div>
@@ -545,9 +545,9 @@ export default function LandingCarPage() {
         )}
       </main>
 
-      <footer className="bg-[#070711] text-white/30 py-8 px-6 text-center text-xs border-t border-white/5">
+      <footer className="bg-[#06101F] text-white/30 py-8 px-6 text-center text-xs border-t border-white/5">
         <div className="max-w-4xl mx-auto">
-          <div className="text-white font-extrabold text-sm">pujamos<span className="text-[#EE7B22]">tu</span>coche.es</div>
+          <div className="text-white font-extrabold text-sm">pujamos<span className="text-[#F47B20]">tu</span>coche.es</div>
           <p className="text-white/20 mt-1">© {new Date().getFullYear()} Pujamostucoche. Todos los derechos reservados.</p>
         </div>
       </footer>
@@ -565,8 +565,8 @@ export default function LandingCarPage() {
 function SpecRow({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="h-8 w-8 rounded-lg bg-[#EE7B22]/10 flex items-center justify-center shrink-0">
-        <Icon className="h-4 w-4 text-[#EE7B22]" />
+      <div className="h-8 w-8 rounded-lg bg-[#F47B20]/10 flex items-center justify-center shrink-0">
+        <Icon className="h-4 w-4 text-[#F47B20]" />
       </div>
       <div className="flex items-center gap-2 text-sm">
         <span className="font-extrabold uppercase tracking-wide text-stone-400 text-[11px] w-24">{label}</span>
