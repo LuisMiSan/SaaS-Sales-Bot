@@ -19,7 +19,7 @@ import {
   Palette,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
-import { WhatsappWidget, buildWhatsappUrl, useWhatsappNumber } from "@/components/whatsapp-widget";
+import { WhatsappWidget, useWhatsappNumber } from "@/components/whatsapp-widget";
 import { formatPrice, sanitizePhotoUrl } from "@/lib/format";
 
 /* ─── RESOLVE IMAGE ─────────────────────────────────────────────────────── */
@@ -212,47 +212,36 @@ export default function LandingCarPage() {
     e.preventDefault();
     if (!accepted || !name.trim() || !phone.trim()) return;
     setSending(true);
-    const fallbackWaUrl = buildWhatsappUrl(
-      waNumber,
-      `Hola, me llamo ${name.trim()} y quiero el ${car.make} ${car.model} ${car.year} por ${formatPrice(car.price)}. ¿Sigue disponible?`,
-    );
     try {
       const BASE = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "");
 
-      // 1. Crear lead en el dashboard (siempre)
-      const leadRes = await fetch(`${BASE}/api/leads`, {
+      // 1. Registrar lead en el dashboard (fire-and-forget)
+      fetch(`${BASE}/api/leads`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), phone: phone.trim(), email: email.trim() || undefined, carId: car.id }),
-      });
-      const leadData = await leadRes.json() as { id?: number; publicToken?: string };
+      }).catch(() => {});
 
-      // 2. Notificar a n8n en paralelo (fire-and-forget)
-      fetch("https://n8n.iadivisionmadrid.es/webhook/pujamostucoche-lead", {
+      // 2. Llamar a n8n y redirigir según respuesta
+      const n8nRes = await fetch("https://n8n.iadivisionmadrid.es/webhook/pujamostucoche-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          leadId: leadData.id,
           name: name.trim(),
           phone: phone.trim(),
-          email: email.trim() || undefined,
           carInterest: `${car.make} ${car.model} ${car.year}`,
-          price: car.price,
-          carUrl: window.location.href,
+          email: email.trim() || undefined,
         }),
-      }).catch(() => {});
-
-      // 3. Abrir WhatsApp
-      if (fallbackWaUrl) {
-        window.open(fallbackWaUrl, "_blank");
+      });
+      const data = await n8nRes.json() as { ok: boolean; waLink?: string };
+      if (data.ok && data.waLink) {
+        window.location.href = data.waLink;
+      } else {
+        alert("Por favor introduce un teléfono válido");
+        setSending(false);
       }
-      setSubmitted(true);
     } catch {
-      if (fallbackWaUrl) {
-        window.open(fallbackWaUrl, "_blank");
-      }
-      setSubmitted(true);
-    } finally {
+      alert("Por favor introduce un teléfono válido");
       setSending(false);
     }
   };
