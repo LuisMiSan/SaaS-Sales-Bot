@@ -6,14 +6,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Lock,
-  ShieldCheck,
   CheckCircle2,
   Fuel,
   Settings2,
   Calendar,
   CarFront,
-  Mic,
-  Phone,
   Receipt,
   Truck,
   Wrench,
@@ -280,19 +277,6 @@ export default function LandingCarPage() {
             >
               Quiero este coche <ArrowRight className="h-3.5 w-3.5" />
             </button>
-            {waHeaderUrl && (
-              <a
-                href={waHeaderUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="h-9 w-9 rounded-full bg-[#25D366] hover:bg-[#1FBA57] flex items-center justify-center transition-colors shadow-sm"
-              >
-                <svg viewBox="0 0 24 24" className="h-5 w-5 fill-white">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                  <path d="M12 0C5.373 0 0 5.373 0 12c0 2.112.546 4.1 1.5 5.834L0 24l6.334-1.5A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.894 0-3.668-.497-5.2-1.363l-.373-.22-3.758.888.903-3.668-.243-.386A9.955 9.955 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-                </svg>
-              </a>
-            )}
           </div>
         </div>
       </header>
@@ -417,42 +401,6 @@ export default function LandingCarPage() {
           </div>
         </section>
 
-        {/* ── SECCIÓN 3: ¿Tienes dudas? Nota de voz ── */}
-        <section className="py-10 px-6 bg-[#F9FAFB] border-b border-stone-100">
-          <div className="max-w-lg mx-auto text-center">
-            <div className="h-14 w-14 rounded-full bg-[#F47B20] flex items-center justify-center mx-auto shadow-lg shadow-[#F47B20]/25">
-              <Mic className="h-6 w-6 text-white" />
-            </div>
-            <h3 className="mt-4 text-xl font-extrabold text-stone-900">¿Tienes dudas?</h3>
-            <p className="mt-2 text-sm text-stone-500 leading-relaxed max-w-sm mx-auto">
-              Mándanos una nota de voz y te respondemos punto por punto con la mayor claridad.
-            </p>
-            {waVoiceUrl && (
-              <a
-                href={waVoiceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-5 inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1FBA57] text-white font-extrabold text-sm px-6 py-3 rounded-full transition-colors shadow"
-              >
-                <Mic className="h-4 w-4" /> Enviar nota de voz por WhatsApp
-              </a>
-            )}
-            <div className="mt-8 grid grid-cols-3 gap-4 text-center">
-              {[
-                { icon: Phone, label: "Atención real.", sub: "Sin bots." },
-                { icon: Mic, label: "Te respondemos", sub: "por nota de voz." },
-                { icon: ShieldCheck, label: "Sin presiones,", sub: "sin prisas." },
-              ].map(({ icon: Icon, label, sub }) => (
-                <div key={label} className="flex flex-col items-center gap-2">
-                  <div className="h-10 w-10 rounded-full border border-stone-200 bg-white flex items-center justify-center shadow-sm">
-                    <Icon className="h-5 w-5 text-[#F47B20]" />
-                  </div>
-                  <div className="text-[11px] font-semibold text-stone-700 leading-tight">{label}<br />{sub}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* ── SECCIÓN 4: Extras opcionales + CTA final ── */}
         <section className="py-8 px-6 bg-[#F9FAFB] border-b border-stone-200">
