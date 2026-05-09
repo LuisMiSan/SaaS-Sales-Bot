@@ -25,9 +25,18 @@ import { CarThumb } from "@/components/car-thumb";
 import { WhatsappWidget, buildWhatsappUrl, useWhatsappNumber } from "@/components/whatsapp-widget";
 import { formatPrice, sanitizePhotoUrl } from "@/lib/format";
 
+/* ─── RESOLVE IMAGE ─────────────────────────────────────────────────────── */
+function resolveGalleryUrl(url: string): string {
+  const sanitized = sanitizePhotoUrl(url);
+  if (/^(?:https?:)?\/\//i.test(sanitized) || sanitized.startsWith("data:")) return sanitized;
+  const base = import.meta.env.BASE_URL || "/";
+  const trimmed = sanitized.startsWith("/") ? sanitized.slice(1) : sanitized;
+  return base.endsWith("/") ? base + trimmed : base + "/" + trimmed;
+}
+
 /* ─── GALLERY ───────────────────────────────────────────────────────────── */
 function Gallery({ car }: { car: PublicCar }) {
-  const photos = (car.photos?.length ? car.photos : car.imageUrl ? [car.imageUrl] : []).map(sanitizePhotoUrl);
+  const photos = (car.photos?.length ? car.photos : car.imageUrl ? [car.imageUrl] : []).map(resolveGalleryUrl);
   const [idx, setIdx] = useState(0);
 
   if (photos.length === 0) {
@@ -45,12 +54,12 @@ function Gallery({ car }: { car: PublicCar }) {
 
   return (
     <div>
-      <div className="relative overflow-hidden bg-stone-100 h-64 sm:h-[340px]">
+      <div className="relative overflow-hidden bg-[#f4f5f7] h-64 sm:h-[340px] flex items-center justify-center">
         <img
           src={photos[idx]}
           alt={`${car.make} ${car.model}`}
-          className="w-full h-full object-cover"
-          onError={(e) => { (e.target as HTMLImageElement).src = ""; }}
+          className="w-full h-full object-contain"
+          onError={(e) => { (e.target as HTMLImageElement).style.opacity = "0"; }}
         />
         <div className="absolute top-3 left-3 bg-[#EE7B22] text-white text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded">
           Stock limitado
@@ -82,7 +91,7 @@ function Gallery({ car }: { car: PublicCar }) {
               onClick={() => setIdx(i)}
               className={`relative flex-1 h-16 overflow-hidden rounded border-2 transition-all ${idx === i ? "border-[#EE7B22]" : "border-transparent hover:border-stone-300"}`}
             >
-              <img src={url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+              <img src={url} alt="" className="w-full h-full object-contain bg-[#f4f5f7]" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
             </button>
           ))}
           {extra > 0 && (
