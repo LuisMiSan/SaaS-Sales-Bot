@@ -76,7 +76,6 @@ export default function LandingPage() {
             Pujamos<span className="text-[#F47B20]">tu</span>coche.es
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-white/60">
-            <a href="#catalogo" className="hover:text-[#F47B20] transition-colors">Ver coches</a>
             <a href="#como-funciona" className="hover:text-[#F47B20] transition-colors">Cómo funciona</a>
             <a href="#nosotros" className="hover:text-[#F47B20] transition-colors">Nosotros</a>
             <a href="#catalogo" className="ml-2 px-6 py-2.5 rounded-lg bg-[#F47B20] hover:bg-[#D66A15] text-white font-bold transition-all hover:scale-105 shadow-lg shadow-[#F47B20]/30">
