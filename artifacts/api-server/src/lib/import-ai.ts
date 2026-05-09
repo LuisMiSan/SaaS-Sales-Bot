@@ -12,7 +12,7 @@ const FETCH_TIMEOUT_MS = 20_000;
 const MAX_RESPONSE_BYTES = 512 * 1024; // 512 KB is plenty to extract car data
 const MAX_REDIRECTS = 5;
 
-const PRIVATE_IP_RES: RegExp[] = [
+const PRIVATE_IPV4_RES: RegExp[] = [
   /^127\./,
   /^10\./,
   /^172\.(1[6-9]|2\d|3[01])\./,
@@ -23,16 +23,63 @@ const PRIVATE_IP_RES: RegExp[] = [
   /^100\.1[01]\d\./,
   /^100\.12[0-7]\./,
   /^0\.0\.0\.0$/,
+];
+
+const PRIVATE_IP_RES: RegExp[] = [
+  ...PRIVATE_IPV4_RES,
   /^::1$/,
   /^::$/,
   /^fc[\da-f]{2}:/i,
   /^fd[\da-f]{2}:/i,
   /^fe80:/i,
-  /^::ffff:(?:127\.|10\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)/i,
 ];
 
+/**
+ * If `ip` is an IPv4-mapped IPv6 address in either dotted-decimal
+ * (::ffff:192.168.1.1) or compressed-hex (::ffff:c0a8:0101) form,
+ * returns the underlying IPv4 dotted-decimal string.  Returns null for
+ * all other addresses.
+ *
+ * This is necessary because Node's dns.promises.lookup may return the
+ * hex form for AAAA records that encode private IPv4 ranges, which
+ * bypasses regex checks that only match the dotted-decimal form.
+ */
+function extractMappedIpv4(ip: string): string | null {
+  const lower = ip.toLowerCase();
+
+  // Dotted-decimal form: ::ffff:a.b.c.d
+  const dotted = lower.match(/^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/);
+  if (dotted) return dotted[1];
+
+  // Hex form: ::ffff:xxyy:zzww  (each group is 16 bits)
+  const hex = lower.match(/^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/);
+  if (hex) {
+    const hi = parseInt(hex[1], 16);
+    const lo = parseInt(hex[2], 16);
+    return `${(hi >> 8) & 0xff}.${hi & 0xff}.${(lo >> 8) & 0xff}.${lo & 0xff}`;
+  }
+
+  // Full-form IPv4-mapped: 0000:0000:0000:0000:0000:ffff:xxyy:zzww
+  const full = lower.match(/^(?:0+:){5}ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/);
+  if (full) {
+    const hi = parseInt(full[1], 16);
+    const lo = parseInt(full[2], 16);
+    return `${(hi >> 8) & 0xff}.${hi & 0xff}.${(lo >> 8) & 0xff}.${lo & 0xff}`;
+  }
+
+  return null;
+}
+
 function isPrivateIp(ip: string): boolean {
-  return PRIVATE_IP_RES.some((re) => re.test(ip));
+  if (PRIVATE_IP_RES.some((re) => re.test(ip))) return true;
+
+  // Unwrap IPv4-mapped IPv6 and re-check against IPv4 private ranges.
+  // This catches hex-encoded private addresses such as ::ffff:a9fe:a9fe
+  // (169.254.169.254) that the plain regex list above cannot match.
+  const mapped = extractMappedIpv4(ip);
+  if (mapped !== null && PRIVATE_IPV4_RES.some((re) => re.test(mapped))) return true;
+
+  return false;
 }
 
 function assertSafeHostname(hostname: string): void {
