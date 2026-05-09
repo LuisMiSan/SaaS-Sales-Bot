@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "wouter";
-import { useGetCar, useCreateLead, useListCars, getGetCarQueryKey } from "@workspace/api-client-react";
+import { useGetCar, useListCars, getGetCarQueryKey } from "@workspace/api-client-react";
 import type { PublicCar } from "@workspace/api-client-react";
 import {
   ArrowLeft,
@@ -122,13 +122,13 @@ export default function LandingCarPage() {
   const id = params.id ? Number(params.id) : 0;
   const { data: car } = useGetCar(id, { query: { enabled: !!id, queryKey: getGetCarQueryKey(id) } });
   const { data: allCars } = useListCars();
-  const create = useCreateLead();
   const waNumber = useWhatsappNumber();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [accepted, setAccepted] = useState(false);
+  const [sending, setSending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => { document.documentElement.classList.remove("dark"); }, []);
@@ -157,13 +157,32 @@ export default function LandingCarPage() {
     : null;
   const savings = marketAvg ? marketAvg - car.price : null;
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!accepted || !name.trim() || !phone.trim()) return;
-    create.mutate(
-      { data: { name: name.trim(), phone: phone.trim(), email: email.trim() || undefined, carId: car.id } },
-      { onSuccess: () => setSubmitted(true) },
-    );
+    setSending(true);
+    try {
+      const res = await fetch("https://n8n.iadivisionmadrid.es/webhook/pujamostucoche-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          phone: phone.trim(),
+          carInterest: `${car.make} ${car.model} ${car.year}`,
+          email: email.trim() || undefined,
+        }),
+      });
+      const data = await res.json() as { ok: boolean; waLink?: string };
+      if (data.ok && data.waLink) {
+        window.location.href = data.waLink;
+      } else {
+        setSubmitted(true);
+      }
+    } catch {
+      setSubmitted(true);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -608,11 +627,11 @@ export default function LandingCarPage() {
                         </label>
                         <button
                           type="submit"
-                          disabled={!accepted || create.isPending}
+                          disabled={!accepted || sending}
                           className="w-full py-4 rounded-xl bg-[#EE7B22] hover:bg-[#C4621A] text-white font-extrabold text-sm tracking-wide uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2 shadow-lg shadow-[#EE7B22]/25"
                         >
                           <Lock className="h-4 w-4" />
-                          {create.isPending ? "Enviando…" : "Quiero este coche"}
+                          {sending ? "Enviando…" : "Quiero este coche"}
                         </button>
                         <div className="flex items-center justify-center gap-1.5 text-[11px] text-stone-400">
                           <ShieldCheck className="h-3.5 w-3.5 text-[#27AE60]" /> Sin pagos · Sin compromiso · 2h de bloqueo gratuito
