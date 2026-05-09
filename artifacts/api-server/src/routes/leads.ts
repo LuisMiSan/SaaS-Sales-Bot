@@ -112,74 +112,6 @@ router.post("/leads", async (req, res): Promise<void> => {
   res.status(201).json({ ...serializeLead(lead, welcome), publicToken: lead.publicToken, car: serializePublicCar(car) });
 });
 
-router.get("/leads/:id/thread", async (req, res): Promise<void> => {
-  const params = ListLeadMessagesParams.safeParse(req.params);
-  if (!params.success) {
-    res.status(400).json({ error: params.error.message });
-    return;
-  }
-  const token = typeof req.query.token === "string" ? req.query.token : "";
-  if (!token) {
-    res.status(401).json({ error: "Missing token" });
-    return;
-  }
-  const [lead] = await db.select().from(leadsTable).where(eq(leadsTable.id, params.data.id));
-  if (!lead || lead.publicToken !== token) {
-    res.status(404).json({ error: "Conversation not found" });
-    return;
-  }
-  const messages = await db.select().from(messagesTable).where(eq(messagesTable.leadId, lead.id)).orderBy(messagesTable.createdAt);
-  res.json(messages.map(serializeMessage));
-});
-
-router.post("/leads/:id/thread", async (req, res): Promise<void> => {
-  const params = SimulateIncomingMessageParams.safeParse(req.params);
-  if (!params.success) {
-    res.status(400).json({ error: params.error.message });
-    return;
-  }
-  const body = SimulateIncomingMessageBody.safeParse(req.body);
-  if (!body.success) {
-    res.status(400).json({ error: body.error.message });
-    return;
-  }
-  const token = typeof req.query.token === "string" ? req.query.token : "";
-  if (!token) {
-    res.status(401).json({ error: "Missing token" });
-    return;
-  }
-  const [lead] = await db.select().from(leadsTable).where(eq(leadsTable.id, params.data.id));
-  if (!lead || lead.publicToken !== token) {
-    res.status(404).json({ error: "Conversation not found" });
-    return;
-  }
-  const clientIp = req.ip ?? "unknown";
-
-  // Per-lead fast check, then cross-lead per-IP DB check to prevent bypass via multiple leads.
-  if (isPublicMessageRateLimited(lead.id)) {
-    res.status(429).json({ error: "Too many messages. Please wait before sending again." });
-    return;
-  }
-  if (await isIpThreadRateLimited(clientIp)) {
-    res.status(429).json({ error: "Too many messages. Please wait before sending again." });
-    return;
-  }
-
-  const [msg] = await db
-    .insert(messagesTable)
-    .values({
-      leadId: lead.id,
-      direction: "incoming",
-      content: body.data.content,
-      aiGenerated: false,
-      clientIp,
-    })
-    .returning();
-  await db.update(leadsTable).set({ unreadCount: sql`${leadsTable.unreadCount} + 1`, updatedAt: sql`now()` }).where(eq(leadsTable.id, lead.id));
-
-  res.status(201).json(serializeMessage(msg));
-});
-
 // Atomically increments a fixed-window counter and returns true if the limit is exceeded.
 // Uses ON CONFLICT DO UPDATE so the increment and read are a single atomic DB operation,
 // preventing race conditions under parallel requests.
@@ -205,11 +137,6 @@ async function isIpLeadRateLimited(ip: string): Promise<boolean> {
   return incrementAndCheck("lead_create", ip, 10);
 }
 
-// Per-IP public thread messages: max 20 per IP per 10-min window across all leads.
-async function isIpThreadRateLimited(ip: string): Promise<boolean> {
-  return incrementAndCheck("thread_msg", ip, 20);
-}
-
 // Periodically delete expired rate_limit_windows rows to prevent unbounded growth.
 setInterval(
   () => {
@@ -221,39 +148,6 @@ setInterval(
   15 * 60_000, // every 15 minutes
 ).unref();
 
-// Per-lead rate limiter for the public chat endpoint.
-// Allows at most 5 messages per lead per 60 seconds.
-const PUBLIC_RATE_LIMIT_MAX = 5;
-const PUBLIC_RATE_LIMIT_WINDOW_MS = 60_000;
-const publicMessageTimestamps = new Map<number, number[]>();
-
-function isPublicMessageRateLimited(leadId: number): boolean {
-  const now = Date.now();
-  const recent = (publicMessageTimestamps.get(leadId) ?? []).filter((t) => now - t < PUBLIC_RATE_LIMIT_WINDOW_MS);
-  if (recent.length >= PUBLIC_RATE_LIMIT_MAX) {
-    publicMessageTimestamps.set(leadId, recent);
-    return true;
-  }
-  recent.push(now);
-  publicMessageTimestamps.set(leadId, recent);
-  return false;
-}
-
-// Periodically evict expired rate-limit entries to prevent unbounded map growth.
-setInterval(
-  () => {
-    const cutoff = Date.now() - PUBLIC_RATE_LIMIT_WINDOW_MS;
-    for (const [leadId, timestamps] of publicMessageTimestamps) {
-      const remaining = timestamps.filter((t) => t > cutoff);
-      if (remaining.length === 0) {
-        publicMessageTimestamps.delete(leadId);
-      } else {
-        publicMessageTimestamps.set(leadId, remaining);
-      }
-    }
-  },
-  5 * 60_000, // run every 5 minutes
-).unref();
 
 router.get("/leads/:id", requireStaffAuth, async (req, res): Promise<void> => {
   const params = GetLeadParams.safeParse(req.params);

@@ -4,7 +4,6 @@ import { seedIfEmpty } from "./lib/seed";
 import { db, carsTable, leadsTable, activityTable } from "@workspace/db";
 import { eq, and, lt } from "drizzle-orm";
 import { windowHoursForAttractiveness } from "./lib/format";
-import { checkAndNudgeLockedLeads } from "./lib/nudge";
 
 const rawPort = process.env["PORT"];
 
@@ -60,12 +59,6 @@ setInterval(() => {
   });
 }, 60_000).unref();
 
-// Every 5 min: send a closing nudge to locked leads that have gone quiet for >25 min.
-setInterval(() => {
-  checkAndNudgeLockedLeads().catch((err) => {
-    logger.error({ err }, "Nudge check failed");
-  });
-}, 5 * 60_000).unref();
 
 app.listen(port, async (err) => {
   if (err) {
