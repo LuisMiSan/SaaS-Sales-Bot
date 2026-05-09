@@ -216,27 +216,35 @@ export default function LandingCarPage() {
       `Hola, me llamo ${name.trim()} y quiero el ${car.make} ${car.model} ${car.year} por ${formatPrice(car.price)}. ¿Sigue disponible?`,
     );
     try {
-      const res = await fetch("https://n8n.iadivisionmadrid.es/webhook/pujamostucoche-lead", {
+      const BASE = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "");
+
+      // 1. Crear lead en el dashboard (siempre)
+      const leadRes = await fetch(`${BASE}/api/leads`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), phone: phone.trim(), carId: car.id }),
+      });
+      const leadData = await leadRes.json() as { id?: number; publicToken?: string };
+
+      // 2. Notificar a n8n en paralelo (fire-and-forget)
+      fetch("https://n8n.iadivisionmadrid.es/webhook/pujamostucoche-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          leadId: leadData.id,
           name: name.trim(),
           phone: phone.trim(),
           carInterest: `${car.make} ${car.model} ${car.year}`,
           price: car.price,
           carUrl: window.location.href,
         }),
-      });
-      const data = await res.json() as { ok: boolean; waLink?: string };
-      if (data.ok && data.waLink) {
-        window.open(data.waLink, "_blank");
-        setSubmitted(true);
-      } else if (fallbackWaUrl) {
+      }).catch(() => {});
+
+      // 3. Abrir WhatsApp
+      if (fallbackWaUrl) {
         window.open(fallbackWaUrl, "_blank");
-        setSubmitted(true);
-      } else {
-        setSubmitted(true);
       }
+      setSubmitted(true);
     } catch {
       if (fallbackWaUrl) {
         window.open(fallbackWaUrl, "_blank");
