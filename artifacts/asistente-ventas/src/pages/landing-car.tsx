@@ -179,6 +179,7 @@ export default function LandingCarPage() {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [accepted, setAccepted] = useState(false);
   const [sending, setSending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -222,7 +223,7 @@ export default function LandingCarPage() {
       const leadRes = await fetch(`${BASE}/api/leads`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), phone: phone.trim(), carId: car.id }),
+        body: JSON.stringify({ name: name.trim(), phone: phone.trim(), email: email.trim() || undefined, carId: car.id }),
       });
       const leadData = await leadRes.json() as { id?: number; publicToken?: string };
 
@@ -234,6 +235,7 @@ export default function LandingCarPage() {
           leadId: leadData.id,
           name: name.trim(),
           phone: phone.trim(),
+          email: email.trim() || undefined,
           carInterest: `${car.make} ${car.model} ${car.year}`,
           price: car.price,
           carUrl: window.location.href,
@@ -467,6 +469,11 @@ export default function LandingCarPage() {
                     <input
                       required type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
                       placeholder="Teléfono WhatsApp (+34 600 000 000)"
+                      className="w-full px-4 py-3 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-[#F47B20] focus:ring-2 focus:ring-[#F47B20]/15"
+                    />
+                    <input
+                      type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Correo electronico (opcional)"
                       className="w-full px-4 py-3 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-[#F47B20] focus:ring-2 focus:ring-[#F47B20]/15"
                     />
                     <label className="flex items-start gap-2 text-xs text-stone-500 cursor-pointer">
