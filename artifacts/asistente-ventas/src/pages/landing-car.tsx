@@ -216,6 +216,10 @@ export default function LandingCarPage() {
     e.preventDefault();
     if (!accepted || !name.trim() || !phone.trim()) return;
     setSending(true);
+    const fallbackWaUrl = buildWhatsappUrl(
+      waNumber,
+      `Hola, me llamo ${name.trim()} y quiero el ${car.make} ${car.model} ${car.year} por ${formatPrice(car.price)}. ¿Sigue disponible?`,
+    );
     try {
       const res = await fetch("https://n8n.iadivisionmadrid.es/webhook/pujamostucoche-lead", {
         method: "POST",
@@ -224,15 +228,24 @@ export default function LandingCarPage() {
           name: name.trim(),
           phone: phone.trim(),
           carInterest: `${car.make} ${car.model} ${car.year}`,
+          price: car.price,
+          carUrl: window.location.href,
         }),
       });
       const data = await res.json() as { ok: boolean; waLink?: string };
       if (data.ok && data.waLink) {
-        window.location.href = data.waLink;
+        window.open(data.waLink, "_blank");
+        setSubmitted(true);
+      } else if (fallbackWaUrl) {
+        window.open(fallbackWaUrl, "_blank");
+        setSubmitted(true);
       } else {
         setSubmitted(true);
       }
     } catch {
+      if (fallbackWaUrl) {
+        window.open(fallbackWaUrl, "_blank");
+      }
       setSubmitted(true);
     } finally {
       setSending(false);
