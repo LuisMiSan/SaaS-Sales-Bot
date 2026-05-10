@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, MessageSquare, Car, Sparkles, Menu, X, Kanban, Settings2, BookOpen, LogOut } from "lucide-react";
+import { LayoutDashboard, Car, Sparkles, Menu, X, Settings2, BookOpen, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -33,8 +33,6 @@ export function Layout({ children, onLogout }: LayoutProps) {
 
   const navItems = [
     { href: "/staff", label: "Dashboard", icon: LayoutDashboard, exact: true },
-    { href: "/staff/pipeline", label: "Pipeline", icon: Kanban },
-    { href: "/staff/inbox", label: "Buzón", icon: MessageSquare },
     { href: "/staff/inventory", label: "Inventario", icon: Car },
     { href: "/staff/settings", label: "Configuración", icon: Settings2 },
     { href: "/staff/manuales", label: "Manuales", icon: BookOpen },

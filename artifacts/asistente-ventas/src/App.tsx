@@ -7,10 +7,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout";
 import NotFound from "@/pages/not-found";
 import DashboardPage from "@/pages/dashboard";
-import InboxPage from "@/pages/inbox";
 import InventoryPage from "@/pages/inventory";
 import CarDetailPage from "@/pages/car-detail";
-import PipelinePage from "@/pages/pipeline";
 import SettingsPage from "@/pages/settings";
 import ManualesPage from "@/pages/manuales";
 import LandingPage from "@/pages/landing";
@@ -70,9 +68,6 @@ function CockpitRouter() {
     <Layout onLogout={handleLogout}>
       <Switch>
         <Route path="/staff" component={DashboardPage} />
-        <Route path="/staff/pipeline" component={PipelinePage} />
-        <Route path="/staff/inbox" component={InboxPage} />
-        <Route path="/staff/inbox/:id" component={InboxPage} />
         <Route path="/staff/inventory" component={InventoryPage} />
         <Route path="/staff/cars/:id" component={CarDetailPage} />
         <Route path="/staff/settings" component={SettingsPage} />
