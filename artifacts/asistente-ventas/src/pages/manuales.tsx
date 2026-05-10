@@ -19,7 +19,7 @@ const MANUALES: Manual[] = [
   {
     id: "panel",
     title: "Panel de gestión (Cockpit)",
-    description: "Login, dashboard, inbox, pipeline y conversaciones con el asistente IA.",
+    description: "Login, dashboard e inventario de vehículos.",
     icon: LayoutDashboard,
     sections: [
       {
@@ -40,37 +40,7 @@ La clave de acceso es confidencial. No la compartas ni la escribas en chats o co
 El dashboard se actualiza automáticamente cada 30 segundos.`,
       },
       {
-        title: "3. Bandeja de entrada (Inbox)",
-        content: `Ruta: /staff/inbox
-
-Aquí aparecen todos los leads nuevos que han rellenado el formulario de bloqueo. Cada tarjeta muestra el nombre y teléfono del cliente, el coche que quiere bloquear, el tiempo desde que entró y el estado actual.
-
-Acciones disponibles:
-- Ver conversación: leer el historial de mensajes
-- Enviar mensaje: escribir al cliente (llega por WhatsApp)
-- Generar respuesta IA: el asistente redacta una respuesta sugerida
-- Bloquear unidad: cuando el cliente confirma que quiere reservar
-- Mover a pipeline: para hacer seguimiento de la operación
-
-Flujo recomendado:
-Lead nuevo → Leer conversación → Llamar o WhatsApp → Si confirma → Bloquear unidad → Mover a pipeline`,
-      },
-      {
-        title: "4. Pipeline de ventas",
-        content: `Ruta: /staff/pipeline
-
-Vista kanban con las etapas de cada operación:
-- Nuevo: lead recién llegado, sin contactar
-- Dudando: cliente interesado pero con dudas
-- Bloqueado: unidad reservada 2h, operación en curso
-- Liberado: el bloqueo expiró sin cerrar
-- Cerrado: venta completada
-- Perdido: cliente descartado
-
-El temporizador de bloqueo muestra un contador regresivo de 2 horas. Si expira sin cerrar la venta, el sistema libera la unidad automáticamente.`,
-      },
-      {
-        title: "5. Conversación con el lead",
+        title: "3. Conversación con el lead",
         content: `Al hacer clic en un lead se abre la vista de conversación donde puedes:
 - Leer todos los mensajes del hilo (WhatsApp + chat web)
 - Escribir un mensaje manual que se enviará por WhatsApp
@@ -79,11 +49,11 @@ El temporizador de bloqueo muestra un contador regresivo de 2 horas. Si expira s
 El asistente tiene en cuenta el historial completo, el coche y el estado del lead para generar respuestas naturales. Revisa siempre el texto antes de enviarlo.`,
       },
       {
-        title: "6. Buenas prácticas",
-        content: `- Revisa el inbox al menos cada 2 horas en horario comercial
+        title: "4. Buenas prácticas",
+        content: `- Revisa el inventario al menos cada 2 horas en horario comercial
 - Contacta siempre en los primeros 5 minutos tras recibir un lead nuevo
 - Usa el asistente IA como punto de partida, pero personaliza siempre el mensaje
-- Cuando cierres una venta, márcala como "Cerrado" en el pipeline
+- Cuando cierres una venta, márcala como "Vendido" en el inventario
 - Al final del día, revisa los leads en estado "Dudando" y envía un seguimiento`,
       },
     ],
@@ -185,7 +155,7 @@ Si la unidad ya está bloqueada, el cliente ve un mensaje de reservado con enlac
         content: `Si transcurren 2 horas sin cerrar la venta:
 - El sistema libera automáticamente la unidad
 - El coche vuelve a aparecer en la tienda como disponible
-- El lead pasa al estado "Liberado" en el pipeline
+- El lead queda en estado "Liberado" en el inventario
 - El chat del cliente en la ficha desaparece automáticamente
 
 El cliente puede volver a bloquear la misma unidad si sigue disponible.`,
@@ -260,7 +230,7 @@ Verificación: abre pujamostucoche.es/api/cars — si devuelve una lista, el pro
         title: "7. Checklist de arranque diario",
         content: `Antes de empezar la jornada comercial:
 - Comprobar que la web carga en pujamostucoche.es
-- Revisar el inbox del cockpit — ¿hay leads nuevos de la noche?
+- Revisar el inventario del cockpit — ¿hay leads nuevos de la noche?
 - Verificar que UptimeRobot no ha enviado alertas de caída
 - Comprobar que hay coches con estado "Ventana abierta" en el inventario
 - Revisar leads en estado "Dudando" del día anterior y enviar seguimiento`,
