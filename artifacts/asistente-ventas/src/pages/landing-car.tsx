@@ -466,6 +466,11 @@ export default function LandingCarPage() {
                       <div className="text-xs text-stone-400 mt-0.5">{car.make} {car.model} {car.year} · {formatPrice(car.price)}</div>
                     </div>
                     <input
+                      readOnly
+                      value={`${car.make} ${car.model} ${car.year} — ${formatPrice(car.price)}`}
+                      className="w-full px-4 py-3 border border-stone-200 rounded-xl text-sm bg-stone-50 text-stone-500 cursor-default"
+                    />
+                    <input
                       required value={name} onChange={(e) => setName(e.target.value)}
                       placeholder="Tu nombre"
                       className="w-full px-4 py-3 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-[#F47B20] focus:ring-2 focus:ring-[#F47B20]/15"
