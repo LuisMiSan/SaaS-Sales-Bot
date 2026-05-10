@@ -19,7 +19,6 @@ import {
   Palette,
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
-import { WhatsappWidget, useWhatsappNumber } from "@/components/whatsapp-widget";
 import { useDocumentMeta, useCarJsonLd } from "@/hooks/useDocumentMeta";
 import { formatPrice, sanitizePhotoUrl } from "@/lib/format";
 
@@ -175,7 +174,6 @@ export default function LandingCarPage() {
   const id = params.id ? Number(params.id) : 0;
   const { data: car } = useGetCar(id, { query: { enabled: !!id, queryKey: getGetCarQueryKey(id) } });
   const { data: allCars } = useListCars();
-  const waNumber = useWhatsappNumber();
   const ctaRef = useRef<HTMLDivElement>(null);
 
   const [name, setName] = useState("");
@@ -548,10 +546,17 @@ export default function LandingCarPage() {
         </div>
       </footer>
 
-      <WhatsappWidget
-        message={`Hola, me interesa el ${car.make} ${car.model} ${car.year} (${formatPrice(car.price)}). ¿Sigue disponible?`}
-        label={`Pregunta por este ${car.make}`}
-      />
+      <button
+        onClick={onScrollToCta}
+        aria-label="Quiero este coche"
+        className="fixed bottom-5 right-5 z-50 group inline-flex items-center gap-2.5 bg-[#F47B20] hover:bg-[#D66A15] text-white font-bold rounded-full shadow-xl shadow-[#F47B20]/30 transition-all hover:scale-105 px-4 py-3.5 md:py-3"
+      >
+        <span className="relative flex h-9 w-9 items-center justify-center">
+          <span className="absolute inset-0 rounded-full bg-white/25 animate-ping" aria-hidden="true" />
+          <Lock className="relative h-6 w-6" strokeWidth={2.5} />
+        </span>
+        <span className="hidden md:inline pr-1.5 text-sm">Quiero este coche</span>
+      </button>
     </div>
   );
 }

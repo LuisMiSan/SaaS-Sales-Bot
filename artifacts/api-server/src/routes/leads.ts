@@ -109,7 +109,7 @@ router.post("/leads", async (req, res): Promise<void> => {
       aiGenerated: true,
     })
     .returning();
-  res.status(201).json({ ...serializeLead(lead, welcome), publicToken: lead.publicToken, car: serializePublicCar(car) });
+  res.status(201).json({ ...serializeLead(lead, welcome), car: serializePublicCar(car) });
 });
 
 // Atomically increments a fixed-window counter and returns true if the limit is exceeded.
