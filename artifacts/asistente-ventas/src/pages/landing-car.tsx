@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
 import { WhatsappWidget, useWhatsappNumber } from "@/components/whatsapp-widget";
+import { useDocumentMeta, useCarJsonLd } from "@/hooks/useDocumentMeta";
 import { formatPrice, sanitizePhotoUrl } from "@/lib/format";
 
 /* ─── RESOLVE IMAGE ─────────────────────────────────────────────────────── */
@@ -184,6 +185,20 @@ export default function LandingCarPage() {
   const [sending, setSending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [showForm, setShowForm] = useState(false);
+
+  useDocumentMeta({
+    title: car
+      ? `${car.make} ${car.model} ${car.year} — ${formatPrice(car.price)} | Pujamostucoche.es`
+      : "Cargando coche…",
+    description: car
+      ? `${car.make} ${car.model} ${car.year} con ${car.km?.toLocaleString("es-ES")} km${car.location ? ` en ${car.location}` : ""}. Precio mayorista: ${formatPrice(car.price)}. Sin comisiones, sin señal, sin compromiso.`
+      : undefined,
+    canonical: car ? `https://pujamostucoche.es/tienda/coche/${car.id}` : undefined,
+    ogUrl: car ? `https://pujamostucoche.es/tienda/coche/${car.id}` : undefined,
+    ogImage: car?.imageUrl ?? undefined,
+    ogType: "product",
+  });
+  useCarJsonLd(car);
 
   useEffect(() => { document.documentElement.classList.remove("dark"); }, []);
   useEffect(() => { window.scrollTo(0, 0); }, [id]);

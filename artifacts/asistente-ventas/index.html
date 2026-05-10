@@ -28,6 +28,7 @@
     <meta property="og:description" content="Compra coches de ocasión a precio mayorista en Madrid. Sin margen de concesionario, sin comisiones ocultas." />
     <meta property="og:image" content="https://pujamostucoche.es/opengraph.jpg" />
     <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content="Pujamostucoche.es" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -35,10 +36,51 @@
     <meta name="twitter:description" content="Compra coches de ocasión a precio mayorista en Madrid. Sin margen de concesionario, sin comisiones ocultas." />
     <meta name="twitter:image" content="https://pujamostucoche.es/opengraph.jpg" />
 
+    <!-- Schema.org: WebSite + AutoDealer -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://pujamostucoche.es/#website",
+          "url": "https://pujamostucoche.es",
+          "name": "Pujamostucoche.es",
+          "description": "Compra coches de ocasión a precio mayorista en Madrid. Sin margen de concesionario.",
+          "inLanguage": "es-ES",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://pujamostucoche.es/tienda",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "AutoDealer",
+          "@id": "https://pujamostucoche.es/#organization",
+          "name": "Pujamostucoche",
+          "url": "https://pujamostucoche.es",
+          "logo": "https://pujamostucoche.es/favicon.svg",
+          "description": "Concesionario de coches de ocasión a precio mayorista en Madrid. Sin comisiones, sin margen.",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Madrid",
+            "addressCountry": "ES"
+          },
+          "telephone": "+34604928624",
+          "priceRange": "€€",
+          "sameAs": []
+        }
+      ]
+    }
+    </script>
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Google Fonts: carga asíncrona para no bloquear el LCP -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"></noscript>
   </head>
   <body>
     <div id="root"></div>

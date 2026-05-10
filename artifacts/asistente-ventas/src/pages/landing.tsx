@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { CarThumb } from "@/components/car-thumb";
 import { WhatsappWidget, useWhatsappNumber } from "@/components/whatsapp-widget";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +43,13 @@ export default function LandingPage() {
   const { data: allCars, isLoading: carsLoading, isError: carsError, refetch: refetchCars } = useListCars();
   const [menuOpen, setMenuOpen] = useState(false);
   const waNumber = useWhatsappNumber();
+
+  useDocumentMeta({
+    title: "Coches de ocasión a precio mayorista en Madrid | Pujamostucoche.es",
+    description: "Compra tu próximo coche de ocasión al precio que pagan los concesionarios. Sin margen, sin comisiones ocultas. Bloquea gratis 2 horas y sin compromiso.",
+    canonical: "https://pujamostucoche.es/tienda",
+    ogUrl: "https://pujamostucoche.es/tienda",
+  });
 
   useEffect(() => {
     if (!menuOpen) return;
