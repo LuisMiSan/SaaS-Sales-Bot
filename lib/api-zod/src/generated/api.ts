@@ -540,7 +540,7 @@ export const ListLeadsResponse = zod.array(ListLeadsResponseItem);
 export const CreateLeadBody = zod.object({
   name: zod.string(),
   phone: zod.string(),
-  email: zod.string().optional(),
+  email: zod.string(),
   carId: zod.number(),
 });
 

@@ -223,7 +223,7 @@ export default function LandingCarPage() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!accepted || !name.trim() || !phone.trim()) return;
+    if (!accepted || !name.trim() || !phone.trim() || !email.trim()) return;
     setSending(true);
     try {
       const BASE = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "");
@@ -234,7 +234,7 @@ export default function LandingCarPage() {
         body: JSON.stringify({
           name: name.trim(),
           phone: phone.trim(),
-          email: email.trim() || undefined,
+          email: email.trim(),
           carId: car.id,
         }),
       });
@@ -477,12 +477,13 @@ export default function LandingCarPage() {
                       className="w-full px-4 py-3 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-[#F47B20] focus:ring-2 focus:ring-[#F47B20]/15"
                     />
                     <input
+                      required
                       type="email"
                       name="email"
                       autoComplete="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Correo electrónico (opcional)"
+                      placeholder="Correo electrónico"
                       className="w-full px-4 py-3 border border-stone-200 rounded-xl text-sm focus:outline-none focus:border-[#F47B20] focus:ring-2 focus:ring-[#F47B20]/15"
                     />
                     <label className="flex items-start gap-2 text-xs text-stone-500 cursor-pointer">

@@ -120,7 +120,7 @@ router.post("/leads", async (req, res): Promise<void> => {
         name: lead.name,
         phone: lead.phone,
         carInterest: `${car.make} ${car.model} ${car.year}`,
-        email: lead.email ?? undefined,
+        email: lead.email,
       }),
     });
     if (n8nRes.ok) {

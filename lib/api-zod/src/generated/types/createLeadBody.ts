@@ -9,6 +9,6 @@
 export interface CreateLeadBody {
   name: string;
   phone: string;
-  email?: string;
+  email: string;
   carId: number;
 }

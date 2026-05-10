@@ -566,7 +566,7 @@ components:
         phone: { type: string }
         email: { type: string }
         carId: { type: integer }
-      required: [name, phone, carId]
+      required: [name, phone, email, carId]
 
     UpdateLeadBody:
       type: object
