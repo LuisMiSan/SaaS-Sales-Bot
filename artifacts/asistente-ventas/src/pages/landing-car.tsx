@@ -228,33 +228,31 @@ export default function LandingCarPage() {
     try {
       const BASE = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "");
 
-      // 1. Registrar lead en el dashboard (fire-and-forget)
-      fetch(`${BASE}/api/leads`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), phone: phone.trim(), email: email.trim() || undefined, carId: car.id }),
-      }).catch(() => {});
-
-      // 2. Llamar a n8n y redirigir según respuesta
-      const n8nRes = await fetch("https://n8n.iadivisionmadrid.es/webhook/pujamostucoche-lead", {
+      const res = await fetch(`${BASE}/api/leads`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
           phone: phone.trim(),
-          carInterest: `${car.make} ${car.model} ${car.year}`,
           email: email.trim() || undefined,
+          carId: car.id,
         }),
       });
-      const data = await n8nRes.json() as { ok: boolean; waLink?: string };
-      if (data.ok && data.waLink) {
+
+      if (!res.ok) {
+        alert("Hubo un problema al enviar tu solicitud. Inténtalo de nuevo.");
+        setSending(false);
+        return;
+      }
+
+      const data = await res.json() as { waLink?: string | null };
+      if (data.waLink) {
         window.location.href = data.waLink;
       } else {
-        alert("Por favor introduce un teléfono válido");
-        setSending(false);
+        setSubmitted(true);
       }
     } catch {
-      alert("Por favor introduce un teléfono válido");
+      alert("Hubo un problema al enviar tu solicitud. Inténtalo de nuevo.");
       setSending(false);
     }
   };

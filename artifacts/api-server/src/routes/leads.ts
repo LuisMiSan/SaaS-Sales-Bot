@@ -109,7 +109,29 @@ router.post("/leads", async (req, res): Promise<void> => {
       aiGenerated: true,
     })
     .returning();
-  res.status(201).json({ ...serializeLead(lead, welcome), car: serializePublicCar(car) });
+
+  // Call n8n to qualify the lead and get the WhatsApp redirect link
+  let waLink: string | null = null;
+  try {
+    const n8nRes = await fetch("https://n8n.iadivisionmadrid.es/webhook/pujamostucoche-lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: lead.name,
+        phone: lead.phone,
+        carInterest: `${car.make} ${car.model} ${car.year}`,
+        email: lead.email ?? undefined,
+      }),
+    });
+    if (n8nRes.ok) {
+      const n8nData = (await n8nRes.json()) as { ok?: boolean; waLink?: string };
+      if (n8nData.ok && n8nData.waLink) waLink = n8nData.waLink;
+    }
+  } catch (err) {
+    req.log.warn({ err }, "n8n webhook call failed — lead registered but no waLink");
+  }
+
+  res.status(201).json({ ...serializeLead(lead, welcome), car: serializePublicCar(car), waLink });
 });
 
 // Atomically increments a fixed-window counter and returns true if the limit is exceeded.
